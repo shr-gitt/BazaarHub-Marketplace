@@ -7,7 +7,7 @@ public enum ResponseStatus {
 
     public final String value;
 
-    private ResponseStatus(String value) {
+    ResponseStatus(String value) {
         this.value = value;
     }
 }

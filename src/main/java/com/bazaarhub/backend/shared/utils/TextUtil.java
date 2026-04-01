@@ -24,4 +24,9 @@ public class TextUtil {
         if (text == null || text.isBlank()) return text;
         return Character.toUpperCase(text.charAt(0)) + text.substring(1);
     }
+
+    //Email lowercase
+    public static String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase();
+    }
 }

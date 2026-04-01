@@ -1,7 +1,42 @@
 package com.bazaarhub.backend.feature.user.entity;
 
-import jakarta.persistence.Entity;
+import com.bazaarhub.backend.feature.user.enums.Gender;
+import com.bazaarhub.backend.shared.entity.BaseEntity;
+import com.bazaarhub.backend.shared.enums.Role;
+import com.bazaarhub.backend.shared.enums.UserStatus;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-public class User {
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+public class User extends BaseEntity {
+
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "phone_number", unique = true, nullable = false)
+    private String phoneNumber;
+
+    @Column(name = "gender",nullable = false)
+    private Gender gender;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @Column(name="role", nullable = false)
+    private Role role= Role.VISITOR;
+
+    @Column(name ="user_status", nullable = false)
+    private UserStatus userStatus=UserStatus.ACTIVE;
 }

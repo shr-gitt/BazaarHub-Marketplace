@@ -1,6 +1,6 @@
 package com.bazaarhub.backend.exception;
 
-import com.bazaarhub.backend.shared.resource.ResponseDto;
+import com.bazaarhub.backend.shared.resource.ApiResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ class GlobalExceptionHandlerTest {
         ResourceNotFoundException ex =
                 new ResourceNotFoundException("Not found");
 
-        ResponseEntity<ResponseDto> response =
+        ResponseEntity<ApiResponseDto<?>> response =
                 handler.handleResourceNotFound(ex);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
