@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "users")
 public class User extends BaseEntity {
 
     @Column(name = "first_name", nullable = false)
@@ -28,15 +29,18 @@ public class User extends BaseEntity {
     @Column(name = "phone_number", unique = true, nullable = false)
     private String phoneNumber;
 
-    @Column(name = "gender",nullable = false)
+    @Column(name = "gender", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name="role", nullable = false)
-    private Role role= Role.VISITOR;
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.VISITOR;
 
-    @Column(name ="user_status", nullable = false)
-    private UserStatus userStatus=UserStatus.ACTIVE;
+    @Column(name = "user_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus = UserStatus.ACTIVE;
 }

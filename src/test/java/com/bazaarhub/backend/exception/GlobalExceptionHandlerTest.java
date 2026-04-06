@@ -1,5 +1,7 @@
 package com.bazaarhub.backend.exception;
 
+import com.bazaarhub.backend.shared.exception.GlobalExceptionHandler;
+import com.bazaarhub.backend.shared.exception.ResourceNotFoundException;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

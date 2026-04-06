@@ -52,10 +52,6 @@ public class UserServiceImpl implements UserService {
         user.setLastName(TextUtil.capitalizeFirstLetter(userRequestDto.getLastName()));
         user.setEmail(email);
         user.setPhoneNumber(phoneNumber);
-        User user = UserMapper.mapToUser(userRequestDto);
-        user.setFirstName(TextUtil.capitalizeFirstLetter(userRequestDto.getFirstName()));
-        user.setLastName(TextUtil.capitalizeFirstLetter(userRequestDto.getLastName()));
-        user.setEmail(TextUtil.normalizeEmail(userRequestDto.getEmail()));
         user.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
         user.setUserStatus(UserStatus.ACTIVE);
         User newUser = userRepository.save(user);
@@ -70,7 +66,6 @@ public class UserServiceImpl implements UserService {
             log.error("User not found {}", userId);
             return new UserNotFoundException("User not found");
         });
-        User user = userRepository.findById(userId).filter(u -> u.getUserStatus() != UserStatus.DELETED).orElseThrow(() -> new UserNotFoundException("User not found"));
         log.info("Fetched user [id= {}]", userId);
         return UserMapper.mapToUserResponse(user);
     }

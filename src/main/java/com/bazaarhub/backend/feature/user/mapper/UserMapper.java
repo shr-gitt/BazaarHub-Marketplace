@@ -4,7 +4,7 @@ import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.resource.request.UserRequestDto;
 import com.bazaarhub.backend.feature.user.resource.response.UserResponseDto;
 import lombok.RequiredArgsConstructor;
-@RequiredArgsConstructor
+ @RequiredArgsConstructor
 public class UserMapper {
 
     public static User mapToUser(UserRequestDto userRequestDto) {

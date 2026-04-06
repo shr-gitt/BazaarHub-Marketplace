@@ -1,4 +1,4 @@
-package com.bazaarhub.backend.exception;
+package com.bazaarhub.backend.shared.exception;
 
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.PhoneNumberAlreadyExistsException;
