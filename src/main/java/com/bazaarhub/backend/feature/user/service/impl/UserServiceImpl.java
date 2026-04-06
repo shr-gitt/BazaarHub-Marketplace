@@ -1,12 +1,16 @@
 package com.bazaarhub.backend.feature.user.service.impl;
 
 import com.bazaarhub.backend.feature.user.entity.User;
+import com.bazaarhub.backend.feature.user.enums.Gender;
+import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
+import com.bazaarhub.backend.feature.user.exception.PhoneNumberAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.mapper.UserMapper;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
 import com.bazaarhub.backend.feature.user.resource.request.UserRequestDto;
 import com.bazaarhub.backend.feature.user.resource.response.UserResponseDto;
 import com.bazaarhub.backend.feature.user.service.UserService;
+import com.bazaarhub.backend.shared.enums.Role;
 import com.bazaarhub.backend.shared.enums.UserStatus;
 import com.bazaarhub.backend.shared.utils.TextUtil;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +37,21 @@ public class UserServiceImpl implements UserService {
     @Override
     @CachePut(cacheNames = CACHE_NAME, key = "#result.id")
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
+        String email = TextUtil.normalizeEmail(userRequestDto.getEmail());
+        String phoneNumber = userRequestDto.getPhoneNumber();
+        if (userRepository.existsByEmailAndUserStatusNot(email, UserStatus.DELETED)) {
+            log.error("Email already in used : {}", email);
+            throw new EmailAlreadyExistsException("Email already exists.");
+        }
+        if (userRepository.existsByPhoneNumberAndUserStatusNot(phoneNumber, UserStatus.DELETED)) {
+            log.error("Phone number already in use: {}", phoneNumber);
+            throw new PhoneNumberAlreadyExistsException("Phone number already exists");
+        }
+        User user = UserMapper.mapToUser(userRequestDto);
+        user.setFirstName(TextUtil.capitalizeFirstLetter(userRequestDto.getFirstName()));
+        user.setLastName(TextUtil.capitalizeFirstLetter(userRequestDto.getLastName()));
+        user.setEmail(email);
+        user.setPhoneNumber(phoneNumber);
         User user = UserMapper.mapToUser(userRequestDto);
         user.setFirstName(TextUtil.capitalizeFirstLetter(userRequestDto.getFirstName()));
         user.setLastName(TextUtil.capitalizeFirstLetter(userRequestDto.getLastName()));
@@ -47,6 +66,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Cacheable(cacheNames = CACHE_NAME, key = "#userId")
     public UserResponseDto getUserById(Long userId) {
+        User user = userRepository.findByIdAndUserStatusNot(userId, UserStatus.DELETED).orElseThrow(() -> {
+            log.error("User not found {}", userId);
+            return new UserNotFoundException("User not found");
+        });
         User user = userRepository.findById(userId).filter(u -> u.getUserStatus() != UserStatus.DELETED).orElseThrow(() -> new UserNotFoundException("User not found"));
         log.info("Fetched user [id= {}]", userId);
         return UserMapper.mapToUserResponse(user);
@@ -61,31 +84,46 @@ public class UserServiceImpl implements UserService {
     @Override
     @CachePut(cacheNames = CACHE_NAME, key = "#userId")
     public UserResponseDto updateUserById(Long userId, UserRequestDto userRequestDto) {
-        log.info("Fetching user [id= {}]", userId);
-        User user = userRepository.findById(userId).filter(u -> u.getUserStatus() != UserStatus.DELETED).orElseThrow(() -> {
-            log.info("User not found {}", userId);
+        log.info("Fetching user with id: {}}", userId);
+        User user = userRepository.findByIdAndUserStatusNot(userId, UserStatus.DELETED).orElseThrow(() -> {
+            log.error("User not found for id : {}", userId);
             return new UserNotFoundException("User Not found");
         });
-        if (userRequestDto.getFirstName() != null) {
-            user.setFirstName(TextUtil.capitalizeFirstLetter(userRequestDto.getFirstName()));
+        String firstName = TextUtil.capitalizeFirstLetter(userRequestDto.getFirstName());
+        String lastName = TextUtil.capitalizeFirstLetter(userRequestDto.getLastName());
+        String email = TextUtil.normalizeEmail(userRequestDto.getEmail());
+        String phoneNumber = userRequestDto.getPhoneNumber();
+        Gender gender = userRequestDto.getGender();
+        String password = passwordEncoder.encode(userRequestDto.getPassword());
+        Role role = userRequestDto.getRole();
+        if (firstName != null) {
+            user.setFirstName(firstName);
         }
-        if (userRequestDto.getLastName() != null) {
-            user.setLastName(TextUtil.capitalizeFirstLetter(userRequestDto.getLastName()));
+        if (lastName != null) {
+            user.setLastName(lastName);
         }
-        if (userRequestDto.getEmail() != null) {
-            user.setEmail(TextUtil.normalizeEmail(userRequestDto.getEmail()));
+        if (email != null) {
+            if (userRepository.existsByEmailAndUserStatusNot(email, UserStatus.DELETED)) {
+                log.error("Email already in used : {}", email);
+                throw new EmailAlreadyExistsException("Email already in use.");
+            }
+            user.setEmail(email);
         }
-        if (userRequestDto.getPhoneNumber() != null) {
-            user.setPhoneNumber(userRequestDto.getPhoneNumber());
+        if (phoneNumber != null) {
+            if (userRepository.existsByPhoneNumberAndUserStatusNot(phoneNumber, UserStatus.DELETED)) {
+                log.error("Phone number already in use : {}", phoneNumber);
+                throw new PhoneNumberAlreadyExistsException("Phone number already in use.");
+            }
+            user.setPhoneNumber(phoneNumber);
         }
-        if (userRequestDto.getGender() != null) {
-            user.setGender(userRequestDto.getGender());
+        if (gender != null) {
+            user.setGender(gender);
         }
-        if (userRequestDto.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
+        if (password != null) {
+            user.setPassword(password);
         }
-        if (userRequestDto.getRole() != null) {
-            user.setRole(userRequestDto.getRole());
+        if (role != null) {
+            user.setRole(role);
         }
         User updatedUser = userRepository.save(user);
         log.info("User updated [id= {}]", userId);
@@ -96,8 +134,8 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(cacheNames = CACHE_NAME, key = "#userId")
     public void deleteUserById(Long userId) {
         log.info("Deleting user [id= {}]", userId);
-        User user = userRepository.findById(userId).filter(u -> u.getUserStatus() != UserStatus.DELETED).orElseThrow(() -> {
-            log.info("User not found {}", userId);
+        User user = userRepository.findByIdAndUserStatusNot(userId, UserStatus.DELETED).orElseThrow(() -> {
+            log.error("User not found {}", userId);
             return new UserNotFoundException("User Not Found");
         });
         user.setUserStatus(UserStatus.DELETED);
