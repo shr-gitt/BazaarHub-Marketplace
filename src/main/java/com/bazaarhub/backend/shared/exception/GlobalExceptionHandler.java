@@ -3,14 +3,20 @@ package com.bazaarhub.backend.shared.exception;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.PhoneNumberAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
+import com.bazaarhub.backend.feature.vendor.exception.VendorInactiveException;
+import com.bazaarhub.backend.feature.vendor.exception.VendorNotFoundException;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @Slf4j
 @ControllerAdvice
@@ -30,6 +36,36 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> handleGenericException(Exception ex) {
         log.error("Unexpected error occurred", ex);
         return buildErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(VendorInactiveException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleVendorInactiveException (VendorInactiveException ex) {
+        log.error("Vendor not found. ",ex);
+        return buildErrorResponse("Vendor is not active.", HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(VendorNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleVendorNotFoundException (VendorNotFoundException ex) {
+        log.error("Vendor not found.", ex);
+        return buildErrorResponse("Vendor not found.", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.error("Data integrity violation", ex);
+        return buildErrorResponse("Database constraint violation", HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleConstraintViolation(ConstraintViolationException ex) {
+        log.error("Constraint violation", ex);
+        return buildErrorResponse("Constraint violation: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleSQLIntegrityViolation(SQLIntegrityConstraintViolationException ex) {
+        log.error("SQL integrity constraint violation", ex);
+        return buildErrorResponse("Database constraint violated: " + ex.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
