@@ -13,9 +13,10 @@ import org.springframework.context.annotation.Configuration;
 public class CacheConfig {
     public static final String USER_CACHE_NAME = "user";
     public static final String VENDOR_CACHE_NAME = "vendor";
+    public static final String CUSTOMER_CACHE_NAME = "customerProfile";
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("user", "vendor");
+        return new ConcurrentMapCacheManager("user", "vendor", "customerProfile");
     }
 }

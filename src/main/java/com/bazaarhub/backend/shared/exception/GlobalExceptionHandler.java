@@ -1,5 +1,6 @@
 package com.bazaarhub.backend.shared.exception;
 
+import com.bazaarhub.backend.feature.customerProfile.exception.CustomerProfileNotFoundException;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.PhoneNumberAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
@@ -12,6 +13,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +39,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> handleGenericException(Exception ex) {
         log.error("Unexpected error occurred", ex);
         return buildErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponseDto<?>> httpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        log.error("One or more fields have an incorrect data type. Please check your input.", ex);
+        return buildErrorResponse("One or more fields have an incorrect data type. Please check your input.", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(VendorInactiveException.class)
@@ -98,5 +106,24 @@ public class GlobalExceptionHandler {
         log.error("Phone number already exists", ex);
         return buildErrorResponse("Phone number already exists.", HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleNoResourceNotFound(NoResourceFoundException ex) {
+        log.error("Resource not found.", ex);
+        return buildErrorResponse("Resource not found.", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CustomerProfileNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> customerProfileNotFoundException(CustomerProfileNotFoundException ex) {
+        log.error("CustomerProfileNotFoundException.", ex);
+        return buildErrorResponse("CustomerProfileNotFoundException.", HttpStatus.NOT_FOUND);
+    }
+
+
+    @ExceptionHandler(NumberFormatException.class)
+    public ResponseEntity<ApiResponseDto<?>> numberFormatException(NumberFormatException ex) {
+        log.error("Invalid number format provided..", ex);
+        return buildErrorResponse("Invalid number format provided..", HttpStatus.NOT_FOUND);
+    }
+
 
 }
