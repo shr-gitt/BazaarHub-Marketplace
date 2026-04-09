@@ -1,9 +1,13 @@
 package com.bazaarhub.backend.shared.resource;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@ToString
 @Getter
 @Setter
 public final class ApiResponseDto<T> {

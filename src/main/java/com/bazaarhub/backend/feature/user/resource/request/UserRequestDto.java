@@ -3,6 +3,7 @@ package com.bazaarhub.backend.feature.user.resource.request;
 
 import com.bazaarhub.backend.feature.user.enums.Gender;
 import com.bazaarhub.backend.shared.enums.Role;
+import com.bazaarhub.backend.shared.validation.annotation.ValidPassword;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,10 +40,7 @@ public class UserRequestDto implements Serializable {
 
     @NotBlank(message = "Password is required")
     @Size(min = 8, max = 16, message = "Password must be 8–16 characters")
-    @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,16}$",
-            message = "Password must contain uppercase, lowercase, number, and special character"
-    )
+    @ValidPassword
     private String password;
 
     @NotNull(message = "Role shouldn't be empty")

@@ -8,8 +8,10 @@ import com.bazaarhub.backend.shared.resource.ApiResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,37 +22,28 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register-user")
-    public ResponseEntity<ApiResponseDto<UserResponseDto>> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
-        UserResponseDto userResponse = userService.createUser(userRequestDto);
-        ApiResponseDto<UserResponseDto> response = new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User created successfully", userResponse);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ApiResponseDto<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto userRequestDto) {
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User created successfully", userService.createUser(userRequestDto));
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<ApiResponseDto<UserResponseDto>> getUserById(@PathVariable("id") Long userId) {
-        UserResponseDto userResponse = userService.getUserById(userId);
-        ApiResponseDto<UserResponseDto> response = new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User fetched successfully", userResponse);
-        return ResponseEntity.ok(response);
+    public ApiResponseDto<UserResponseDto> getUserById(@PathVariable("id") Long userId) {
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User fetched successfully", userService.getUserById(userId));
     }
 
     @GetMapping("/users")
-    public ResponseEntity<ApiResponseDto<Page<UserResponseDto>>> getAllUsers() {
-        Page<UserResponseDto> allUsers = userService.getAllUsers(0, 10);
-        ApiResponseDto<Page<UserResponseDto>> response = new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Users fetched successfully", allUsers);
-        return ResponseEntity.ok(response);
+    public ApiResponseDto<Page<UserResponseDto>> getAllUsers(@PageableDefault(sort = "modifiedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Users fetched successfully", userService.getAllUsers(pageable));
     }
 
-    @PostMapping("/user/{id}")
-    public ResponseEntity<ApiResponseDto<UserResponseDto>> updateUserById(@Valid @PathVariable("id") Long userId, @RequestBody UserRequestDto userRequestDto) {
-        UserResponseDto user = userService.updateUserById(userId, userRequestDto);
-        ApiResponseDto<UserResponseDto> response = new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User updated successfully", user);
-        return ResponseEntity.ok(response);
+    @PostMapping("/update-user/{id}")
+    public ApiResponseDto<UserResponseDto> updateUserById(@PathVariable("id") Long userId,@Valid @RequestBody UserRequestDto userRequestDto) {
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User updated successfully", userService.updateUserById(userId, userRequestDto));
     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity<ApiResponseDto<String>> deleteUserById(@PathVariable("id") Long userId) {
+    public ApiResponseDto<String> deleteUserById(@PathVariable("id") Long userId) {
         userService.deleteUserById(userId);
-        ApiResponseDto<String> response = new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User deleted successfully");
-        return ResponseEntity.ok(response);
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User deleted successfully");
     }
 }
