@@ -1,10 +1,12 @@
 package com.bazaarhub.backend.shared.utils;
 
-public class TextUtil {
-    private TextUtil() {} // prevent instantiation
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class InputUtil {
 
     // Capitalize First Letter Of Each Word In A Phrase
-    public static String capitalizeEachWord(String text) {
+    public String capitalizeEachWord(String text) {
         if (text == null || text.isBlank()) return text;
 
         text = text.trim().replaceAll("\\s+", " ");
@@ -20,13 +22,13 @@ public class TextUtil {
     }
 
     // Capitalize First Letter Of Word
-    public static String capitalizeFirstLetter(String text) {
+    public String capitalizeFirstLetter(String text) {
         if (text == null || text.isBlank()) return text;
         return Character.toUpperCase(text.charAt(0)) + text.substring(1);
     }
 
     //Email lowercase
-    public static String normalizeEmail(String email) {
+    public String normalizeEmail(String email) {
         return email == null ? null : email.trim().toLowerCase();
     }
 }

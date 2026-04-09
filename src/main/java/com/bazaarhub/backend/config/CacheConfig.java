@@ -1,6 +1,5 @@
 package com.bazaarhub.backend.config;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -12,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableCaching
 @RequiredArgsConstructor
 public class CacheConfig {
+    public static final String USER_CACHE_NAME = "user";
     public static final String VENDOR_CACHE_NAME = "vendor";
 
     @Bean

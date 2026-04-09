@@ -4,10 +4,13 @@ import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.resource.request.UserRequestDto;
 import com.bazaarhub.backend.feature.user.resource.response.UserResponseDto;
 import lombok.RequiredArgsConstructor;
- @RequiredArgsConstructor
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
 public class UserMapper {
 
-    public static User mapToUser(UserRequestDto userRequestDto) {
+    public User mapToUser(UserRequestDto userRequestDto) {
         User user = new User();
         user.setFirstName(userRequestDto.getFirstName());
         user.setLastName(userRequestDto.getLastName());
@@ -19,7 +22,7 @@ public class UserMapper {
         return user;
     }
 
-    public static UserResponseDto mapToUserResponse(User user) {
+    public UserResponseDto mapToUserResponse(User user) {
         return new UserResponseDto(
                 user.getId(),
                 user.getVersion(),
