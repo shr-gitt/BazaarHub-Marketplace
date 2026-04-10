@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto getUserById(Long userId) {
 
         User user = userRepository.findByIdAndUserStatusNot(userId, UserStatus.DELETED).orElseThrow(() -> {
-            log.error("User not found {}", userId);
+            log.error("User not found {} in get User By Id", userId);
             return new UserNotFoundException("User not found");
         });
         return userMapper.mapToUserResponse(user);
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateUserById(Long userId, UserRequestDto userRequestDto) {
 
         User user = userRepository.findByIdAndUserStatusNot(userId, UserStatus.DELETED).orElseThrow(() -> {
-            log.error("User not found for id : {}", userId);
+            log.error("User not found for id : {} in update user.", userId);
             return new UserNotFoundException("User Not found");
         });
 
@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(Long userId) {
 
         User user = userRepository.findByIdAndUserStatusNot(userId, UserStatus.DELETED).orElseThrow(() -> {
-            log.error("User not found {}", userId);
+            log.error("User not found {} in delete user.", userId);
             return new UserNotFoundException("User Not Found");
         });
 

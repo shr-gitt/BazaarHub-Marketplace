@@ -3,6 +3,7 @@ package com.bazaarhub.backend.feature.vendor.entity;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.vendor.enums.ApprovalStatus;
 import com.bazaarhub.backend.feature.vendor.enums.VendorProfileStatus;
+import com.bazaarhub.backend.feature.vendor.helper.VendorProfileStatusConverter;
 import com.bazaarhub.backend.shared.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,7 +40,6 @@ public class Vendor extends BaseEntity {
     @Column(name = "registration_no", nullable = false, unique = true)
     private String registrationNo;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "vendor_profile_status", nullable = false)
     private VendorProfileStatus vendorProfileStatus;
 
@@ -52,7 +52,6 @@ public class Vendor extends BaseEntity {
     @Column(name = "country", nullable = false)
     private String country;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "approval_status", nullable = false)
     private ApprovalStatus approvalStatus;
 
