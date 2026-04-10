@@ -15,7 +15,8 @@ import com.bazaarhub.backend.feature.vendor.exception.VendorNotFoundException;
 import com.bazaarhub.backend.feature.vendor.mapper.VendorMapper;
 import com.bazaarhub.backend.feature.vendor.repository.VendorRepository;
 import com.bazaarhub.backend.feature.vendor.service.VendorService;
-import com.bazaarhub.backend.shared.utils.TextUtil;
+import com.bazaarhub.backend.shared.utils.InputUtil;
+import com.bazaarhub.backend.shared.utils.InputUtil;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -107,7 +108,7 @@ public class VendorServiceImpl implements VendorService {
 
         vendor.setUser(user);
 
-        vendor.setBusinessEmail(TextUtil.normalizeEmail(vendor.getBusinessEmail()));
+        vendor.setBusinessEmail(InputUtil.normalizeEmail(vendor.getBusinessEmail()));
 
         vendor.setVendorProfileStatus(VendorProfileStatus.ACTIVE);
 
@@ -135,7 +136,7 @@ public class VendorServiceImpl implements VendorService {
 
         toUpdateVendor.setShopName(vendor.getShopName());
 
-        toUpdateVendor.setBusinessEmail(TextUtil.normalizeEmail(vendor.getBusinessEmail()));
+        toUpdateVendor.setBusinessEmail(InputUtil.normalizeEmail(vendor.getBusinessEmail()));
 
         toUpdateVendor.setBusinessPhone(vendor.getBusinessPhone());
 
