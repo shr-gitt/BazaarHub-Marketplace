@@ -1,6 +1,8 @@
 package com.bazaarhub.backend.shared.exception;
 
 import com.bazaarhub.backend.feature.customerProfile.exception.CustomerProfileNotFoundException;
+import com.bazaarhub.backend.feature.category.exception.CategoryAlreadyExistsException;
+import com.bazaarhub.backend.feature.category.exception.CategoryNotFoundException;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.PhoneNumberAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
@@ -48,13 +50,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(VendorInactiveException.class)
-    public ResponseEntity<ApiResponseDto<?>> handleVendorInactiveException (VendorInactiveException ex) {
-        log.error("Vendor not found. ",ex);
+    public ResponseEntity<ApiResponseDto<?>> handleVendorInactiveException(VendorInactiveException ex) {
+        log.error("Vendor not found. ", ex);
         return buildErrorResponse("Vendor is not active.", HttpStatus.NOT_ACCEPTABLE);
     }
 
     @ExceptionHandler(VendorNotFoundException.class)
-    public ResponseEntity<ApiResponseDto<?>> handleVendorNotFoundException (VendorNotFoundException ex) {
+    public ResponseEntity<ApiResponseDto<?>> handleVendorNotFoundException(VendorNotFoundException ex) {
         log.error("Vendor not found.", ex);
         return buildErrorResponse("Vendor not found.", HttpStatus.NOT_FOUND);
     }
@@ -106,6 +108,7 @@ public class GlobalExceptionHandler {
         log.error("Phone number already exists", ex);
         return buildErrorResponse("Phone number already exists.", HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiResponseDto<?>> handleNoResourceNotFound(NoResourceFoundException ex) {
         log.error("Resource not found.", ex);
@@ -123,6 +126,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> numberFormatException(NumberFormatException ex) {
         log.error("Invalid number format provided..", ex);
         return buildErrorResponse("Invalid number format provided..", HttpStatus.NOT_FOUND);
+    }
+
+
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleCategoryAlreadyExists(CategoryAlreadyExistsException ex) {
+        log.error("Category already exist", ex);
+        return buildErrorResponse("Category already exists.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleCategoryNotFound(CategoryNotFoundException ex) {
+        log.error("Category not found", ex);
+        return buildErrorResponse("Category not found.", HttpStatus.NOT_FOUND);
     }
 
 
