@@ -1,6 +1,5 @@
 package com.bazaarhub.backend.config;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -15,10 +14,11 @@ public class CacheConfig {
     public static final String USER_CACHE_NAME = "user";
     public static final String VENDOR_CACHE_NAME = "vendor";
     public static final String CUSTOMER_CACHE_NAME = "customerProfile";
-    public static final String category_CACHE_NAME = "categories";
+    public static final String CATEGORY_CACHE_NAME = "category";
+    public static final String PRODUCT_CACHE_NAME = "product";
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("user", "vendor", "customerProfile", "categories");
+        return new ConcurrentMapCacheManager("user", "vendor", "customerProfile", "product", "category");
     }
 }
