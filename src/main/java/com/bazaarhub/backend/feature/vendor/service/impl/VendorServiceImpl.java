@@ -16,11 +16,9 @@ import com.bazaarhub.backend.feature.vendor.mapper.VendorMapper;
 import com.bazaarhub.backend.feature.vendor.repository.VendorRepository;
 import com.bazaarhub.backend.feature.vendor.service.VendorService;
 import com.bazaarhub.backend.shared.utils.InputUtil;
-import com.bazaarhub.backend.shared.utils.InputUtil;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -78,7 +76,7 @@ public class VendorServiceImpl implements VendorService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> {
                     log.error("User not found in create vendor.");
-                    throw new UserNotFoundException("User not found.");
+                    return new UserNotFoundException("User not found.");
                 }
         );
 
@@ -107,11 +105,8 @@ public class VendorServiceImpl implements VendorService {
         }
 
         vendor.setUser(user);
-
         vendor.setBusinessEmail(InputUtil.normalizeEmail(vendor.getBusinessEmail()));
-
         vendor.setVendorProfileStatus(VendorProfileStatus.ACTIVE);
-
         vendor.setApprovalStatus(ApprovalStatus.PENDING);
 
         Vendor newVendor = vendorRepository.save(vendor);
@@ -135,15 +130,10 @@ public class VendorServiceImpl implements VendorService {
         Vendor vendor = vendorMapper.mapToVendor(vendorRequestDto);
 
         toUpdateVendor.setShopName(vendor.getShopName());
-
         toUpdateVendor.setBusinessEmail(InputUtil.normalizeEmail(vendor.getBusinessEmail()));
-
         toUpdateVendor.setBusinessPhone(vendor.getBusinessPhone());
-
         toUpdateVendor.setAddress(vendor.getAddress());
-
         toUpdateVendor.setCity(vendor.getCity());
-
         toUpdateVendor.setCountry(vendor.getCountry());
 
         Vendor updatedVendor = vendorRepository.save(toUpdateVendor);
@@ -152,10 +142,12 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    @CachePut(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#vendorId")
-    public VendorResponseDto vendorApproval(Long vendorId, ApprovalRequestDto approvalRequestDto){
+    @CachePut(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#approvalRequestDto.vendorId")
+    public VendorResponseDto vendorApproval(Long approverId, ApprovalRequestDto approvalRequestDto){
 
-        log.info("Fetching vendor with: [id={}] in vendorApproval",vendorId);
+        log.info("Fetching vendor with: [id={}] in vendorApproval",approvalRequestDto.getVendorId());
+
+        Long vendorId = approvalRequestDto.getVendorId();
 
         Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(
                 () -> {
@@ -164,17 +156,15 @@ public class VendorServiceImpl implements VendorService {
                 }
         );
 
-        User user = userRepository.findById(approvalRequestDto.getApprovedBy()).orElseThrow(
+        User user = userRepository.findById(approverId).orElseThrow(
                 () -> {
                     log.error("User not found in vendor approval.");
-                    throw new UserNotFoundException("User not found.");
+                    return new UserNotFoundException("User not found.");
                 }
         );
 
         vendor.setApprovedBy(user);
-
         vendor.setApprovalStatus(approvalRequestDto.getApprovalStatus());
-
         vendor.setApprovedAt(LocalDateTime.now());
 
         Vendor updatedVendor = vendorRepository.save(vendor);
