@@ -19,6 +19,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.util.PlaceholderResolutionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,11 +32,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 public class GlobalExceptionHandler {
 
     private ResponseEntity<ApiResponseDto<?>> buildErrorResponse(String message, HttpStatus status) {
-        ApiResponseDto<?> response = new ApiResponseDto<>(
-                ResponseStatus.ERROR.value,
-                message,
-                status
-        );
+        ApiResponseDto<?> response = new ApiResponseDto<>(ResponseStatus.ERROR.value, message, status);
         return ResponseEntity.status(status).body(response);
 
     }
@@ -144,6 +141,10 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("Category not found.", HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(PlaceholderResolutionException.class)
+    public ResponseEntity<ApiResponseDto<?>> placeholderResolutionException(CategoryNotFoundException ex) {
+        log.error("Some information is missing or unavailable. Please contact support if the issue continues.", ex);
+        return buildErrorResponse("Some information is missing or unavailable. Please contact support if the issue continues.", HttpStatus.NOT_FOUND);
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ApiResponseDto<?>> handleProductNotFoundException(ProductNotFoundException ex) {
         log.error("Product not found.", ex);

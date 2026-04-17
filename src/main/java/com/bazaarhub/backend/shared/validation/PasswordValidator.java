@@ -16,7 +16,6 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
         boolean hasDigit = password.matches(".*\\d.*");
         boolean hasSpecial = password.matches(".*[@$!%*?&].*");
 
-        return password.length() >= 8 && password.length() <= 16
-                && hasUpper && hasLower && hasDigit && hasSpecial;
+        return password.length() >= 8 && password.length() <= 16 && hasUpper && hasLower && hasDigit && hasSpecial;
     }
 }
