@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    @CachePut(cacheNames = CacheConfig.category_CACHE_NAME, key = "#result.id")
+    @CachePut(cacheNames = CacheConfig.CATEGORY_CACHE_NAME, key = "#result.id")
     public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) {
         if (categoryRepository.existsByNameIgnoreCase(categoryRequestDto.getName().trim())) {
             log.error("Category already exists [name={}]", categoryRequestDto.getName());
@@ -43,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Cacheable(cacheNames = CacheConfig.category_CACHE_NAME, key = "#categoryId")
+    @Cacheable(cacheNames = CacheConfig.CATEGORY_CACHE_NAME, key = "#categoryId")
     public CategoryResponseDto getCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .filter(c -> c.getStatus() != CategoryStatus.DELETED)
@@ -55,7 +55,6 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryMapper.mapToCategoryResponse(category);
     }
 
-
     @Override
     public Page<CategoryResponseDto> getAllCategories(Pageable pageable) {
         log.info("Fetching all categories");
@@ -66,10 +65,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     }
 
-
-
     @Override
-    @CachePut(cacheNames = CacheConfig.category_CACHE_NAME, key = "#categoryId")
+    @CachePut(cacheNames = CacheConfig.CATEGORY_CACHE_NAME, key = "#categoryId")
     public CategoryResponseDto updateCategoryById(Long categoryId, CategoryRequestDto categoryRequestDto) {
 
         Category category = categoryRepository.findById(categoryId)
@@ -97,7 +94,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @CacheEvict(cacheNames = CacheConfig.category_CACHE_NAME, key = "#categoryId")
+    @CacheEvict(cacheNames = CacheConfig.CATEGORY_CACHE_NAME, key = "#categoryId")
     public void deleteCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .filter(c -> c.getStatus() != CategoryStatus.DELETED)

@@ -3,6 +3,9 @@ package com.bazaarhub.backend.shared.exception;
 import com.bazaarhub.backend.feature.customerProfile.exception.CustomerProfileNotFoundException;
 import com.bazaarhub.backend.feature.category.exception.CategoryAlreadyExistsException;
 import com.bazaarhub.backend.feature.category.exception.CategoryNotFoundException;
+import com.bazaarhub.backend.feature.product.exception.InvalidDiscountPriceException;
+import com.bazaarhub.backend.feature.product.exception.InvalidPriceException;
+import com.bazaarhub.backend.feature.product.exception.ProductNotFoundException;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.PhoneNumberAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
@@ -139,6 +142,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> handleCategoryNotFound(CategoryNotFoundException ex) {
         log.error("Category not found", ex);
         return buildErrorResponse("Category not found.", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleProductNotFoundException(ProductNotFoundException ex) {
+        log.error("Product not found.", ex);
+        return buildErrorResponse("Product not found.", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidPriceException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleInvalidPriceException(InvalidPriceException ex) {
+        log.error("Invalid price.", ex);
+        return buildErrorResponse("Invalid Price", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidDiscountPriceException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleInvalidPriceException(InvalidDiscountPriceException ex) {
+        log.error("Invalid discount price.", ex);
+        return buildErrorResponse("Invalid discount Price", HttpStatus.BAD_REQUEST);
     }
 
 
