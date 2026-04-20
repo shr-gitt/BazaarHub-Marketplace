@@ -11,6 +11,7 @@ import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
+import com.bazaarhub.backend.shared.enums.UserStatus;
 import com.bazaarhub.backend.shared.exception.InvalidCredentialException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,15 +40,12 @@ public class AuthServiceImpl implements AuthService {
             throw new EmailAlreadyExistsException("Email Already Exists");
         });
         User user = authMapper.mapToUser(registerRequestDto);
-
+        user.setUserStatus(UserStatus.ACTIVE);
         user.setEmail(email);
-
         user.setRole(registerRequestDto.getRole());
         user.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
-        User saved = userRepository.save(user);
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(saved.getEmail());
-        String token = jwtService.generateToken(userDetails, Map.of("userId", user.getId(), "role", user.getRole() != null ? user.getRole() : "USER"));
-        return new AuthResponse("Registration Successful", user.getId(), user.getRole(), token);
+        userRepository.save(user);
+        return new AuthResponse("Registration Successful", user.getId(), user.getRole(), null);
     }
 
     @Override
