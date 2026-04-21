@@ -1,5 +1,7 @@
 package com.bazaarhub.backend.shared.exception;
 
+import com.bazaarhub.backend.feature.cart.exception.CartItemNotFoundException;
+import com.bazaarhub.backend.feature.cart.exception.CartNotFoundException;
 import com.bazaarhub.backend.feature.customerProfile.exception.CustomerProfileNotFoundException;
 import com.bazaarhub.backend.feature.category.exception.CategoryAlreadyExistsException;
 import com.bazaarhub.backend.feature.category.exception.CategoryNotFoundException;
@@ -47,6 +49,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> httpMessageNotReadableException(HttpMessageNotReadableException ex) {
         log.error("One or more fields have an incorrect data type. Please check your input.", ex);
         return buildErrorResponse("One or more fields have an incorrect data type. Please check your input.", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.error("Illegal Argument");
+        return buildErrorResponse("Illegal argument", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(VendorInactiveException.class)
@@ -145,6 +153,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> placeholderResolutionException(CategoryNotFoundException ex) {
         log.error("Some information is missing or unavailable. Please contact support if the issue continues.", ex);
         return buildErrorResponse("Some information is missing or unavailable. Please contact support if the issue continues.", HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ApiResponseDto<?>> handleProductNotFoundException(ProductNotFoundException ex) {
         log.error("Product not found.", ex);
@@ -161,6 +171,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> handleInvalidPriceException(InvalidDiscountPriceException ex) {
         log.error("Invalid discount price.", ex);
         return buildErrorResponse("Invalid discount Price", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleInvalidPriceException(InsufficientStockException ex) {
+        log.error("Requested quantity exceeds available stock.", ex);
+        return buildErrorResponse("Requested quantity exceeds available stock.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CartItemNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleCartItemNotFoundException(CartItemNotFoundException ex) {
+        log.error("Cart item not found", ex);
+        return buildErrorResponse("Cart item not found", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CartNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleCartNotFoundException(CartNotFoundException ex) {
+        log.error("Cart not found", ex);
+        return buildErrorResponse("Cart not found", HttpStatus.NOT_FOUND);
     }
 
 
