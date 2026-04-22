@@ -41,7 +41,25 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable).authenticationProvider(daoAuthenticationProvider()).authorizeHttpRequests(request -> request.requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name()).requestMatchers(HttpMethod.GET, "/api/category/**").hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name(),Role.CUSTOMER.name()).requestMatchers(HttpMethod.POST, "/api/category/**").hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name()).requestMatchers(HttpMethod.PUT, "/api/category/**").hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name()).requestMatchers(HttpMethod.DELETE, "/api/category/**").hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())).sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).userDetailsService(customUserDetailsService).authorizeHttpRequests(auth -> auth.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/register", "/api/login").permitAll().anyRequest().authenticated())
+        http.csrf(AbstractHttpConfigurer::disable)
+                .authenticationProvider(daoAuthenticationProvider())
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/api/category/**")
+                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name(),Role.CUSTOMER.name())
+                        .requestMatchers(HttpMethod.POST, "/api/category/**")
+                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/category/**")
+                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/category/**")
+                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name()))
+                .sessionManagement(sm -> sm
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .userDetailsService(customUserDetailsService)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/register", "/api/login")
+                        .permitAll().anyRequest()
+                        .authenticated())
 
                 .httpBasic(Customizer.withDefaults()).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

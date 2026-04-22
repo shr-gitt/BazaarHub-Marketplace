@@ -150,7 +150,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PlaceholderResolutionException.class)
-    public ResponseEntity<ApiResponseDto<?>> placeholderResolutionException(CategoryNotFoundException ex) {
+    public ResponseEntity<ApiResponseDto<?>> placeholderResolutionException(PlaceholderResolutionException ex) {
         log.error("Some information is missing or unavailable. Please contact support if the issue continues.", ex);
         return buildErrorResponse("Some information is missing or unavailable. Please contact support if the issue continues.", HttpStatus.NOT_FOUND);
     }
@@ -189,6 +189,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> handleCartNotFoundException(CartNotFoundException ex) {
         log.error("Cart not found", ex);
         return buildErrorResponse("Cart not found", HttpStatus.NOT_FOUND);
+
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleOrderNotFoundException(OrderNotFoundException ex) {
+        log.error("Order Not Found Exception.", ex);
+        return buildErrorResponse("Order Not Found Exception.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidOrderStateException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleInvalidOrderStateException(InvalidOrderStateException ex) {
+        log.error("Invalid Order State Not Found Exception.", ex);
+        return buildErrorResponse("Invalid Order State Not Found Exception.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmptyCartCheckoutException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleEmptyCartCheckoutException(EmptyCartCheckoutException ex) {
+        log.error("Empty Cart Checkout Exception.", ex);
+        return buildErrorResponse("Empty Cart Checkout Exception.", HttpStatus.BAD_REQUEST);
     }
 
 

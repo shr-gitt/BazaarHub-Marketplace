@@ -16,7 +16,6 @@ import java.util.List;
 public class CustomerProfileResponseDTO implements Serializable {
     private Long id;
     private Long version;
-    private Long userId;
     private String firstName;
     private String lastName;
     private String email;

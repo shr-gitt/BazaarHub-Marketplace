@@ -33,18 +33,18 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
 
     @Override
     @CachePut(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#userId")
-    public CustomerProfileResponseDTO createCustomerProfile(Long userId, CustomerProfileRequestDTO customerProfileRequestDTO) {
-        User user = userRepository.findById(userId).orElseThrow(() -> {
-            log.error("Customer profile not found by id : {}", userId);
+    public CustomerProfileResponseDTO createCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO) {
+
+        User user = userRepository.findById(customerProfileRequestDTO.getUserId()).orElseThrow(() -> {
+            log.error("Customer profile not found by id : {}", customerProfileRequestDTO.getUserId());
             return new UserNotFoundException("User Not Found");
         });
         CustomerProfile profile = customerProfileMapper.mapToCustomerProfile(customerProfileRequestDTO);
+        profile.setUser(user);
         profile.setProfileImageUrl(customerProfileRequestDTO.getProfileImageUrl());
         profile.setDateOfBirth(customerProfileRequestDTO.getDateOfBirth());
         profile.setAddress(customerProfileRequestDTO.getAddress());
         profile.setPreferences(customerProfileRequestDTO.getPreferences());
-
-        profile.setUser(user);
         CustomerProfile saveProfile = customerProfileRepository.save(profile);
         return customerProfileMapper.mapToCustomerProfileResponseDTO(saveProfile);
     }
