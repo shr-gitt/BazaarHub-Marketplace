@@ -18,9 +18,9 @@ public class CustomerProfileController {
 
     private final CustomerProfileService customerProfileService;
 
-    @PostMapping("/customer-profile/{id}")
-    public ApiResponseDto<CustomerProfileResponseDTO> createCustomerProfile(@PathVariable("id") Long userId, @Valid @RequestBody CustomerProfileRequestDTO customerProfileRequestDTO) {
-        CustomerProfileResponseDTO response = customerProfileService.createCustomerProfile(userId, customerProfileRequestDTO);
+    @PostMapping("/create-customer-profile")
+    public ApiResponseDto<CustomerProfileResponseDTO> createCustomerProfile(@Valid @RequestBody CustomerProfileRequestDTO customerProfileRequestDTO) {
+        CustomerProfileResponseDTO response = customerProfileService.createCustomerProfile(customerProfileRequestDTO);
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Customer Profile created successfully", response);
     }
 

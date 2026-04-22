@@ -20,6 +20,9 @@ import java.util.List;
 @NoArgsConstructor
 public class CustomerProfileRequestDTO implements Serializable {
 
+    @NotNull(message = "UserId is required.")
+    private Long userId;
+
     @NotBlank(message = "Image Name is required")
     private String profileImageUrl;
 

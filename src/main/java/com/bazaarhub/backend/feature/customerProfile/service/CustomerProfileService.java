@@ -4,7 +4,7 @@ import com.bazaarhub.backend.feature.customerProfile.resource.request.CustomerPr
 import com.bazaarhub.backend.feature.customerProfile.resource.response.CustomerProfileResponseDTO;
 
 public interface CustomerProfileService {
-    CustomerProfileResponseDTO createCustomerProfile(Long userId, CustomerProfileRequestDTO customerProfileRequestDTO);
+    CustomerProfileResponseDTO createCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO);
 
     CustomerProfileResponseDTO getCustomerProfileById(Long id);
 

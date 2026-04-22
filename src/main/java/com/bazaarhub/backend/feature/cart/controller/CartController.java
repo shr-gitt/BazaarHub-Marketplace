@@ -4,6 +4,7 @@ import com.bazaarhub.backend.feature.cart.resource.request.CartItemRequestDto;
 import com.bazaarhub.backend.feature.cart.resource.request.UpdateCartItemRequestDto;
 import com.bazaarhub.backend.feature.cart.resource.response.CartResponseDto;
 import com.bazaarhub.backend.feature.cart.service.CartService;
+import com.bazaarhub.backend.shared.aop.LogExecutionTime;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
 import com.bazaarhub.backend.shared.utils.AuthUtil;
@@ -19,17 +20,20 @@ public class CartController {
     private final AuthUtil authUtil;
 
     @PostMapping("/items")
+    @LogExecutionTime
     public ApiResponseDto<CartResponseDto> addToCart(@Valid @RequestBody CartItemRequestDto cartItemRequestDto) {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Item added to cart successfully.",
                 cartService.addToCart(authUtil.getCurrentUserId(), cartItemRequestDto));
     }
 
     @GetMapping
+    @LogExecutionTime
     public ApiResponseDto<CartResponseDto> getCart() {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Cart fetched successfully", cartService.getCartByUserId(authUtil.getCurrentUserId()));
     }
 
     @PostMapping("/items/{productId}")
+    @LogExecutionTime
     public ApiResponseDto<CartResponseDto> updateCartItem(
             @PathVariable Long productId,
             @Valid @RequestBody UpdateCartItemRequestDto cartItemRequestDto
@@ -46,6 +50,7 @@ public class CartController {
     }
 
     @DeleteMapping("/items/{productId}")
+    @LogExecutionTime
     public ApiResponseDto<CartResponseDto> removeFromCart(@PathVariable Long productId) {
         return new ApiResponseDto<>(
                 ResponseStatus.SUCCESS.value,
@@ -55,6 +60,7 @@ public class CartController {
     }
 
     @DeleteMapping
+    @LogExecutionTime
     public ApiResponseDto<Void> clearCart() {
         cartService.clearCart(authUtil.getCurrentUserId());
         return new ApiResponseDto<>(
