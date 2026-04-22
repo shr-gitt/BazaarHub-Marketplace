@@ -2,6 +2,7 @@ package com.bazaarhub.backend.shared.exception;
 
 import com.bazaarhub.backend.feature.cart.exception.CartItemNotFoundException;
 import com.bazaarhub.backend.feature.cart.exception.CartNotFoundException;
+import com.bazaarhub.backend.feature.address.exception.AddressNotFoundException;
 import com.bazaarhub.backend.feature.customerProfile.exception.CustomerProfileNotFoundException;
 import com.bazaarhub.backend.feature.category.exception.CategoryAlreadyExistsException;
 import com.bazaarhub.backend.feature.category.exception.CategoryNotFoundException;
@@ -190,6 +191,13 @@ public class GlobalExceptionHandler {
         log.error("Cart not found", ex);
         return buildErrorResponse("Cart not found", HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleAddressNotFoundException(AddressNotFoundException ex) {
+        log.error("Address not found.", ex);
+        return buildErrorResponse("Address not found.", HttpStatus.NOT_FOUND);
+    }
+
 
 
 }

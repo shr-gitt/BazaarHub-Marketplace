@@ -17,9 +17,10 @@ public class CacheConfig {
     public static final String CATEGORY_CACHE_NAME = "category";
     public static final String PRODUCT_CACHE_NAME = "product";
     public static final String CART_CACHE_NAME = "cart";
+    public static final String ADDRESS_CACHE_NAME = "address";
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("user", "vendor", "customerProfile", "product", "category", "cart");
+        return new ConcurrentMapCacheManager("user", "vendor", "customerProfile", "product", "category", "cart", "address");
     }
 }
