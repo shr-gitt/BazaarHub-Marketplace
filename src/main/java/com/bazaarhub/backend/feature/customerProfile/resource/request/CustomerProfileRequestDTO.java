@@ -23,9 +23,6 @@ public class CustomerProfileRequestDTO implements Serializable {
     @NotNull(message = "UserId is required.")
     private Long userId;
 
-    @NotBlank(message = "Image Name is required")
-    private String profileImageUrl;
-
     @NotNull(message = "Date of Birth is required")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
