@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public class CustomerProfileMapper {
     public CustomerProfile mapToCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO) {
         CustomerProfile customerProfile = new CustomerProfile();
-        customerProfile.setProfileImageUrl(customerProfileRequestDTO.getProfileImageUrl());
         customerProfile.setDateOfBirth(customerProfileRequestDTO.getDateOfBirth());
         customerProfile.setAddress(customerProfileRequestDTO.getAddress());
         customerProfile.setPreferences(customerProfileRequestDTO.getPreferences());

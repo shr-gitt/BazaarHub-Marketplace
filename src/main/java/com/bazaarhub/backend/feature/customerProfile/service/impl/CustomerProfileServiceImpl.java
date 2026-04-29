@@ -11,12 +11,14 @@ import com.bazaarhub.backend.feature.customerProfile.service.CustomerProfileServ
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
+import com.bazaarhub.backend.shared.service.MinioService;
 import com.bazaarhub.backend.shared.utils.InputUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,19 +31,21 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     private final CustomerProfileRepository customerProfileRepository;
     private final UserRepository userRepository;
     private final CustomerProfileMapper customerProfileMapper;
+    private final MinioService minioService;
 
 
     @Override
-    @CachePut(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#userId")
-    public CustomerProfileResponseDTO createCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO) {
+    @CachePut(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#result.id")
+    public CustomerProfileResponseDTO createCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO, MultipartFile file) {
 
         User user = userRepository.findById(customerProfileRequestDTO.getUserId()).orElseThrow(() -> {
             log.error("Customer profile not found by id : {}", customerProfileRequestDTO.getUserId());
             return new UserNotFoundException("User Not Found");
         });
+        String imageUrl = minioService.uploadFile(file);
         CustomerProfile profile = customerProfileMapper.mapToCustomerProfile(customerProfileRequestDTO);
         profile.setUser(user);
-        profile.setProfileImageUrl(customerProfileRequestDTO.getProfileImageUrl());
+        profile.setProfileImageUrl(imageUrl);
         profile.setDateOfBirth(customerProfileRequestDTO.getDateOfBirth());
         profile.setAddress(customerProfileRequestDTO.getAddress());
         profile.setPreferences(customerProfileRequestDTO.getPreferences());
@@ -68,15 +72,10 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
             return new CustomerProfileNotFoundException("Customer Profile Not Found");
 
         });
-        String profileImageUrl = customerProfileRequestDTO.getProfileImageUrl();
-
         LocalDate dateOfBirth = customerProfileRequestDTO.getDateOfBirth();
         String address = InputUtil.capitalizeFirstLetter(customerProfileRequestDTO.getAddress());
         List<Integer> preferences = customerProfileRequestDTO.getPreferences();
 
-        if (profileImageUrl != null) {
-            customerProfile.setProfileImageUrl(profileImageUrl);
-        }
         if (dateOfBirth != null) {
             customerProfile.setDateOfBirth(dateOfBirth);
         }
