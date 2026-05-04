@@ -1,6 +1,6 @@
-package com.bazaarhub.backend.feature.vendor.helper;
+package com.bazaarhub.backend.feature.vendorProfile.helper;
 
-import com.bazaarhub.backend.feature.vendor.enums.ApprovalStatus;
+import com.bazaarhub.backend.feature.vendorProfile.enums.ApprovalStatus;
 import com.bazaarhub.backend.shared.helper.EnumConverter;
 import jakarta.persistence.Converter;
 

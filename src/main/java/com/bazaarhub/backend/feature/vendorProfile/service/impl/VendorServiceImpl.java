@@ -1,20 +1,20 @@
-package com.bazaarhub.backend.feature.vendor.service.impl;
+package com.bazaarhub.backend.feature.vendorProfile.service.impl;
 
 import com.bazaarhub.backend.config.CacheConfig;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
-import com.bazaarhub.backend.feature.vendor.resource.request.ApprovalRequestDto;
-import com.bazaarhub.backend.feature.vendor.resource.request.VendorRequestDto;
-import com.bazaarhub.backend.feature.vendor.resource.response.VendorResponseDto;
-import com.bazaarhub.backend.feature.vendor.entity.Vendor;
-import com.bazaarhub.backend.feature.vendor.enums.ApprovalStatus;
-import com.bazaarhub.backend.feature.vendor.enums.VendorProfileStatus;
-import com.bazaarhub.backend.feature.vendor.exception.VendorInactiveException;
-import com.bazaarhub.backend.feature.vendor.exception.VendorNotFoundException;
-import com.bazaarhub.backend.feature.vendor.mapper.VendorMapper;
-import com.bazaarhub.backend.feature.vendor.repository.VendorRepository;
-import com.bazaarhub.backend.feature.vendor.service.VendorService;
+import com.bazaarhub.backend.feature.vendorProfile.resource.request.ApprovalRequestDto;
+import com.bazaarhub.backend.feature.vendorProfile.resource.request.VendorRequestDto;
+import com.bazaarhub.backend.feature.vendorProfile.resource.response.VendorResponseDto;
+import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
+import com.bazaarhub.backend.feature.vendorProfile.enums.ApprovalStatus;
+import com.bazaarhub.backend.feature.vendorProfile.enums.VendorProfileStatus;
+import com.bazaarhub.backend.feature.vendorProfile.exception.VendorInactiveException;
+import com.bazaarhub.backend.feature.vendorProfile.exception.VendorNotFoundException;
+import com.bazaarhub.backend.feature.vendorProfile.mapper.VendorMapper;
+import com.bazaarhub.backend.feature.vendorProfile.repository.VendorRepository;
+import com.bazaarhub.backend.feature.vendorProfile.service.VendorService;
 import com.bazaarhub.backend.shared.utils.InputUtil;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
@@ -52,30 +52,30 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @Cacheable(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#id")
-    public VendorResponseDto getVendorById(Long id){
-        log.info("Fetching vendor with: [id={}] in getVendorById",id);
-        Vendor vendor = vendorRepository.findById(id).orElseThrow(
+    public VendorResponseDto getVendorById(Long vendorId) {
+        log.info("Fetching vendor with id={}", vendorId);
+        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(
                 () -> {
-                    log.error("Could not find vendor with vendor id: [id={}] in getVendorById",id);
+                    log.error("Vendor not found of id={}", vendorId);
                     return new VendorNotFoundException("Vendor not found.");
                 }
         );
 
-        if(vendor.getVendorProfileStatus() == VendorProfileStatus.ACTIVE)
+        if (vendor.getVendorProfileStatus() == VendorProfileStatus.ACTIVE)
             return vendorMapper.mapToVendorResponse(vendor);
         else {
-            log.error("Vendor is inactive.");
+            log.error("Vendor is not active of id={}", vendorId);
             throw new VendorInactiveException("Vendor is not active.");
         }
     }
 
     @Override
     @CachePut(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#result.id")
-    public VendorResponseDto createVendor(Long userId, VendorRequestDto vendorRequestDto){
-        log.info("Trying to create vendor.");
+    public VendorResponseDto createVendor(Long userId, VendorRequestDto vendorRequestDto) {
+        log.info("Creating vendor of userId={}", userId);
         User user = userRepository.findById(userId).orElseThrow(
                 () -> {
-                    log.error("User not found in create vendor.");
+                    log.error("User not found of id={}", userId);
                     return new UserNotFoundException("User not found.");
                 }
         );
@@ -84,20 +84,20 @@ public class VendorServiceImpl implements VendorService {
 
         Optional<Vendor> existingVendorOpt = vendorRepository.findByBusinessEmail(vendor.getBusinessEmail());
 
-        if(existingVendorOpt.isEmpty())
+        if (existingVendorOpt.isEmpty())
             existingVendorOpt = vendorRepository.findByBusinessPhone(vendor.getBusinessPhone());
 
-        if(existingVendorOpt.isEmpty())
+        if (existingVendorOpt.isEmpty())
             existingVendorOpt = vendorRepository.findByPanCardNo(vendor.getPanCardNo());
 
-        if(existingVendorOpt.isEmpty())
+        if (existingVendorOpt.isEmpty())
             existingVendorOpt = vendorRepository.findByRegistrationNo(vendor.getRegistrationNo());
 
-        if( existingVendorOpt.isPresent()){
+        if (existingVendorOpt.isPresent()) {
             Vendor existingVendor = existingVendorOpt.get();
 
-            if (VendorProfileStatus.ACTIVE == existingVendor.getVendorProfileStatus()){
-                log.error("Vendor with this information is active so cannot be created");
+            if (VendorProfileStatus.ACTIVE == existingVendor.getVendorProfileStatus()) {
+                log.error("Vendor information already exists of userId={}", userId);
                 throw new EntityExistsException("Vendor account with this information already exists. Use other credentials.");
             }
 
@@ -115,14 +115,14 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    @CachePut(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#vendorId")
-    public VendorResponseDto updateVendor(Long vendorId, VendorRequestDto vendorRequestDto){
+    @CachePut(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#result.id")
+    public VendorResponseDto updateVendor(Long userId, VendorRequestDto vendorRequestDto) {
 
-        log.info("Fetching vendor with: [id={}] in updateVendor",vendorId);
+        log.info("Fetching vendor of userId={}", userId);
 
-        Vendor toUpdateVendor = vendorRepository.findById(vendorId).orElseThrow(
+        Vendor toUpdateVendor = vendorRepository.findByUserId(userId).orElseThrow(
                 () -> {
-                    log.error("Could not find vendor with vendor id: [id={}] in updateVendor",vendorId);
+                    log.error("Vendor not found of userId={}", userId);
                     return new VendorNotFoundException("Vendor not found to update.");
                 }
         );
@@ -142,16 +142,14 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    @CachePut(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#approvalRequestDto.vendorId")
-    public VendorResponseDto vendorApproval(Long approverId, ApprovalRequestDto approvalRequestDto){
+    @CachePut(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#vendorId")
+    public VendorResponseDto approveVendor(Long approverId, Long vendorId, ApprovalRequestDto approvalRequestDto) {
 
-        log.info("Fetching vendor with: [id={}] in vendorApproval",approvalRequestDto.getVendorId());
-
-        Long vendorId = approvalRequestDto.getVendorId();
+        log.info("Fetching vendor with id={}", vendorId);
 
         Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(
                 () -> {
-                    log.error("Could not find vendor with vendor id: [id={}] in vendorApproval",vendorId);
+                    log.error("Vendor not found during approval of vendorId={}", vendorId);
                     return new VendorNotFoundException("Vendor not found to approve.");
                 }
         );
@@ -174,12 +172,12 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     @CacheEvict(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#vendorId")
-    public boolean deleteVendor(Long vendorId) {
-        log.info("Fetching vendor: [id={}] in deleteVendor",vendorId);
+    public void deleteVendor(Long vendorId) {
+        log.info("Fetching vendor of vendorId={}", vendorId);
 
         Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(
                 () -> {
-                    log.error("Could not find vendor with vendor id: [id={}] in deleteVendor",vendorId);
+                    log.error("Vendor not found of vendorId={}", vendorId);
                     return new VendorNotFoundException("Vendor not found to delete.");
                 }
         );
@@ -187,7 +185,5 @@ public class VendorServiceImpl implements VendorService {
         vendor.setVendorProfileStatus(VendorProfileStatus.INACTIVE);
 
         vendorRepository.save(vendor);
-
-        return true;
     }
 }

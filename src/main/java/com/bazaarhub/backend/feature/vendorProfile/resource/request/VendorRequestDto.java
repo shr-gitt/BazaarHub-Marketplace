@@ -1,4 +1,4 @@
-package com.bazaarhub.backend.feature.vendor.resource.request;
+package com.bazaarhub.backend.feature.vendorProfile.resource.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -2,20 +2,15 @@ package com.bazaarhub.backend.feature.vendor.service.impl;
 
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
-import com.bazaarhub.backend.feature.user.resource.request.UserRequestDto;
 import com.bazaarhub.backend.feature.user.enums.Gender;
-import com.bazaarhub.backend.feature.user.service.UserService;
-import com.bazaarhub.backend.feature.user.service.impl.UserServiceImpl;
-import com.bazaarhub.backend.feature.vendor.entity.Vendor;
-import com.bazaarhub.backend.feature.vendor.enums.VendorProfileStatus;
-import com.bazaarhub.backend.feature.vendor.mapper.VendorMapper;
-import com.bazaarhub.backend.feature.vendor.repository.VendorRepository;
-import com.bazaarhub.backend.feature.vendor.resource.request.VendorRequestDto;
-import com.bazaarhub.backend.feature.vendor.resource.response.VendorResponseDto;
-import com.bazaarhub.backend.feature.vendor.service.VendorService;
+import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
+import com.bazaarhub.backend.feature.vendorProfile.enums.VendorProfileStatus;
+import com.bazaarhub.backend.feature.vendorProfile.mapper.VendorMapper;
+import com.bazaarhub.backend.feature.vendorProfile.repository.VendorRepository;
+import com.bazaarhub.backend.feature.vendorProfile.resource.request.VendorRequestDto;
+import com.bazaarhub.backend.feature.vendorProfile.resource.response.VendorResponseDto;
+import com.bazaarhub.backend.feature.vendorProfile.service.impl.VendorServiceImpl;
 import com.bazaarhub.backend.shared.enums.Role;
-import com.bazaarhub.backend.shared.enums.UserStatus;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,13 +20,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,12 +1,10 @@
-package com.bazaarhub.backend.feature.vendor.resource.response;
+package com.bazaarhub.backend.feature.vendorProfile.resource.response;
 
-import com.bazaarhub.backend.feature.user.entity.User;
-import com.bazaarhub.backend.feature.vendor.enums.ApprovalStatus;
+import com.bazaarhub.backend.feature.vendorProfile.enums.ApprovalStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 @Getter
 @Setter

@@ -1,9 +1,9 @@
-package com.bazaarhub.backend.feature.vendor.mapper;
+package com.bazaarhub.backend.feature.vendorProfile.mapper;
 
 import com.bazaarhub.backend.feature.user.entity.User;
-import com.bazaarhub.backend.feature.vendor.resource.request.VendorRequestDto;
-import com.bazaarhub.backend.feature.vendor.resource.response.VendorResponseDto;
-import com.bazaarhub.backend.feature.vendor.entity.Vendor;
+import com.bazaarhub.backend.feature.vendorProfile.resource.request.VendorRequestDto;
+import com.bazaarhub.backend.feature.vendorProfile.resource.response.VendorResponseDto;
+import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import org.springframework.stereotype.Component;
 
 @Component
