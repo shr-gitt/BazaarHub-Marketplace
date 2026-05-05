@@ -6,6 +6,7 @@ import com.bazaarhub.backend.feature.address.exception.AddressNotFoundException;
 import com.bazaarhub.backend.feature.customerProfile.exception.CustomerProfileNotFoundException;
 import com.bazaarhub.backend.feature.category.exception.CategoryAlreadyExistsException;
 import com.bazaarhub.backend.feature.category.exception.CategoryNotFoundException;
+import com.bazaarhub.backend.feature.payment.exception.*;
 import com.bazaarhub.backend.feature.product.exception.InvalidDiscountPriceException;
 import com.bazaarhub.backend.feature.product.exception.InvalidPriceException;
 import com.bazaarhub.backend.feature.product.exception.ProductNotFoundException;
@@ -130,13 +131,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("CustomerProfileNotFoundException.", HttpStatus.NOT_FOUND);
     }
 
-
     @ExceptionHandler(NumberFormatException.class)
     public ResponseEntity<ApiResponseDto<?>> numberFormatException(NumberFormatException ex) {
         log.error("Invalid number format provided..", ex);
         return buildErrorResponse("Invalid number format provided..", HttpStatus.NOT_FOUND);
     }
-
 
     @ExceptionHandler(CategoryAlreadyExistsException.class)
     public ResponseEntity<ApiResponseDto<?>> handleCategoryAlreadyExists(CategoryAlreadyExistsException ex) {
@@ -217,6 +216,38 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("Address not found.", HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handlePaymentNotFoundException(PaymentNotFoundException ex) {
+        log.error("Payment not found.", ex);
+        return buildErrorResponse("Payment not found.", HttpStatus.NOT_FOUND);
+    }
 
+    @ExceptionHandler(PaymentAmountMismatchException.class)
+    public ResponseEntity<ApiResponseDto<?>> handlePaymentAmountMismatchException(PaymentAmountMismatchException ex) {
+        log.error("Payment amount mismatch.", ex);
+        return buildErrorResponse("Payment amount mismatch.", HttpStatus.BAD_REQUEST);
+    }
 
+    @ExceptionHandler(UnauthorizedPaymentAccessException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleUnauthorizedPaymentAccessException(UnauthorizedPaymentAccessException ex) {
+        log.error("Unauthorized payment access.", ex);
+        return buildErrorResponse("Unauthorized payment access.", HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(EsewaVerificationException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleEsewaVerificationException(EsewaVerificationException ex) {
+        log.error("eSewa verification failed.", ex);
+        return buildErrorResponse("Payment verification failed.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OrderPaidException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleOrderPaidException(OrderPaidException ex) {
+        log.error("Order already paid.", ex);
+        return buildErrorResponse("Order already paid.", HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(WrongPaymentTypeException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleInvalidPaymentGatewayException(WrongPaymentTypeException ex) {
+        return buildErrorResponse("Wrong payment type.", HttpStatus.BAD_REQUEST);
+    }
 }
