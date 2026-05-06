@@ -1,9 +1,8 @@
-package com.bazaarhub.backend.feature.vendor.entity;
+package com.bazaarhub.backend.feature.vendorProfile.entity;
 
 import com.bazaarhub.backend.feature.user.entity.User;
-import com.bazaarhub.backend.feature.vendor.enums.ApprovalStatus;
-import com.bazaarhub.backend.feature.vendor.enums.VendorProfileStatus;
-import com.bazaarhub.backend.feature.vendor.helper.VendorProfileStatusConverter;
+import com.bazaarhub.backend.feature.vendorProfile.enums.ApprovalStatus;
+import com.bazaarhub.backend.feature.vendorProfile.enums.VendorProfileStatus;
 import com.bazaarhub.backend.shared.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Getter

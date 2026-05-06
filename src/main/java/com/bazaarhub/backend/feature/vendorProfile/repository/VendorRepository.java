@@ -1,10 +1,8 @@
-package com.bazaarhub.backend.feature.vendor.repository;
+package com.bazaarhub.backend.feature.vendorProfile.repository;
 
-import com.bazaarhub.backend.feature.vendor.entity.Vendor;
+import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 public interface VendorRepository extends JpaRepository<Vendor, Long> {
@@ -16,4 +14,6 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
     Optional<Vendor> findByPanCardNo(String panCardNo);
 
     Optional<Vendor> findByRegistrationNo(String registrationNo);
+
+    Optional<Vendor> findByUserId(Long userId);
 }

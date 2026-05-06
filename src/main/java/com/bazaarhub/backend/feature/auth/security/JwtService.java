@@ -24,7 +24,15 @@ public class JwtService {
     public String generateToken(UserDetails userDetails, Map<String, Object> extraClaims) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
-        return Jwts.builder().claims().add(extraClaims).and().subject(userDetails.getUsername()).issuedAt(now).expiration(expiry).signWith(getSigningKey()).compact();
+        return Jwts.builder()
+                .claims()
+                .add(extraClaims)
+                .and()
+                .subject(userDetails.getUsername())
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(getSigningKey())
+                .compact();
     }
 
     public String extractUsername(String token) {
@@ -41,7 +49,11 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private SecretKey getSigningKey() {

@@ -13,10 +13,11 @@ import com.bazaarhub.backend.feature.product.exception.ProductNotFoundException;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.PhoneNumberAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
-import com.bazaarhub.backend.feature.vendor.exception.VendorInactiveException;
-import com.bazaarhub.backend.feature.vendor.exception.VendorNotFoundException;
+import com.bazaarhub.backend.feature.vendorProfile.exception.VendorInactiveException;
+import com.bazaarhub.backend.feature.vendorProfile.exception.VendorNotFoundException;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
+import jakarta.persistence.EntityExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -216,6 +217,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("Address not found.", HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(InvalidCredentialException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleInvalidCredentialException(InvalidCredentialException ex) {
+        log.error("Invalid Credentials.", ex);
+        return buildErrorResponse("Invalid Credentials.", HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(PaymentNotFoundException.class)
     public ResponseEntity<ApiResponseDto<?>> handlePaymentNotFoundException(PaymentNotFoundException ex) {
         log.error("Payment not found.", ex);
@@ -249,5 +256,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WrongPaymentTypeException.class)
     public ResponseEntity<ApiResponseDto<?>> handleInvalidPaymentGatewayException(WrongPaymentTypeException ex) {
         return buildErrorResponse("Wrong payment type.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EntityExistsException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleEntityExistsException(EntityExistsException ex) {
+        log.error("Information already exists.", ex);
+        return buildErrorResponse("Information already exists.", HttpStatus.BAD_REQUEST);
     }
 }

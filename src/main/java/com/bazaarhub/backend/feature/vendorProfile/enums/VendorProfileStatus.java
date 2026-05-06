@@ -1,4 +1,4 @@
-package com.bazaarhub.backend.feature.vendor.enums;
+package com.bazaarhub.backend.feature.vendorProfile.enums;
 
 import com.bazaarhub.backend.shared.enums.EnumWithId;
 
