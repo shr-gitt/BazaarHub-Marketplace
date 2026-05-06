@@ -7,6 +7,7 @@ import com.bazaarhub.backend.feature.customerProfile.exception.CustomerProfileNo
 import com.bazaarhub.backend.feature.category.exception.CategoryAlreadyExistsException;
 import com.bazaarhub.backend.feature.category.exception.CategoryNotFoundException;
 import com.bazaarhub.backend.feature.payment.exception.*;
+import com.bazaarhub.backend.feature.points.exception.PointsNotFoundException;
 import com.bazaarhub.backend.feature.product.exception.InvalidDiscountPriceException;
 import com.bazaarhub.backend.feature.product.exception.InvalidPriceException;
 import com.bazaarhub.backend.feature.product.exception.ProductNotFoundException;
@@ -263,4 +264,11 @@ public class GlobalExceptionHandler {
         log.error("Information already exists.", ex);
         return buildErrorResponse("Information already exists.", HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(PointsNotFoundException.class)
+    public ResponseEntity<ApiResponseDto<?>> handlePointsNotFoundException(PointsNotFoundException ex) {
+        log.error("Points not found.", ex);
+        return buildErrorResponse("Points not found.", HttpStatus.NOT_FOUND);
+    }
+
 }

@@ -14,6 +14,7 @@ import com.bazaarhub.backend.feature.payment.repository.PaymentRepository;
 import com.bazaarhub.backend.feature.payment.resource.request.PaymentRequestDto;
 import com.bazaarhub.backend.feature.payment.resource.response.PaymentResponseDto;
 import com.bazaarhub.backend.feature.payment.service.PaymentService;
+import com.bazaarhub.backend.feature.points.service.PointsService;
 import com.bazaarhub.backend.shared.enums.PaymentStatus;
 import com.bazaarhub.backend.shared.exception.OrderNotFoundException;
 import com.bazaarhub.backend.shared.exception.OrderPaidException;
@@ -42,6 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final EsewaSignatureUtil esewaSignatureUtil;
     private final RestTemplate restTemplate;
+    private final PointsService pointsService;
 
     @Value("${esewa.merchant.code}")
     private String merchantCode;
@@ -214,6 +216,7 @@ public class PaymentServiceImpl implements PaymentService {
         Order order = payment.getOrder();
 
         if (verified) {
+            pointsService.updateUserPoints(order.getUser(), order.getTotalAmount());
             order.setPaymentStatus(PaymentStatus.PAID);
             payment.setPaymentStatus(PaymentStatus.SUCCESS);
             payment.setRefId(refId);
