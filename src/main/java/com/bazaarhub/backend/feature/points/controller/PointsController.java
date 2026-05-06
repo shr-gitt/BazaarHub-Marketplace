@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PointsController {
 
     private final PointsService pointsService;
-    private final AuthUtil authUtil;
 
     @GetMapping("/points")
     @LogExecutionTime
@@ -25,6 +24,6 @@ public class PointsController {
         return new ApiResponseDto<>(
                 ResponseStatus.SUCCESS.value,
                 "Points fetched successfully.",
-                pointsService.getPointsByUserId(authUtil.getCurrentUserId()));
+                pointsService.getPointsByUserId(AuthUtil.getCurrentUserId()));
     }
 }

@@ -18,21 +18,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
-    private final AuthUtil authUtil;
 
     @PostMapping("/checkout")
     public ApiResponseDto<OrderResponseDto> placeOrder(@Valid @RequestBody OrderRequestDto requestDto) {
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Order placed successfully.", orderService.placeOrder(authUtil.getCurrentUserId(), requestDto));
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Order placed successfully.", orderService.placeOrder(AuthUtil.getCurrentUserId(), requestDto));
     }
 
     @GetMapping("/{orderId}")
     public ApiResponseDto<OrderResponseDto> getOrderById(@PathVariable Long orderId) {
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Order fetched successfully.", orderService.getOrderById(authUtil.getCurrentUserId(), orderId));
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Order fetched successfully.", orderService.getOrderById(AuthUtil.getCurrentUserId(), orderId));
     }
 
     @GetMapping
     public ApiResponseDto<List<OrderResponseDto>> getOrdersByUserId() {
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Orders fetched successfully.", orderService.getOrdersByUserId(authUtil.getCurrentUserId()));
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Orders fetched successfully.", orderService.getOrdersByUserId(AuthUtil.getCurrentUserId()));
     }
 
     @PatchMapping("/{orderId}/status")
@@ -42,6 +41,6 @@ public class OrderController {
 
     @PatchMapping("/{orderId}/cancel")
     public ApiResponseDto<OrderResponseDto> cancelOrder(@PathVariable Long orderId) {
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Order cancelled successfully.", orderService.cancelOrder(authUtil.getCurrentUserId(), orderId));
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Order cancelled successfully.", orderService.cancelOrder(AuthUtil.getCurrentUserId(), orderId));
     }
 }

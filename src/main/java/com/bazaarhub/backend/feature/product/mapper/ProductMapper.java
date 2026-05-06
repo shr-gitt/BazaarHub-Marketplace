@@ -16,7 +16,6 @@ public class ProductMapper {
         product.setPrice(request.getPrice());
         product.setDiscountPrice(request.getDiscountPrice());
         product.setStockQuantity(request.getStockQuantity());
-        product.setImageUrl(request.getImageUrl());
         return product;
     }
 

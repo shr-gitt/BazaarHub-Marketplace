@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class VendorController {
     private final VendorService vendorService;
-    private final AuthUtil authUtil;
 
     @GetMapping("/vendors")
     @LogExecutionTime
@@ -37,7 +36,7 @@ public class VendorController {
 
     @PostMapping("/vendor/create")
     public ApiResponseDto<VendorResponseDto> createVendor(@RequestBody @Valid VendorRequestDto vendorRequestDto) {
-        Long userId = authUtil.getCurrentUserId();
+        Long userId = AuthUtil.getCurrentUserId();
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor created", vendorService.createVendor(userId, vendorRequestDto));
     }
 
@@ -45,7 +44,7 @@ public class VendorController {
     public ApiResponseDto<VendorResponseDto> updateVendor(
             @RequestBody @Valid VendorRequestDto vendorRequestDto
     ) {
-        Long userId = authUtil.getCurrentUserId();
+        Long userId = AuthUtil.getCurrentUserId();
 
         return new ApiResponseDto<>(
                 ResponseStatus.SUCCESS.value,
@@ -57,7 +56,7 @@ public class VendorController {
     @PostMapping("/vendor/approval/{vendorId}")
     @LogExecutionTime
     public ApiResponseDto<VendorResponseDto> approveVendor(@PathVariable Long vendorId, @RequestBody @Valid ApprovalRequestDto approvalRequestDto) {
-        Long approverId = authUtil.getCurrentUserId();
+        Long approverId = AuthUtil.getCurrentUserId();
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor approval updated.", vendorService.approveVendor(approverId, vendorId, approvalRequestDto));
     }
 

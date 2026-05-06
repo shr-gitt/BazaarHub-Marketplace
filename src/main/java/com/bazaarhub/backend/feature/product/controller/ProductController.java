@@ -12,7 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api")
@@ -20,10 +22,13 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping("/create-product")
+    @PostMapping(value = "/create-product",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @LogExecutionTime
-    public ApiResponseDto<ProductResponseDto> createProduct(@Valid @RequestBody ProductRequestDto productRequestDto) {
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Product created successfully.", productService.createProduct(productRequestDto));
+    public ApiResponseDto<ProductResponseDto> createProduct(@Valid
+                                                            @RequestPart("productRequestDto") ProductRequestDto productRequestDto,
+                                                            @RequestPart("file") MultipartFile file) {
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Product created successfully.", productService.createProduct(productRequestDto, file));
     }
 
     @GetMapping("/product/{id}")
@@ -36,6 +41,18 @@ public class ProductController {
     @LogExecutionTime
     public ApiResponseDto<Page<ProductResponseDto>> getAllProducts(@PageableDefault(sort = "modifiedAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Products fetched successfully", productService.getAllProduct(pageable));
+    }
+
+    @GetMapping("/products/recommended")
+    @LogExecutionTime
+    public ApiResponseDto<Page<ProductResponseDto>> getRecommendedProducts(
+            @PageableDefault(sort = "modifiedAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return new ApiResponseDto<>(
+                ResponseStatus.SUCCESS.value,
+                "Recommended products fetched successfully",
+                productService.getRecommendedProducts(pageable)
+        );
     }
 
     @PostMapping("/update-product/{id}")

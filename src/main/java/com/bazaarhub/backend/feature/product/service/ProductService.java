@@ -4,9 +4,10 @@ import com.bazaarhub.backend.feature.product.resource.request.ProductRequestDto;
 import com.bazaarhub.backend.feature.product.resource.response.ProductResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ProductService {
-    ProductResponseDto createProduct(ProductRequestDto productRequest);
+    ProductResponseDto createProduct(ProductRequestDto productRequestDto, MultipartFile file);
 
     ProductResponseDto getProductById(Long productId);
 
@@ -15,4 +16,6 @@ public interface ProductService {
     ProductResponseDto updateProductById(Long productId, ProductRequestDto productRequestDto);
 
     void deleteProductById(Long productId);
+
+    Page<ProductResponseDto> getRecommendedProducts(Pageable pageable);
 }
