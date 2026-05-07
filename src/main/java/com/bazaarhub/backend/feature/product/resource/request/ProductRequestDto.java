@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.URL;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -32,9 +31,6 @@ public class ProductRequestDto implements Serializable {
     @NotNull(message = "Stock quantity is required")
     @Min(value = 0, message = "Stock cannot be negative")
     private Integer stockQuantity;
-
-    @URL(message = "Invalid URL format")
-    private String imageUrl;
 
     @NotNull(message = "Category is required")
     private Long categoryId;

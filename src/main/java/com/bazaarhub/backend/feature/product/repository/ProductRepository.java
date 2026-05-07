@@ -6,10 +6,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByIdAndStatusNot(Long id, ProductStatus status);
     Page<Product> findByStatusNot(ProductStatus status, Pageable pageable);
+
+    //For recommendation logic
+    Page<Product> findByCategory_IdInAndStatusNot(
+            List<Long> categoryIds,
+            ProductStatus status,
+            Pageable pageable
+    );
 }

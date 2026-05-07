@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
-    private final AuthUtil authUtil;
 
     @GetMapping("/payments")
     @LogExecutionTime
@@ -38,7 +37,7 @@ public class PaymentController {
     @PostMapping("/payment/create")
     @LogExecutionTime
     public ApiResponseDto<PaymentResponseDto> createPayment(@Valid @RequestBody PaymentRequestDto paymentRequestDto){
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Payment created.", paymentService.createPayment(authUtil.getCurrentUserId(), paymentRequestDto));
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Payment created.", paymentService.createPayment(AuthUtil.getCurrentUserId(), paymentRequestDto));
     }
 
     @PostMapping("/payment/cash/confirm")

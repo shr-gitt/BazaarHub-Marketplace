@@ -1,7 +1,8 @@
 package com.bazaarhub.backend.feature.product.entity;
 
 import com.bazaarhub.backend.feature.category.entity.Category;
-import com.bazaarhub.backend.feature.vendor.entity.Vendor;
+
+import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import com.bazaarhub.backend.shared.entity.BaseEntity;
 import com.bazaarhub.backend.shared.enums.ProductStatus;
 import jakarta.persistence.*;

@@ -5,10 +5,13 @@ import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -25,8 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         });
         String role = user.getRole() != null ? user.getRole().name() : "USER";
         String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-        return org.springframework.security.core.userdetails.User.withUsername(user.getEmail()).password(user.getPassword()).authorities(authority).accountLocked(false).disabled(false).build();
-
+        return new CustomUserDetails(user, List.of(new SimpleGrantedAuthority(authority)));
     }
 }
 

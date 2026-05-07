@@ -26,11 +26,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.PlaceholderResolutionException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.net.ConnectException;
 import java.sql.SQLIntegrityConstraintViolationException;
 
 @Slf4j
@@ -269,6 +271,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseDto<?>> handlePointsNotFoundException(PointsNotFoundException ex) {
         log.error("Points not found.", ex);
         return buildErrorResponse("Points not found.", HttpStatus.NOT_FOUND);
+    }
+
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
+        log.error("Image type not supported.", ex);
+        return buildErrorResponse("Image type not supported.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConnectException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleConnectionException(ConnectException ex) {
+        log.error("Minio not connected.");
+        return buildErrorResponse("Something went wrong.", HttpStatus.BAD_REQUEST);
     }
 
 }
