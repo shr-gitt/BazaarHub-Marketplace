@@ -1,6 +1,9 @@
 package com.bazaarhub.backend.feature.payment.service.impl;
 
+import com.bazaarhub.backend.feature.notification.enums.NotificationType;
+import com.bazaarhub.backend.feature.notification.service.NotificationService;
 import com.bazaarhub.backend.feature.order.entity.Order;
+import com.bazaarhub.backend.feature.order.entity.OrderItem;
 import com.bazaarhub.backend.feature.order.repository.OrderRepository;
 import com.bazaarhub.backend.feature.payment.entity.Payment;
 import com.bazaarhub.backend.feature.payment.enums.PaymentType;
@@ -44,6 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final EsewaSignatureUtil esewaSignatureUtil;
     private final RestTemplate restTemplate;
     private final PointsService pointsService;
+    private final NotificationService notificationService;
 
     @Value("${esewa.merchant.code}")
     private String merchantCode;
@@ -77,11 +81,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponseDto getPaymentById(Long id) {
-        log.info("Getting payment by id {}",id);
+        log.info("Getting payment by id {}", id);
 
         Payment payment = paymentRepository.findById(id).orElseThrow(
                 () -> {
-                    log.error("Could not find payment with payment [id={}] in getPaymentById",id);
+                    log.error("Could not find payment with payment [id={}] in getPaymentById", id);
                     return new PaymentNotFoundException("Payment not found.");
                 }
         );
@@ -145,7 +149,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
 
-        if(PaymentType.CASH_ON_DELIVERY != payment.getPaymentType()){
+        if (PaymentType.CASH_ON_DELIVERY != payment.getPaymentType()) {
             throw new WrongPaymentTypeException("Wrong payment type.");
         }
 
@@ -156,6 +160,24 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
         payment.getOrder().setPaymentStatus(PaymentStatus.PAID);
         orderRepository.save(payment.getOrder());
+
+        notificationService.createNotification(
+                payment.getUser(),
+                "Payment confirmed",
+                "Your cash payment has been confirmed.",
+                NotificationType.PAYMENT_SUCCESS,
+                payment.getOrder().getId()
+        );
+
+        for (OrderItem orderItem : payment.getOrder().getOrderItems()) {
+            notificationService.createNotification(
+                    orderItem.getProduct().getVendor().getUser(),
+                    "Payment received",
+                    "Payment has been confirmed for product: " + orderItem.getProductName(),
+                    NotificationType.PAYMENT_SUCCESS,
+                    payment.getOrder().getId()
+            );
+        }
 
         return paymentMapper.mapToPaymentResponse(paymentRepository.save(payment));
     }
@@ -220,9 +242,36 @@ public class PaymentServiceImpl implements PaymentService {
             order.setPaymentStatus(PaymentStatus.PAID);
             payment.setPaymentStatus(PaymentStatus.SUCCESS);
             payment.setRefId(refId);
+
+            notificationService.createNotification(
+                    order.getUser(),
+                    "Payment successful",
+                    "Your payment has been completed successfully.",
+                    NotificationType.PAYMENT_SUCCESS,
+                    order.getId()
+            );
+
+            for (OrderItem orderItem : order.getOrderItems()) {
+                notificationService.createNotification(
+                        orderItem.getProduct().getVendor().getUser(),
+                        "Payment received",
+                        "Payment received for product: " + orderItem.getProductName(),
+                        NotificationType.PAYMENT_SUCCESS,
+                        order.getId()
+                );
+            }
+
         } else {
             order.setPaymentStatus(PaymentStatus.FAILED);
             payment.setPaymentStatus(PaymentStatus.FAILED);
+            notificationService.createNotification(
+                    order.getUser(),
+                    "Payment failed",
+                    "Your payment could not be verified.",
+                    NotificationType.PAYMENT_FAILED,
+                    order.getId()
+            );
+
         }
 
         orderRepository.save(order);
@@ -235,6 +284,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public void markPaymentFailed(String pid) {
+
         log.info("Marking payment failed.");
 
         Payment payment = paymentRepository.findByPid(pid)
@@ -243,6 +293,13 @@ public class PaymentServiceImpl implements PaymentService {
             payment.getOrder().setPaymentStatus(PaymentStatus.FAILED);
         }
         payment.setPaymentStatus(PaymentStatus.FAILED);
+        notificationService.createNotification(
+                payment.getUser(),
+                "Payment failed",
+                "Your payment has failed.",
+                NotificationType.PAYMENT_FAILED,
+                payment.getOrder().getId()
+        );
         paymentRepository.save(payment);
     }
 }

@@ -33,6 +33,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.13.0")
 	implementation("org.springframework.security:spring-security-crypto:7.1.0-M3")
 	implementation("io.minio:minio:8.6.0")
+	implementation("org.springframework.boot:spring-boot-starter-websocket:4.0.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 	compileOnly 'org.projectlombok:lombok'
