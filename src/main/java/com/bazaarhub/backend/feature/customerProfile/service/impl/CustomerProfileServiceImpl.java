@@ -1,6 +1,9 @@
 package com.bazaarhub.backend.feature.customerProfile.service.impl;
 
 import com.bazaarhub.backend.config.CacheConfig;
+import com.bazaarhub.backend.feature.address.entity.Address;
+import com.bazaarhub.backend.feature.address.repository.AddressRepository;
+import com.bazaarhub.backend.feature.address.service.AddressService;
 import com.bazaarhub.backend.feature.customerProfile.entity.CustomerProfile;
 import com.bazaarhub.backend.feature.customerProfile.exception.CustomerProfileNotFoundException;
 import com.bazaarhub.backend.feature.customerProfile.mapper.CustomerProfileMapper;
@@ -11,8 +14,10 @@ import com.bazaarhub.backend.feature.customerProfile.service.CustomerProfileServ
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
+import com.bazaarhub.backend.shared.exception.UnauthorizedAccessException;
 import com.bazaarhub.backend.shared.service.MinioService;
-import com.bazaarhub.backend.shared.utils.InputUtil;
+import jakarta.persistence.EntityExistsException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
@@ -32,25 +37,41 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     private final UserRepository userRepository;
     private final CustomerProfileMapper customerProfileMapper;
     private final MinioService minioService;
-
+    private final AddressService addressService;
+    private final AddressRepository addressRepository;
 
     @Override
+    @Transactional
     @CachePut(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#result.id")
-    public CustomerProfileResponseDTO createCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO, MultipartFile file) {
+    public CustomerProfileResponseDTO createCustomerProfile(Long userId, CustomerProfileRequestDTO customerProfileRequestDTO, MultipartFile file) {
+        log.info("Creating vendor profile for userId={}", userId);
 
-        User user = userRepository.findById(customerProfileRequestDTO.getUserId()).orElseThrow(() -> {
-            log.error("Customer profile not found by id : {}", customerProfileRequestDTO.getUserId());
-            return new UserNotFoundException("User Not Found");
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            log.error("User not found by id : {}", userId);
+            return new UserNotFoundException("User not found with given id.");
         });
+
+        if(customerProfileRepository.existsByUser(user)){
+            log.error("Customer profile creation failed. Profile with userId={} already exists.", userId);
+            throw new EntityExistsException("Profile already exists.");
+        }
+
         String imageUrl = minioService.uploadFile(file);
-        CustomerProfile profile = customerProfileMapper.mapToCustomerProfile(customerProfileRequestDTO);
+
+        Address address = addressRepository.findByStreetAndMunicipality(
+                customerProfileRequestDTO.getAddressRequestDto().getStreet(),
+                customerProfileRequestDTO.getAddressRequestDto().getMunicipality()
+        ).orElseGet(() ->
+                addressService.createAddress(
+                        customerProfileRequestDTO.getAddressRequestDto()
+                )
+        );
+
+        CustomerProfile profile = customerProfileMapper.mapToCustomerProfile(customerProfileRequestDTO, address);
         profile.setUser(user);
         profile.setProfileImageUrl(imageUrl);
-        profile.setDateOfBirth(customerProfileRequestDTO.getDateOfBirth());
-        profile.setAddress(customerProfileRequestDTO.getAddress());
-        profile.setPreferences(customerProfileRequestDTO.getPreferences());
-        CustomerProfile saveProfile = customerProfileRepository.save(profile);
-        return customerProfileMapper.mapToCustomerProfileResponseDTO(saveProfile);
+        CustomerProfile savedProfile = customerProfileRepository.save(profile);
+        return customerProfileMapper.mapToCustomerProfileResponseDTO(savedProfile);
     }
 
     @Override
@@ -58,23 +79,43 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     public CustomerProfileResponseDTO getCustomerProfileById(Long id) {
         CustomerProfile profile = customerProfileRepository.findById(id).orElseThrow(() -> {
             log.error("Customer Profile Not Found.");
-            return new CustomerProfileNotFoundException("Customer profile not found");
+            return new CustomerProfileNotFoundException("Customer profile not found with given id.");
         });
         return customerProfileMapper.mapToCustomerProfileResponseDTO(profile);
     }
 
 
     @Override
+    @Transactional
     @CachePut(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#id")
-    public CustomerProfileResponseDTO updateCustomerProfileById(Long id, CustomerProfileRequestDTO customerProfileRequestDTO) {
-        CustomerProfile customerProfile = customerProfileRepository.findById(id).orElseThrow(() -> {
-            log.error("Customer profile not found by id  : {}", id);
-            return new CustomerProfileNotFoundException("Customer Profile Not Found");
+    public CustomerProfileResponseDTO updateCustomerProfileById(Long userId, Long id, CustomerProfileRequestDTO customerProfileRequestDTO) {
+        log.info("Updating customer profile of id={}", id);
 
+        CustomerProfile customerProfile = customerProfileRepository.findById(id).orElseThrow(() -> {
+            log.error("Customer profile fetch failed. Profile not found with id={}", id);
+            return new CustomerProfileNotFoundException("Customer profile not found with given id.");
         });
+
+        if(!customerProfile.getUser().getId().equals(userId)){
+            log.error("Customer profile update failed. due to unauthorized access. userId={}, profileId={}",
+                    userId,
+                    id);
+            throw new UnauthorizedAccessException("You are not authorized to update this customer profile.");
+        }
+
         LocalDate dateOfBirth = customerProfileRequestDTO.getDateOfBirth();
-        String address = InputUtil.capitalizeFirstLetter(customerProfileRequestDTO.getAddress());
         List<Integer> preferences = customerProfileRequestDTO.getPreferences();
+
+        if (customerProfileRequestDTO.getAddressRequestDto() != null) {
+            Address address = addressRepository.findByStreetAndMunicipality(
+                    customerProfileRequestDTO.getAddressRequestDto().getStreet(),
+                    customerProfileRequestDTO.getAddressRequestDto().getMunicipality()
+            ).orElse(
+                    addressService.createAddress(customerProfileRequestDTO.getAddressRequestDto())
+            );
+
+            customerProfile.setAddress(address);
+        }
 
         if (dateOfBirth != null) {
             customerProfile.setDateOfBirth(dateOfBirth);
@@ -83,14 +124,9 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
         if (preferences != null) {
             customerProfile.setPreferences(preferences);
         }
-        if (address != null) {
-            customerProfile.setAddress(address);
-        }
 
-        CustomerProfile updateProfile = customerProfileRepository.save(customerProfile);
+        CustomerProfile updatedProfile = customerProfileRepository.save(customerProfile);
 
-        return customerProfileMapper.mapToCustomerProfileResponseDTO(updateProfile);
+        return customerProfileMapper.mapToCustomerProfileResponseDTO(updatedProfile);
     }
-
-
 }

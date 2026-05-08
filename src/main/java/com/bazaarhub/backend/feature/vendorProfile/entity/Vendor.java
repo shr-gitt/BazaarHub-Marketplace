@@ -1,5 +1,6 @@
 package com.bazaarhub.backend.feature.vendorProfile.entity;
 
+import com.bazaarhub.backend.feature.address.entity.Address;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.vendorProfile.enums.ApprovalStatus;
 import com.bazaarhub.backend.feature.vendorProfile.enums.VendorProfileStatus;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+//@Table(name = "vendor_profile")
 public class Vendor extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY ,optional = false)
@@ -41,14 +43,8 @@ public class Vendor extends BaseEntity {
     @Column(name = "vendor_profile_status", nullable = false)
     private VendorProfileStatus vendorProfileStatus;
 
-    @Column(name = "address", nullable = false)
-    private String address;
-
-    @Column(name = "city", nullable = false)
-    private String city;
-
-    @Column(name = "country", nullable = false)
-    private String country;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Address address;
 
     @Column(name = "approval_status", nullable = false)
     private ApprovalStatus approvalStatus;

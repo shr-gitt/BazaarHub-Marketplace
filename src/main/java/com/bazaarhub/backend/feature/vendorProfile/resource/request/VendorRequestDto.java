@@ -1,14 +1,11 @@
 package com.bazaarhub.backend.feature.vendorProfile.resource.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.bazaarhub.backend.feature.address.resource.request.AddressRequestDto;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 @Getter
 @AllArgsConstructor
@@ -32,12 +29,6 @@ public class VendorRequestDto implements Serializable {
     @NotBlank(message = "Business registration number is required.")
     private String registrationNo;
 
-    @NotBlank(message = "Address is required.")
-    private String address;
-
-    @NotBlank(message = "City is required.")
-    private String city;
-
-    @NotBlank(message = "Country is required.")
-    private String country;
+    @NotNull(message = "Address is required.")
+    private AddressRequestDto addressRequestDto;
 }

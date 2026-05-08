@@ -1,5 +1,6 @@
 package com.bazaarhub.backend.feature.vendorProfile.resource.response;
 
+import com.bazaarhub.backend.feature.address.resource.response.AddressResponseDto;
 import com.bazaarhub.backend.feature.vendorProfile.enums.ApprovalStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,11 +24,7 @@ public class VendorResponseDto implements Serializable {
 
     private String registrationNo;
 
-    private String address;
-
-    private String city;
-
-    private String country;
+    private AddressResponseDto address;
 
     private ApprovalStatus approvalStatus;
 

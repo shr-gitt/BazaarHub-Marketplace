@@ -7,6 +7,7 @@ import com.bazaarhub.backend.feature.customerProfile.service.CustomerProfileServ
 import com.bazaarhub.backend.shared.aop.LogExecutionTime;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
+import com.bazaarhub.backend.shared.utils.AuthUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -27,7 +28,7 @@ public class CustomerProfileController {
     public ApiResponseDto<CustomerProfileResponseDTO> createCustomerProfile(@Valid
                                                                             @RequestPart("customerProfileDto") CustomerProfileRequestDTO customerProfileRequestDTO,
                                                                             @RequestPart("file") MultipartFile file) {
-        CustomerProfileResponseDTO response = customerProfileService.createCustomerProfile(customerProfileRequestDTO, file);
+        CustomerProfileResponseDTO response = customerProfileService.createCustomerProfile(AuthUtil.getCurrentUserId(), customerProfileRequestDTO, file);
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Customer Profile created successfully", response);
     }
 
@@ -41,7 +42,7 @@ public class CustomerProfileController {
     @PostMapping("/update-customer-profile/{id}")
     @LogExecutionTime
     public ApiResponseDto<CustomerProfileResponseDTO> updateCustomerProfileById(@PathVariable long id, @Valid @RequestBody CustomerProfileRequestDTO customerProfileRequestDTO) {
-        CustomerProfileResponseDTO response = customerProfileService.updateCustomerProfileById(id, customerProfileRequestDTO);
+        CustomerProfileResponseDTO response = customerProfileService.updateCustomerProfileById(AuthUtil.getCurrentUserId(), id, customerProfileRequestDTO);
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Customer Profile Updated", response);
     }
 }

@@ -1,5 +1,6 @@
 package com.bazaarhub.backend.feature.customerProfile.entity;
 
+import com.bazaarhub.backend.feature.address.entity.Address;
 import com.bazaarhub.backend.feature.customerProfile.helper.PreferencesConverter;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.shared.entity.BaseEntity;
@@ -29,9 +30,9 @@ public class CustomerProfile extends BaseEntity {
     @Column(name = "dob", nullable = false)
     private LocalDate dateOfBirth;
 
-    @Column(name = "address", nullable = false)
-    private String address;
-
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    private Address address;
 
     @Convert(converter = PreferencesConverter.class)
     @Column(name = "preferences")

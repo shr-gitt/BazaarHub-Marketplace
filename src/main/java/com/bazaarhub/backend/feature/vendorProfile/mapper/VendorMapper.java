@@ -1,13 +1,18 @@
 package com.bazaarhub.backend.feature.vendorProfile.mapper;
 
+import com.bazaarhub.backend.feature.address.mapper.AddressMapper;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.vendorProfile.resource.request.VendorRequestDto;
 import com.bazaarhub.backend.feature.vendorProfile.resource.response.VendorResponseDto;
 import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class VendorMapper {
+
+    private final AddressMapper addressMapper;
 
     public Vendor mapToVendor(VendorRequestDto vendorRequestDto){
         Vendor vendor = new Vendor();
@@ -21,12 +26,6 @@ public class VendorMapper {
         vendor.setPanCardNo(vendorRequestDto.getPanCardNo());
 
         vendor.setRegistrationNo(vendorRequestDto.getRegistrationNo());
-
-        vendor.setAddress(vendorRequestDto.getAddress());
-
-        vendor.setCity(vendorRequestDto.getCity());
-
-        vendor.setCountry(vendorRequestDto.getCountry());
 
         return vendor;
     }
@@ -42,12 +41,6 @@ public class VendorMapper {
         vendor.setPanCardNo(vendorRequestDto.getPanCardNo());
 
         vendor.setRegistrationNo(vendorRequestDto.getRegistrationNo());
-
-        vendor.setAddress(vendorRequestDto.getAddress());
-
-        vendor.setCity(vendorRequestDto.getCity());
-
-        vendor.setCountry(vendorRequestDto.getCountry());
 
         return vendor;
     }
@@ -71,11 +64,7 @@ public class VendorMapper {
 
         vendorResponseDto.setRegistrationNo(vendor.getRegistrationNo());
 
-        vendorResponseDto.setAddress(vendor.getAddress());
-
-        vendorResponseDto.setCity(vendor.getCity());
-
-        vendorResponseDto.setCountry(vendor.getCountry());
+        vendorResponseDto.setAddress(addressMapper.mapToAddressResponseDto(vendor.getAddress()));
 
         vendorResponseDto.setApprovalStatus(vendor.getApprovalStatus());
 
