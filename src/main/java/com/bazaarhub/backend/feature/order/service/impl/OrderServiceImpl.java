@@ -4,6 +4,8 @@ import com.bazaarhub.backend.config.CacheConfig;
 import com.bazaarhub.backend.feature.cart.entity.Cart;
 import com.bazaarhub.backend.feature.cart.entity.CartItem;
 import com.bazaarhub.backend.feature.cart.repository.CartRepository;
+import com.bazaarhub.backend.feature.notification.enums.NotificationType;
+import com.bazaarhub.backend.feature.notification.service.NotificationService;
 import com.bazaarhub.backend.feature.order.entity.Order;
 import com.bazaarhub.backend.feature.order.entity.OrderItem;
 import com.bazaarhub.backend.feature.order.mapper.OrderMapper;
@@ -16,6 +18,7 @@ import com.bazaarhub.backend.feature.product.entity.Product;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
+import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import com.bazaarhub.backend.shared.enums.OrderStatus;
 import com.bazaarhub.backend.shared.enums.PaymentStatus;
 import com.bazaarhub.backend.shared.enums.ProductStatus;
@@ -43,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
     private final CartRepository cartRepository;
-
+    private final NotificationService notificationService;
 
 
     @Override
@@ -91,6 +94,25 @@ public class OrderServiceImpl implements OrderService {
         }
         order.setTotalAmount((totalAmount));
         Order saveOrder = orderRepository.save(order);
+
+        notificationService.createNotification(user, "Order placed",
+                "Your order has been placed successfully.",
+                NotificationType.ORDER_PLACED,
+                saveOrder.getId());
+
+        for (CartItem cartItem : cart.getItems()) {
+            Product product = cartItem.getProduct();
+            Vendor vendor = product.getVendor();
+
+            notificationService.createNotification(
+                    vendor.getUser(),
+                    "New order received",
+                    "You received a new order for product: " + product.getName(),
+                    NotificationType.ORDER_RECEIVED,
+                    saveOrder.getId()
+            );
+        }
+
         cart.getItems().clear();
         cartRepository.save(cart);
         return orderMapper.mapToOrderResponseDTO(saveOrder);
@@ -126,6 +148,13 @@ public class OrderServiceImpl implements OrderService {
         validateOrderStatusTransition(order.getOrderStatus(), requestDTO.getOrderStatus());
         order.setOrderStatus(requestDTO.getOrderStatus());
         Order saveOrder = orderRepository.save(order);
+        notificationService.createNotification(
+                saveOrder.getUser(),
+                "Order status updated.",
+                "Your order status has been updated." + saveOrder.getOrderStatus(),
+                NotificationType.ORDER_STATUS_UPDATED,
+                saveOrder.getId()
+        );
         return orderMapper.mapToOrderResponseDTO(saveOrder);
     }
 
@@ -138,10 +167,12 @@ public class OrderServiceImpl implements OrderService {
             return new OrderNotFoundException("Order Not Found Exception");
         });
         if (order.getOrderStatus() == OrderStatus.SHIPPED || order.getOrderStatus() == OrderStatus.DELIVERED) {
+            log.error("Invalid order of id: {}", orderId);
             throw new InvalidOrderStateException("Order cannot be cancelled after shipping or delivery.");
         }
 
         if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+            log.error("Order is already cancelled of id: {}", orderId);
             throw new InvalidOrderStateException("Order is already cancelled.");
         }
         for (OrderItem orderItem : order.getOrderItems()) {
@@ -152,8 +183,26 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(OrderStatus.CANCELLED);
         Order savedOrder = orderRepository.save(order);
 
-        return orderMapper.mapToOrderResponseDTO(savedOrder);
+        notificationService.createNotification(
+                savedOrder.getUser(),
+                "Order cancelled",
+                "Your order has been cancelled successfully.",
+                NotificationType.ORDER_CANCELLED,
+                savedOrder.getId()
+        );
 
+        for (OrderItem orderItem : savedOrder.getOrderItems()) {
+            Product product = orderItem.getProduct();
+
+            notificationService.createNotification(
+                    product.getVendor().getUser(),
+                    "Order cancelled",
+                    "Order for product " + product.getName() + " has been cancelled.",
+                    NotificationType.ORDER_CANCELLED,
+                    savedOrder.getId()
+            );
+        }
+        return orderMapper.mapToOrderResponseDTO(savedOrder);
     }
 
     private void validateCartItems(Cart cart) {
@@ -161,10 +210,12 @@ public class OrderServiceImpl implements OrderService {
             Product product = item.getProduct();
 
             if (product.getStatus() != ProductStatus.ACTIVE) {
+                log.error("Product is inactive of id: {}", product.getId());
                 throw new InvalidOrderStateException("Product '" + product.getName() + "' is inactive and cannot be ordered.");
             }
 
             if (product.getStockQuantity() == null || product.getStockQuantity() < item.getQuantity()) {
+                log.error("Insufficient product stock of id: {}", product.getId());
                 throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
             }
         }
@@ -172,6 +223,7 @@ public class OrderServiceImpl implements OrderService {
 
     private void validateOrderStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {
         if (currentStatus == OrderStatus.CANCELLED || currentStatus == OrderStatus.DELIVERED) {
+            log.error("Order status cannot be changed");
             throw new InvalidOrderStateException("Order status cannot be changed from " + currentStatus);
         }
     }

@@ -17,19 +17,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
-    private final AuthUtil authUtil;
 
     @PostMapping("/items")
     @LogExecutionTime
     public ApiResponseDto<CartResponseDto> addToCart(@Valid @RequestBody CartItemRequestDto cartItemRequestDto) {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Item added to cart successfully.",
-                cartService.addToCart(authUtil.getCurrentUserId(), cartItemRequestDto));
+                cartService.addToCart(AuthUtil.getCurrentUserId(), cartItemRequestDto));
     }
 
     @GetMapping
     @LogExecutionTime
     public ApiResponseDto<CartResponseDto> getCart() {
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Cart fetched successfully", cartService.getCartByUserId(authUtil.getCurrentUserId()));
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Cart fetched successfully", cartService.getCartByUserId(AuthUtil.getCurrentUserId()));
     }
 
     @PostMapping("/items/{productId}")
@@ -42,7 +41,7 @@ public class CartController {
                 ResponseStatus.SUCCESS.value,
                 "Cart item updated successfully.",
                 cartService.updateCartItem(
-                        authUtil.getCurrentUserId(),
+                        AuthUtil.getCurrentUserId(),
                         productId,
                         cartItemRequestDto.getQuantity()
                 )
@@ -55,14 +54,14 @@ public class CartController {
         return new ApiResponseDto<>(
                 ResponseStatus.SUCCESS.value,
                 "Item removed from cart successfully.",
-                cartService.removeItemFromCart(authUtil.getCurrentUserId(), productId)
+                cartService.removeItemFromCart(AuthUtil.getCurrentUserId(), productId)
         );
     }
 
     @DeleteMapping
     @LogExecutionTime
     public ApiResponseDto<Void> clearCart() {
-        cartService.clearCart(authUtil.getCurrentUserId());
+        cartService.clearCart(AuthUtil.getCurrentUserId());
         return new ApiResponseDto<>(
                 ResponseStatus.SUCCESS.value,
                 "Cart cleared successfully.",

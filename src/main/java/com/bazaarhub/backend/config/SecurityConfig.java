@@ -45,6 +45,10 @@ public class SecurityConfig {
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers("/api/vendor/approval/**")
+                        .hasRole(Role.ADMIN.name())
+                        .requestMatchers("/api/vendor/delete/**")
+                        .hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.GET, "/api/category/**")
                         .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name(),Role.CUSTOMER.name())
                         .requestMatchers(HttpMethod.POST, "/api/category/**")
@@ -52,19 +56,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/category/**")
                         .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
                         .requestMatchers(HttpMethod.DELETE, "/api/category/**")
-                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
-                        .requestMatchers(HttpMethod.POST, "/api/payment/cash/confirm")
-                        .hasAnyRole(Role.VENDOR.name(), Role.ADMIN.name())
-                )
+                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name()))
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .userDetailsService(customUserDetailsService)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/register", "/api/login", "/api/payment/esewa/**")
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/register", "/api/login", "/api/payment/esewa/**","/ws/**")
                         .permitAll().anyRequest()
                         .authenticated())
 
                 .httpBasic(Customizer.withDefaults()).addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+
     }
+
+
 }
