@@ -15,7 +15,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -60,7 +62,6 @@ class CategoryServiceImplTest {
     }
 
 
-
     @Test
     void createCategory_shouldSaveAndReturnCategory() {
         when(categoryRepository.existsByNameIgnoreCase("Electronics")).thenReturn(false);
@@ -94,6 +95,145 @@ class CategoryServiceImplTest {
         verify(categoryMapper, never()).mapToCategoryResponse(any());
     }
 
+    @Test
+    void getCategoryById_shouldReturnCategory_whenFound() {
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryMapper.mapToCategoryResponse(category)).thenReturn(categoryResponseDto);
+
+        CategoryResponseDto result = categoryService.getCategoryById(1L);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1L, result.getId());
+        Assertions.assertEquals("Electronics", result.getName());
+
+        verify(categoryRepository, times(1)).findById(1L);
+        verify(categoryMapper, times(1)).mapToCategoryResponse(category);
+    }
+
+    @Test
+    void getCategoryById_shouldThrowException_whenNotFound() {
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(
+                CategoryNotFoundException.class,
+                () -> categoryService.getCategoryById(99L)
+        );
+
+        verify(categoryRepository, times(1)).findById(99L);
+        verify(categoryMapper, never()).mapToCategoryResponse(any());
+    }
+
+    @Test
+    void getCategoryById_shouldThrowException_whenCategoryDeleted() {
+        category.setStatus(CategoryStatus.DELETED);
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+
+        Assertions.assertThrows(
+                CategoryNotFoundException.class,
+                () -> categoryService.getCategoryById(1L)
+        );
+
+        verify(categoryRepository, times(1)).findById(1L);
+        verify(categoryMapper, never()).mapToCategoryResponse(any());
+    }
+
+    @Test
+    void getAllCategories_shouldReturnPagedCategories() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("name").ascending());
+        Page<Category> categoryPage = new PageImpl<>(List.of(category), pageable, 1);
+
+        when(categoryRepository.findAll(any(Pageable.class))).thenReturn(categoryPage);
+        when(categoryMapper.mapToCategoryResponse(category)).thenReturn(categoryResponseDto);
+
+        Page<CategoryResponseDto> result = categoryService.getAllCategories(pageable);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.getTotalElements());
+        Assertions.assertEquals("Electronics", result.getContent().get(0).getName());
+
+        verify(categoryRepository, times(1)).findAll(any(Pageable.class));
+        verify(categoryMapper, times(1)).mapToCategoryResponse(category);
+    }
+
+    @Test
+    void updateCategoryById_shouldUpdateCategory_whenValid() {
+        CategoryRequestDto updateRequest = new CategoryRequestDto();
+        updateRequest.setName("Updated Electronics");
+        updateRequest.setDescription("Updated description");
+
+        CategoryResponseDto updatedResponse = new CategoryResponseDto(
+                1L,
+                0L,
+                "Updated Electronics",
+                "Updated description",
+                CategoryStatus.ACTIVE,
+                null,
+                null
+        );
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.existsByNameIgnoreCase("Updated Electronics")).thenReturn(false);
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.mapToCategoryResponse(category)).thenReturn(updatedResponse);
+
+        CategoryResponseDto result = categoryService.updateCategoryById(1L, updateRequest);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("Updated Electronics", result.getName());
+        Assertions.assertEquals("Updated description", result.getDescription());
+
+        verify(categoryRepository, times(1)).findById(1L);
+        verify(categoryRepository, times(1)).existsByNameIgnoreCase("Updated Electronics");
+        verify(categoryRepository, times(1)).save(category);
+        verify(categoryMapper, times(1)).mapToCategoryResponse(category);
+    }
+
+    @Test
+    void updateCategoryById_shouldUpdateDescriptionOnly_whenNameIsNull() {
+        CategoryRequestDto updateRequest = new CategoryRequestDto();
+        updateRequest.setName(null);
+        updateRequest.setDescription("Only description updated");
+
+        CategoryResponseDto updatedResponse = new CategoryResponseDto(
+                1L,
+                0L,
+                "Electronics",
+                "Only description updated",
+                CategoryStatus.ACTIVE,
+                null,
+                null
+        );
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.mapToCategoryResponse(category)).thenReturn(updatedResponse);
+
+        CategoryResponseDto result = categoryService.updateCategoryById(1L, updateRequest);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals("Electronics", result.getName());
+        Assertions.assertEquals("Only description updated", result.getDescription());
+
+        verify(categoryRepository, times(1)).findById(1L);
+        verify(categoryRepository, never()).existsByNameIgnoreCase(anyString());
+        verify(categoryRepository, times(1)).save(category);
+        verify(categoryMapper, times(1)).mapToCategoryResponse(category);
+    }
+
+    @Test
+    void updateCategoryById_shouldThrowException_whenCategoryNotFound() {
+        when(categoryRepository.findById(99L)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(
+                CategoryNotFoundException.class,
+                () -> categoryService.updateCategoryById(99L, categoryRequestDto)
+        );
+
+        verify(categoryRepository, times(1)).findById(99L);
+        verify(categoryRepository, never()).save(any(Category.class));
+        verify(categoryMapper, never()).mapToCategoryResponse(any());
+    }
 
 
     @Test

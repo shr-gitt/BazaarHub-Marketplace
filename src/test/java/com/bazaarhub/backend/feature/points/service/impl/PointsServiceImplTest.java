@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -38,6 +39,11 @@ class PointsServiceImplTest {
 
     @BeforeEach
     public void setUp() {
+        ReflectionTestUtils.setField(
+                pointsService,
+                "pointsRate",
+                new BigDecimal("0.01")
+        );
         user = new User();
         user.setId(1L);
 
@@ -88,7 +94,7 @@ class PointsServiceImplTest {
         when(pointsRepository.findByUserId(1L)).thenReturn(Optional.of(points));
         when(pointsRepository.save(any(Points.class))).thenReturn(points);
 
-        pointsService.updatePoints(user, new BigDecimal("1000"));
+        pointsService.updateUserPoints(user, new BigDecimal("1000"));
 
         Assertions.assertEquals(30, points.getPoints());
 
@@ -101,7 +107,7 @@ class PointsServiceImplTest {
         when(pointsRepository.findByUserId(1L)).thenReturn(Optional.empty());
         when(pointsRepository.save(any(Points.class))).thenReturn(points);
 
-        pointsService.updatePoints(user, new BigDecimal("500"));
+        pointsService.updateUserPoints(user, new BigDecimal("500"));
 
         verify(pointsRepository, times(2)).save(any(Points.class));
         verify(pointsRepository, times(1)).findByUserId(1L);
@@ -115,7 +121,7 @@ class PointsServiceImplTest {
         when(pointsRepository.save(any(Points.class))).thenReturn(points);
 
 
-        pointsService.updatePoints(user, new BigDecimal("99"));
+        pointsService.updateUserPoints(user, new BigDecimal("99"));
 
         Assertions.assertEquals(10, points.getPoints()); // unchanged
 
@@ -131,7 +137,7 @@ class PointsServiceImplTest {
         when(pointsRepository.save(any(Points.class))).thenReturn(points);
 
 
-        pointsService.updatePoints(user, new BigDecimal("3000"));
+        pointsService.updateUserPoints(user, new BigDecimal("3000"));
 
         Assertions.assertEquals(30, points.getPoints());
 

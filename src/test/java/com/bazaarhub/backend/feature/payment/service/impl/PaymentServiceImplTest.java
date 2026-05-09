@@ -1,6 +1,6 @@
-// PaymentServiceImplTest.java
 package com.bazaarhub.backend.feature.payment.service.impl;
 
+import com.bazaarhub.backend.feature.notification.service.NotificationService;
 import com.bazaarhub.backend.feature.order.entity.Order;
 import com.bazaarhub.backend.feature.order.repository.OrderRepository;
 import com.bazaarhub.backend.feature.payment.entity.Payment;
@@ -12,6 +12,7 @@ import com.bazaarhub.backend.feature.payment.mapper.PaymentMapper;
 import com.bazaarhub.backend.feature.payment.repository.PaymentRepository;
 import com.bazaarhub.backend.feature.payment.resource.request.PaymentRequestDto;
 import com.bazaarhub.backend.feature.payment.resource.response.PaymentResponseDto;
+import com.bazaarhub.backend.feature.points.service.PointsService;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.shared.enums.PaymentStatus;
 import com.bazaarhub.backend.shared.exception.OrderNotFoundException;
@@ -38,11 +39,27 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceImplTest {
 
-    @Mock private PaymentRepository paymentRepository;
-    @Mock private PaymentMapper paymentMapper;
-    @Mock private OrderRepository orderRepository;
-    @Mock private EsewaSignatureUtil esewaSignatureUtil;
-    @Mock private RestTemplate restTemplate;
+    @Mock
+    private PaymentRepository paymentRepository;
+
+    @Mock
+    private PaymentMapper paymentMapper;
+
+    @Mock
+    private OrderRepository orderRepository;
+
+    @Mock
+    private EsewaSignatureUtil esewaSignatureUtil;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private PointsService pointsService;
+
+    @Mock
+    private NotificationService notificationService;
+
 
     @InjectMocks
     private PaymentServiceImpl paymentService;
@@ -51,19 +68,23 @@ class PaymentServiceImplTest {
     private User user;
     private Payment payment;
 
-    @Value("${frontend.success.url}")
     private String frontendSuccessUrl;
-
-    @Value("${frontend.failure.url}")
     private String frontendFailureUrl;
 
     @BeforeEach
     void setUp() {
+
+        frontendSuccessUrl = "http://localhost:5173/payment/success";
+        frontendFailureUrl = "http://localhost:5173/payment/failure";
+
         ReflectionTestUtils.setField(paymentService, "merchantCode", "EPAYTEST");
         ReflectionTestUtils.setField(paymentService, "paymentUrl", "https://rc-epay.esewa.com.np/api/epay/main/v2/form");
         ReflectionTestUtils.setField(paymentService, "verifyUrl", "https://rc-epay.esewa.com.np/api/epay/transaction/status/");
         ReflectionTestUtils.setField(paymentService, "successUrl", "http://localhost:8080/api/payment/esewa/success");
         ReflectionTestUtils.setField(paymentService, "failureUrl", "http://localhost:8080/api/payment/esewa/failure");
+
+        ReflectionTestUtils.setField(paymentService, "frontendSuccessUrl", frontendSuccessUrl);
+        ReflectionTestUtils.setField(paymentService, "frontendFailureUrl", frontendFailureUrl);
 
         user = new User();
         ReflectionTestUtils.setField(user, "id", 1L);
@@ -80,13 +101,13 @@ class PaymentServiceImplTest {
         payment.setAmount(new BigDecimal("1000.00"));
         payment.setPaymentStatus(PaymentStatus.PENDING);
         payment.setOrder(order);
+        payment.setUser(user);
     }
 
     @Test
     void createPayment_shouldSucceedForValidRequest() {
         PaymentRequestDto dto = new PaymentRequestDto(1L, PaymentType.CASH_ON_DELIVERY);
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
-        when(esewaSignatureUtil.generateSignature(any())).thenReturn("signature123");
         when(paymentRepository.save(any())).thenReturn(payment);
         when(paymentMapper.mapToPaymentResponse(any())).thenReturn(new PaymentResponseDto());
 
@@ -137,6 +158,11 @@ class PaymentServiceImplTest {
         assertEquals(frontendFailureUrl, result);
         assertEquals(PaymentStatus.FAILED, order.getPaymentStatus());
         assertEquals(PaymentStatus.FAILED, payment.getPaymentStatus());
+
+        verify(pointsService, never()).updateUserPoints(any(), any());
+        verify(notificationService, times(1))
+                .createNotification(any(User.class), anyString(), anyString(), any(), anyLong());
+
     }
 
     @Test
@@ -164,11 +190,15 @@ class PaymentServiceImplTest {
     @Test
     void markPaymentFailed_shouldSetStatusToFailed() {
         when(paymentRepository.findByPid("ORD-1-1714000000000")).thenReturn(Optional.of(payment));
-        when(paymentRepository.save(any())).thenReturn(payment);
+        when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
         paymentService.markPaymentFailed("ORD-1-1714000000000");
 
         assertEquals(PaymentStatus.FAILED, payment.getPaymentStatus());
         assertEquals(PaymentStatus.FAILED, order.getPaymentStatus());
+        verify(notificationService, times(1))
+                .createNotification(any(User.class), anyString(), anyString(), any(), anyLong());
+
+        verify(paymentRepository, times(1)).save(payment);
     }
 }

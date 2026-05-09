@@ -3,6 +3,7 @@ package com.bazaarhub.backend.feature.order.service.impl;
 import com.bazaarhub.backend.feature.cart.entity.Cart;
 import com.bazaarhub.backend.feature.cart.entity.CartItem;
 import com.bazaarhub.backend.feature.cart.repository.CartRepository;
+import com.bazaarhub.backend.feature.notification.service.NotificationService;
 import com.bazaarhub.backend.feature.order.entity.Order;
 import com.bazaarhub.backend.feature.order.entity.OrderItem;
 import com.bazaarhub.backend.feature.order.mapper.OrderMapper;
@@ -14,6 +15,7 @@ import com.bazaarhub.backend.feature.product.entity.Product;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
+import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import com.bazaarhub.backend.shared.enums.*;
 
 import com.bazaarhub.backend.shared.exception.*;
@@ -48,6 +50,9 @@ class OrderServiceImplTest {
     @Mock
     private OrderMapper orderMapper;
 
+    @Mock
+    private NotificationService notificationService;
+
     @InjectMocks
     private OrderServiceImpl orderService;
 
@@ -59,27 +64,34 @@ class OrderServiceImplTest {
         User user = new User();
         user.setId(userId);
 
+        User vendorUser = new User();
+        vendorUser.setId(2L);
+
+        Vendor vendor = new Vendor();
+        vendor.setUser(vendorUser);
+
         Product product = new Product();
         product.setName("Laptop");
         product.setStockQuantity(10);
         product.setStatus(ProductStatus.ACTIVE);
+        product.setVendor(vendor);
 
         CartItem item = new CartItem();
         item.setProduct(product);
         item.setQuantity(2);
         item.setPricePerUnit(BigDecimal.valueOf(100));
 
-        List<CartItem> items = new ArrayList<>();
-        items.add(item);
-
         Cart cart = new Cart();
-        cart.setItems(items);
+        cart.setItems(new ArrayList<>(List.of(item)));
 
         OrderRequestDto request = new OrderRequestDto();
         request.setShippingAddress("Kathmandu");
         request.setContactNumber("9800000000");
+        request.setRemark("Test order");
 
         Order savedOrder = new Order();
+        savedOrder.setId(10L);
+        savedOrder.setUser(user);
 
         when(userRepository.findByIdAndUserStatusNot(eq(userId), any(UserStatus.class)))
                 .thenReturn(Optional.of(user));
@@ -100,6 +112,8 @@ class OrderServiceImplTest {
 
         verify(orderRepository, times(1)).save(any(Order.class));
         verify(cartRepository, times(1)).save(cart);
+        verify(notificationService, times(2))
+                .createNotification(any(User.class), anyString(), anyString(), any(), anyLong());
     }
 
     @Test
@@ -191,21 +205,31 @@ class OrderServiceImplTest {
         Long userId = 1L;
         Long orderId = 10L;
 
+        User customer = new User();
+        customer.setId(userId);
+
+        User vendorUser = new User();
+        vendorUser.setId(2L);
+
+        Vendor vendor = new Vendor();
+        vendor.setUser(vendorUser);
+
         Product product = new Product();
+        product.setName("Laptop");
         product.setStockQuantity(5);
+        product.setVendor(vendor);
 
         OrderItem item = new OrderItem();
         item.setProduct(product);
         item.setQuantity(2);
 
         Order order = new Order();
+        order.setId(orderId);
+        order.setUser(customer);
         order.setOrderStatus(OrderStatus.PENDING);
+        order.setOrderItems(new ArrayList<>(List.of(item)));
 
-        List<OrderItem> orderItems = new ArrayList<>();
-        orderItems.add(item);
-        order.setOrderItems(orderItems);
-
-        when(orderRepository.findByIdAndUserId(orderId, userId))
+        when(orderRepository.findById(orderId))
                 .thenReturn(Optional.of(order));
 
         when(orderRepository.save(any(Order.class)))
@@ -227,7 +251,7 @@ class OrderServiceImplTest {
         Order order = new Order();
         order.setOrderStatus(OrderStatus.DELIVERED);
 
-        when(orderRepository.findByIdAndUserId(anyLong(), anyLong()))
+        when(orderRepository.findById(anyLong()))
                 .thenReturn(Optional.of(order));
 
         assertThrows(InvalidOrderStateException.class,
@@ -237,7 +261,12 @@ class OrderServiceImplTest {
     @Test
     void updateOrderStatus_success() {
 
+        User user = new User();
+        user.setId(1L);
+
         Order order = new Order();
+        order.setId(10L);
+        order.setUser(user);
         order.setOrderStatus(OrderStatus.PENDING);
 
         OrderStatusUpdateRequestDto dto = new OrderStatusUpdateRequestDto();
@@ -256,5 +285,8 @@ class OrderServiceImplTest {
 
         assertNotNull(response);
         assertEquals(OrderStatus.SHIPPED, order.getOrderStatus());
+
+        verify(notificationService, times(1))
+                .createNotification(any(User.class), anyString(), anyString(), any(), anyLong());
     }
 }
