@@ -56,7 +56,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/category/**")
                         .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
                         .requestMatchers(HttpMethod.DELETE, "/api/category/**")
-                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name()))
+                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
+                        .requestMatchers(HttpMethod.GET, "/api/vendor/**")
+                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name(),Role.CUSTOMER.name())
+                        .requestMatchers(HttpMethod.POST, "/api/vendor/**")
+                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
+                )
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .userDetailsService(customUserDetailsService)

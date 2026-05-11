@@ -1,5 +1,6 @@
 package com.bazaarhub.backend.feature.customerProfile.resource.response;
 
+import com.bazaarhub.backend.feature.address.resource.response.AddressResponseDto;
 import com.bazaarhub.backend.feature.user.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +24,7 @@ public class CustomerProfileResponseDTO implements Serializable {
     private String phoneNumber;
     private String profileImageUrl;
     private LocalDate dateOfBirth;
-    private String address;
+    private AddressResponseDto addressResponseDto;
     private List<String> preferences;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

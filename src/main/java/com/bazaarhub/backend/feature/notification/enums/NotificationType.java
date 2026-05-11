@@ -7,5 +7,6 @@ public enum NotificationType {
     ORDER_CANCELLED,
     PAYMENT_SUCCESS,
     PAYMENT_FAILED,
-    VENDOR_APPROVED
+    VENDOR_APPROVED,
+    VENDOR_REJECTED
 }

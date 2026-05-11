@@ -35,35 +35,35 @@ public class VendorController {
     }
 
     @PostMapping("/vendor/create")
+    @LogExecutionTime
     public ApiResponseDto<VendorResponseDto> createVendor(@RequestBody @Valid VendorRequestDto vendorRequestDto) {
-        Long userId = AuthUtil.getCurrentUserId();
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor created", vendorService.createVendor(userId, vendorRequestDto));
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor created", vendorService.createVendor(AuthUtil.getCurrentUserId(), vendorRequestDto));
     }
 
-    @PostMapping("/vendor/update")
+    @PostMapping("/vendor/update/{id}")
+    @LogExecutionTime
     public ApiResponseDto<VendorResponseDto> updateVendor(
+            @PathVariable Long id,
             @RequestBody @Valid VendorRequestDto vendorRequestDto
     ) {
-        Long userId = AuthUtil.getCurrentUserId();
 
         return new ApiResponseDto<>(
                 ResponseStatus.SUCCESS.value,
                 "Vendor updated.",
-                vendorService.updateVendor(userId, vendorRequestDto)
+                vendorService.updateVendor(AuthUtil.getCurrentUserId(), id, vendorRequestDto)
         );
     }
 
     @PostMapping("/vendor/approval/{vendorId}")
     @LogExecutionTime
     public ApiResponseDto<VendorResponseDto> approveVendor(@PathVariable Long vendorId, @RequestBody @Valid ApprovalRequestDto approvalRequestDto) {
-        Long approverId = AuthUtil.getCurrentUserId();
-        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor approval updated.", vendorService.approveVendor(approverId, vendorId, approvalRequestDto));
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor approval updated.", vendorService.approveVendor(AuthUtil.getCurrentUserId(), vendorId, approvalRequestDto));
     }
 
     @PostMapping("/vendor/delete/{id}")
     @LogExecutionTime
     public ApiResponseDto<Boolean> deleteVendor(@PathVariable Long id) {
-        vendorService.deleteVendor(id);
+        vendorService.deleteVendor(AuthUtil.getCurrentUserId(), id);
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor deleted.");
     }
 }

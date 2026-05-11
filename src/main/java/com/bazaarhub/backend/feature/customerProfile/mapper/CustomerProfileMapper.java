@@ -1,5 +1,7 @@
 package com.bazaarhub.backend.feature.customerProfile.mapper;
 
+import com.bazaarhub.backend.feature.address.entity.Address;
+import com.bazaarhub.backend.feature.address.mapper.AddressMapper;
 import com.bazaarhub.backend.feature.customerProfile.entity.CustomerProfile;
 import com.bazaarhub.backend.feature.customerProfile.enums.Preferences;
 import com.bazaarhub.backend.feature.customerProfile.resource.request.CustomerProfileRequestDTO;
@@ -12,10 +14,12 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class CustomerProfileMapper {
-    public CustomerProfile mapToCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO) {
+    private final AddressMapper addressMapper;
+
+    public CustomerProfile mapToCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO, Address address) {
         CustomerProfile customerProfile = new CustomerProfile();
         customerProfile.setDateOfBirth(customerProfileRequestDTO.getDateOfBirth());
-        customerProfile.setAddress(customerProfileRequestDTO.getAddress());
+        customerProfile.setAddress(address);
         customerProfile.setPreferences(customerProfileRequestDTO.getPreferences());
         return customerProfile;
     }
@@ -32,7 +36,7 @@ public class CustomerProfileMapper {
                 customerProfile.getUser().getPhoneNumber(),
                 customerProfile.getProfileImageUrl(),
                 customerProfile.getDateOfBirth(),
-                customerProfile.getAddress(),
+                addressMapper.mapToAddressResponseDto(customerProfile.getAddress()),
                 customerProfile.getPreferences()
                         .stream()
                         .map(Preferences::fromId)
@@ -40,8 +44,6 @@ public class CustomerProfileMapper {
                         .collect(Collectors.toList()),
                 customerProfile.getCreatedAt(),
                 customerProfile.getModifiedAt()
-
-
         );
     }
 }
