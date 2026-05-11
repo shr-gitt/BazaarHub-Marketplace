@@ -1,1 +1,215 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+.auth-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 42px;
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.register-card {
+  max-width: 640px;
+}
+
+.auth-brand {
+  text-align: center;
+  margin-bottom: 32px;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #6b7280;
+    font-size: 15px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-weight: 600;
+    font-size: 14px;
+  }
+}
+
+.form-control {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 15px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  }
+
+  &.is-invalid {
+    border-color: #ef4444;
+  }
+}
+
+.invalid-feedback {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #ef4444;
+}
+
+.btn-primary {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+
+  &:hover {
+    background: #1d4ed8;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.auth-footer {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+
+  a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+  }
+}
+
+.alert {
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.alert-danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.alert-success {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.role-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.role-option {
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+  transition: 0.2s ease;
+
+  &:hover {
+    border-color: #2563eb;
+    background: #f8fafc;
+  }
+
+  &.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+}
+
+.role-icon {
+  font-size: 20px;
+}
+
+.show-pass-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 28px;
+  }
+
+  .register-card {
+    max-width: 460px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

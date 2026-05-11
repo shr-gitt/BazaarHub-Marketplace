@@ -1,0 +1,14 @@
+<nav class="navbar">
+  <a routerLink="/" class="brand">BazaarHub</a>
+
+  <div class="nav-links">
+    <a routerLink="/customer/dashboard" *ngIf="auth.isCustomer()">Customer</a>
+    <a routerLink="/vendor/dashboard" *ngIf="auth.isVendor()">Vendor</a>
+    <a routerLink="/admin/dashboard" *ngIf="auth.isAdmin()">Admin</a>
+
+    <a routerLink="/login" *ngIf="!auth.isLoggedIn()">Login</a>
+    <a routerLink="/register" *ngIf="!auth.isLoggedIn()">Register</a>
+
+    <button *ngIf="auth.isLoggedIn()" (click)="logout()">Logout</button>
+  </div>
+</nav>

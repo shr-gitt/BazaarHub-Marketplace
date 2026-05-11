@@ -1,0 +1,129 @@
+<div class="auth-page">
+  <div class="auth-card register-card">
+    <div class="auth-brand">
+      <h1>BazaarHub</h1>
+      <p>Create your free account</p>
+    </div>
+
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input
+            id="firstName"
+            type="text"
+            class="form-control"
+            formControlName="firstName"
+            placeholder="Enter first name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input
+            id="lastName"
+            type="text"
+            class="form-control"
+            formControlName="lastName"
+            placeholder="Enter last name"
+          />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input
+            id="phoneNumber"
+            type="text"
+            class="form-control"
+            formControlName="phoneNumber"
+            placeholder="Enter phone number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" class="form-control" formControlName="gender">
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="form-control"
+          [class.is-invalid]="f['email'].invalid && f['email'].touched"
+          formControlName="email"
+          placeholder="your@email.com"
+        />
+        <span
+          class="invalid-feedback"
+          *ngIf="f['email'].invalid && f['email'].touched"
+        >
+          <ng-container *ngIf="f['email'].errors?.['required']">
+            Email is required.
+          </ng-container>
+          <ng-container *ngIf="f['email'].errors?.['email']">
+            Invalid email.
+          </ng-container>
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password">Password</label>
+        <input
+          id="reg-password"
+          type="password"
+          class="form-control"
+          [class.is-invalid]="f['password'].invalid && f['password'].touched"
+          formControlName="password"
+          placeholder="Min. 8 characters"
+        />
+        <span
+          class="invalid-feedback"
+          *ngIf="f['password'].invalid && f['password'].touched"
+        >
+          <ng-container *ngIf="f['password'].errors?.['required']">
+            Password is required.
+          </ng-container>
+          <ng-container *ngIf="f['password'].errors?.['minlength']">
+            Minimum 8 chars.
+          </ng-container>
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>Register as</label>
+        <div class="role-selector">
+          <label
+            class="role-option"
+            *ngFor="let r of roles"
+            [class.selected]="f['role'].value === r"
+          >
+            <input type="radio" formControlName="role" [value]="r" hidden />
+            <span class="role-icon">{{ r === "CUSTOMER" ? "🛒" : "🏪" }}</span>
+            <span>{{ r }}</span>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        <span *ngIf="!loading">Create Account</span>
+        <span *ngIf="loading">Creating...</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <h1>BazaarHub</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="form-control"
+          [class.is-invalid]="email.invalid && email.touched"
+          formControlName="email"
+          placeholder="Enter your email address"
+          autocomplete="email"
+        />
+        <span class="invalid-feedback" *ngIf="email.invalid && email.touched">
+          <ng-container *ngIf="email.errors?.['required']">
+            Email is required.
+          </ng-container>
+          <ng-container *ngIf="email.errors?.['email']">
+            Must be a valid email address.
+          </ng-container>
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          [type]="showPassword ? 'text' : 'password'"
+          class="form-control"
+          [class.is-invalid]="password.invalid && password.touched"
+          formControlName="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+        />
+        <span
+          class="invalid-feedback"
+          *ngIf="password.invalid && password.touched"
+        >
+          <ng-container *ngIf="password.errors?.['required']">
+            Password is required.
+          </ng-container>
+          <ng-container *ngIf="password.errors?.['minlength']">
+            Minimum 8 characters.
+          </ng-container>
+        </span>
+      </div>
+
+      <div class="show-pass-toggle">
+        <input
+          type="checkbox"
+          id="showPass"
+          [(ngModel)]="showPassword"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <label for="showPass">Show password</label>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        <span *ngIf="!loading">Sign In</span>
+        <span *ngIf="loading">Signing in...</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Don't have an account? <a routerLink="/register">Create one</a>
+    </div>
+  </div>
+</div>
