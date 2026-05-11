@@ -21,16 +21,6 @@ public class AddressController {
 
     private final AddressService addressService;
 
-    @PostMapping("/address")
-    @LogExecutionTime
-    public ApiResponseDto<AddressResponseDto> createAddress(
-            @Valid @RequestBody AddressRequestDto addressRequestDto) {
-        return new ApiResponseDto<>(
-                ResponseStatus.SUCCESS.value,
-                "Address created successfully",
-                addressService.createAddress(addressRequestDto));
-    }
-
     @GetMapping("/address/{id}")
     @LogExecutionTime
     public ApiResponseDto<AddressResponseDto> getAddressById(
@@ -49,26 +39,5 @@ public class AddressController {
                 ResponseStatus.SUCCESS.value,
                 "Addresses fetched successfully",
                 addressService.getAllAddresses(pageable));
-    }
-
-    @PostMapping("/update-address/{id}")
-    @LogExecutionTime
-    public ApiResponseDto<AddressResponseDto> updateAddressById(
-            @PathVariable("id") Long id,
-            @Valid @RequestBody AddressRequestDto addressRequestDto) {
-        return new ApiResponseDto<>(
-                ResponseStatus.SUCCESS.value,
-                "Address updated successfully",
-                addressService.updateAddress(id, addressRequestDto));
-    }
-
-    @DeleteMapping("/address/{id}")
-    @LogExecutionTime
-    public ApiResponseDto<String> deleteAddressById(
-            @PathVariable("id") Long id) {
-        addressService.deleteAddress(id);
-        return new ApiResponseDto<>(
-                ResponseStatus.SUCCESS.value,
-                "Address deleted successfully");
     }
 }

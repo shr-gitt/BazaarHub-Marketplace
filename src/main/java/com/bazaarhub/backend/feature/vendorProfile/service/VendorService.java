@@ -13,9 +13,9 @@ public interface VendorService {
 
     VendorResponseDto createVendor(Long userId, VendorRequestDto vendorRequestDto);
 
-    VendorResponseDto updateVendor(Long userId, VendorRequestDto vendorRequestDto);
+    VendorResponseDto updateVendor(Long userId, Long vendorId, VendorRequestDto vendorRequestDto);
 
     VendorResponseDto approveVendor(Long approverId,Long vendorId, ApprovalRequestDto approvalRequestDto);
 
-    void deleteVendor (Long vendorId);
+    void deleteVendor (Long userId, Long vendorId);
 }
