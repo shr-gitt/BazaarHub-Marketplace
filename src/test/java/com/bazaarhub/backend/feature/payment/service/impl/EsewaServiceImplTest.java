@@ -1,6 +1,5 @@
 package com.bazaarhub.backend.feature.payment.service.impl;
 
-import com.bazaarhub.backend.feature.payment.exception.EsewaVerificationException;
 import com.bazaarhub.backend.feature.payment.service.PaymentService;
 import com.bazaarhub.backend.feature.payment.util.EsewaSignatureUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
