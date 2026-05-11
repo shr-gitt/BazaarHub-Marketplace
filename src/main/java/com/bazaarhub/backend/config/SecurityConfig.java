@@ -18,6 +18,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -40,8 +45,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
@@ -50,18 +68,18 @@ public class SecurityConfig {
                         .requestMatchers("/api/vendor/delete/**")
                         .hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.GET, "/api/category/**")
-                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name(),Role.CUSTOMER.name())
+                        .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name(), Role.CUSTOMER.name())
                         .requestMatchers(HttpMethod.POST, "/api/category/**")
-                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
+                        .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name())
                         .requestMatchers(HttpMethod.PUT, "/api/category/**")
-                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name())
+                        .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name())
                         .requestMatchers(HttpMethod.DELETE, "/api/category/**")
-                        .hasAnyRole(Role.ADMIN.name(),Role.VENDOR.name()))
+                        .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name()))
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .userDetailsService(customUserDetailsService)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/register", "/api/login", "/api/payment/esewa/**","/ws/**")
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/register", "/api/login", "/api/payment/esewa/**", "/ws/**")
                         .permitAll().anyRequest()
                         .authenticated())
 
