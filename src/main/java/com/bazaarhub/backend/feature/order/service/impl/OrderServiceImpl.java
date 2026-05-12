@@ -3,6 +3,7 @@ package com.bazaarhub.backend.feature.order.service.impl;
 import com.bazaarhub.backend.config.CacheConfig;
 import com.bazaarhub.backend.feature.cart.entity.Cart;
 import com.bazaarhub.backend.feature.cart.entity.CartItem;
+import com.bazaarhub.backend.feature.cart.exception.CartNotFoundException;
 import com.bazaarhub.backend.feature.cart.repository.CartRepository;
 import com.bazaarhub.backend.feature.notification.enums.NotificationType;
 import com.bazaarhub.backend.feature.notification.service.NotificationService;
@@ -60,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
 
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
             log.error("Cart not found of user id : {}", userId);
-            return new EmptyCartCheckoutException("Cart not found");
+            return new CartNotFoundException("Cart not found");
         });
 
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
