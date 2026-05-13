@@ -35,6 +35,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -54,6 +56,23 @@ public class VendorServiceImpl implements VendorService {
         log.info("Fetching all vendors.");
         return vendorRepository.findAll(pageable)
                 .map(vendorMapper::mapToVendorResponse);
+    }
+
+    @Override
+    public List<VendorResponseDto> getVendorsByUser(Long userId){
+        log.info("Fetching all vendors of user id = {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> {
+                    log.error("Vendor fetching failed. User not found of id={}", userId);
+                    return new UserNotFoundException("User not found with given id.");
+                }
+        );
+
+        List<Vendor> vendors = vendorRepository.findByUser(user);
+
+        return vendors.stream()
+                .map(vendorMapper::mapToVendorResponse)
+                .toList();
     }
 
     @Override

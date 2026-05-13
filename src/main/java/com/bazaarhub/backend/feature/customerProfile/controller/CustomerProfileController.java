@@ -39,6 +39,12 @@ public class CustomerProfileController {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Customer Profile fetched successfully", response);
     }
 
+    @GetMapping("/customer-profile/my")
+    @LogExecutionTime
+    public ApiResponseDto<CustomerProfileResponseDTO> getCustomerByUser(){
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "All Vendors fetched by User.", customerProfileService.getCustomerProfileByUser(AuthUtil.getCurrentUserId()));
+    }
+
     @PostMapping("/update-customer-profile/{id}")
     @LogExecutionTime
     public ApiResponseDto<CustomerProfileResponseDTO> updateCustomerProfileById(@PathVariable long id, @Valid @RequestBody CustomerProfileRequestDTO customerProfileRequestDTO) {

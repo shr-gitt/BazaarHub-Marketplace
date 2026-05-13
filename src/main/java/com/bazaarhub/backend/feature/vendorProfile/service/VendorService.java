@@ -6,8 +6,12 @@ import com.bazaarhub.backend.feature.vendorProfile.resource.response.VendorRespo
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface VendorService {
     Page<VendorResponseDto> getAllVendors(Pageable pageable);
+
+    List<VendorResponseDto> getVendorsByUser(Long userId);
 
     VendorResponseDto getVendorById(Long id);
 

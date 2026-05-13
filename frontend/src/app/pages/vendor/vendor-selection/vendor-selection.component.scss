@@ -1,0 +1,90 @@
+.vendor-page {
+  min-height: 100vh;
+  color: #2d2525;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #544848;
+  }
+}
+
+/* States */
+.error {
+  color: #ff4d4d;
+  margin-bottom: 20px;
+}
+
+.loading {
+  color: #aaa;
+}
+
+/* Vendor list */
+.vendor-list {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Vendor item */
+.vendor-item {
+  background: #d2b8b8;
+  padding: 16px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  transition: 0.2s ease;
+
+  &:hover {
+    background: #bb9292;
+    transform: translateX(4px);
+  }
+}
+
+.vendor-name {
+  font-size: 1rem;
+}
+
+.vendor-action {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+/* Empty */
+.empty {
+  color: #777;
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Create button */
+.create {
+  margin-top: 30px;
+  color: #4da3ff;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

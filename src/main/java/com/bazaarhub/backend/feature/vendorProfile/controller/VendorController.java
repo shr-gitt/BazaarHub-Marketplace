@@ -16,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -26,6 +28,12 @@ public class VendorController {
     @LogExecutionTime
     public ApiResponseDto<Page<VendorResponseDto>> getAllVendors(@PageableDefault(sort = "modifiedAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "All Vendors fetched", vendorService.getAllVendors(pageable));
+    }
+
+    @GetMapping("/vendors/my")
+    @LogExecutionTime
+    public ApiResponseDto<List<VendorResponseDto>> getVendorsByUser(){
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "All Vendors fetched by User.", vendorService.getVendorsByUser(AuthUtil.getCurrentUserId()));
     }
 
     @GetMapping("/vendor/{id}")
