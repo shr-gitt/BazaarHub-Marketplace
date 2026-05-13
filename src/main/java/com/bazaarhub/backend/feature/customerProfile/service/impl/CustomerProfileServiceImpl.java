@@ -84,6 +84,12 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
         return customerProfileMapper.mapToCustomerProfileResponseDTO(profile);
     }
 
+    @Override
+    @Cacheable(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#id")
+    public CustomerProfileResponseDTO getCustomerProfileByUser(Long userId) {
+        CustomerProfile profile = customerProfileRepository.findByUserId(userId);
+        return customerProfileMapper.mapToCustomerProfileResponseDTO(profile);
+    }
 
     @Override
     @Transactional

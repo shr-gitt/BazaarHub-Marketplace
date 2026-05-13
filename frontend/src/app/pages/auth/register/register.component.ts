@@ -61,7 +61,7 @@ export class RegisterComponent {
         if (selectedRole === 'CUSTOMER') {
           this.router.navigate(['/customer/profile-setup']);
         } else if (selectedRole === 'VENDOR') {
-          this.router.navigate(['/vendor/profile-setup']);
+          this.router.navigate(['/vendor/profile-setup'], {state: { isUpdate: false }});
         }
       },
       error: (err) => {

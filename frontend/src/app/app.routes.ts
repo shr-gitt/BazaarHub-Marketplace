@@ -6,6 +6,9 @@ import { AdminDashboardComponent } from './pages/admin/admin-dashboard/admin-das
 import { RegisterComponent } from './pages/auth/register/register.component';
 import { CustomerProfileSetupComponent } from './pages/customer/customer-profile-setup/customer-profile-setup.component';
 import { VendorProfileSetupComponent } from './pages/vendor/vendor-profile-setup/vendor-profile-setup.component';
+import { VendorSelectionComponent } from './pages/vendor/vendor-selection/vendor-selection.component';
+import { VendorProfileComponent } from './pages/vendor/vendor-profile/vendor-profile.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 export const routes: Routes = [
   {
@@ -18,6 +21,11 @@ export const routes: Routes = [
 
   { path: 'customer/profile-setup', component: CustomerProfileSetupComponent },
   { path: 'vendor/profile-setup', component: VendorProfileSetupComponent },
+
+  { path: 'vendor/selection', component: VendorSelectionComponent },
+  { path: 'vendor/profile', component: VendorProfileComponent },
+
+  { path: 'profile', component: ProfileComponent },
 
   { path: 'admin/dashboard', component: AdminDashboardComponent },
   { path: 'vendor/dashboard', component: VendorDashboardComponent },

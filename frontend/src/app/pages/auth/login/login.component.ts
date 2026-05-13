@@ -74,7 +74,7 @@ export class LoginComponent {
   private redirectByRole(): void {
     const role = this.auth.getRole();
     if (role === 'ADMIN') this.router.navigate(['/admin/dashboard']);
-    else if (role === 'VENDOR') this.router.navigate(['/vendor/dashboard']);
+    else if (role === 'VENDOR') this.router.navigate(['/vendor/selection']);
     else this.router.navigate(['/customer/dashboard']);
   }
 

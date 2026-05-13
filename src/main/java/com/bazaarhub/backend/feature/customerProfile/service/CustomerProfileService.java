@@ -10,5 +10,7 @@ public interface CustomerProfileService {
 
     CustomerProfileResponseDTO getCustomerProfileById(Long id);
 
+    CustomerProfileResponseDTO getCustomerProfileByUser(Long userId);
+
     CustomerProfileResponseDTO updateCustomerProfileById(Long userId, Long id, CustomerProfileRequestDTO customerProfileRequestDTO);
 }
