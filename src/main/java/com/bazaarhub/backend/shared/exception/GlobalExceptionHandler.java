@@ -20,6 +20,7 @@ import com.bazaarhub.backend.shared.enums.ResponseStatus;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
 import jakarta.persistence.EntityExistsException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -285,5 +286,12 @@ public class GlobalExceptionHandler {
         log.error("Minio not connected.");
         return buildErrorResponse("Something went wrong.", HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(FileSizeLimitExceededException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleFileSizeExceedException(FileSizeLimitExceededException ex) {
+        log.error("File size exceed.");
+        return buildErrorResponse("File size exceed.", HttpStatus.BAD_REQUEST);
+    }
+
 
 }
