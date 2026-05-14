@@ -1,4 +1,4 @@
-package com.bazaarhub.backend.shared.validation.validator;
+package com.bazaarhub.backend.shared.validation;
 
 import com.bazaarhub.backend.shared.validation.annotation.ValidPassword;
 import jakarta.validation.ConstraintValidator;

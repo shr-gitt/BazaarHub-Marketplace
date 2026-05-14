@@ -1,0 +1,25 @@
+<aside class="sidebar" [class.open]="isOpen">
+  <div class="sidebar-header mobile-only">
+    <h2>BazaarHub</h2>
+    <button class="close-btn" (click)="close.emit()">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <nav class="nav-menu">
+    <div class="nav-section">
+      <p class="nav-section-title">MAIN MENU</p>
+      <a
+        *ngFor="let item of navItems"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="nav-item"
+        (click)="close.emit()"
+      >
+        <span class="material-icons">{{ item.icon }}</span>
+        <span>{{ item.label }}</span>
+      </a>
+    </div>
+  </nav>
+</aside>
+<div class="overlay" *ngIf="isOpen" (click)="close.emit()"></div>

@@ -1,0 +1,9 @@
+.product-thumb {
+  width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);
+}
+.thumb-placeholder { font-size: 28px; opacity: 0.4; }
+.pagination {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding: 16px; border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--text-secondary);
+}

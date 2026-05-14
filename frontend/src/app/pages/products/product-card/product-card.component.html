@@ -1,0 +1,36 @@
+<div class="product-card">
+  <img class="product-image" [src]="imageSrc" [alt]="product.name" />
+
+  <div class="product-info">
+    <h3>{{ product.name }}</h3>
+
+    <p class="description">
+      {{ product.description }}
+    </p>
+
+    <div class="price-section">
+      <ng-container *ngIf="product.discountPrice; else normalPrice">
+        <span class="discount-price">
+          Rs. {{ product.price - product.discountPrice }}
+        </span>
+
+        <span class="old-price"> Rs. {{ product.price }} </span>
+      </ng-container>
+
+      <ng-template #normalPrice>
+        <span class="normal-price"> Rs. {{ product.price }} </span>
+      </ng-template>
+    </div>
+
+    <p class="stock">Stock: {{ product.stockQuantity }}</p>
+
+    <div class="actions" *ngIf="isVendorView">
+      <button class="edit-btn" (click)="onEdit()">Edit</button>
+      <button class="delete-btn" (click)="onDelete()">Delete</button>
+    </div>
+
+    <div class="actions" *ngIf="!isVendorView">
+      <button class="cart-btn" (click)="onAddToCart()">Add to Cart</button>
+    </div>
+  </div>
+</div>
