@@ -1,0 +1,39 @@
+<div class="page-header">
+  <div>
+    <h2>🗂️ Categories</h2>
+    <p class="subtitle">{{ totalElements }} categories</p>
+  </div>
+  <a routerLink="/categories/add" class="btn btn-primary">+ Add Category</a>
+</div>
+
+<div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+<div class="card">
+  <div *ngIf="loading" class="loading-overlay"><div class="spinner"></div></div>
+  <div class="table-wrapper" *ngIf="!loading">
+    <table *ngIf="categories.length > 0">
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let c of categories; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td><strong>{{ c.name }}</strong></td>
+          <td>{{ c.description || '—' }}</td>
+          <td><span class="badge badge-success">{{ c.status || 'ACTIVE' }}</span></td>
+          <td>
+            <div class="flex gap-2">
+              <a [routerLink]="['/categories/edit', c.id]" class="btn btn-outline btn-sm">✏️ Edit</a>
+              <button class="btn btn-danger btn-sm" (click)="delete(c.id)">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="empty-state" *ngIf="categories.length === 0">
+      <div class="empty-icon">🗂️</div>
+      <h4>No categories yet</h4>
+      <a routerLink="/categories/add" class="btn btn-primary mt-4">+ Add Category</a>
+    </div>
+  </div>
+</div>

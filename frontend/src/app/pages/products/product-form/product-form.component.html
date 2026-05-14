@@ -1,0 +1,79 @@
+<div class="page-header">
+  <div>
+    <h2>{{ isEdit ? '✏️ Edit Product' : '+ Add Product' }}</h2>
+    <p class="subtitle">{{ isEdit ? 'Update product details' : 'Add a new product to your store' }}</p>
+  </div>
+  <a routerLink="/products" class="btn btn-ghost">← Back to Products</a>
+</div>
+
+<div class="card" style="max-width:700px">
+  <div class="card-body">
+    <div *ngIf="loading" class="loading-overlay"><div class="spinner"></div></div>
+
+    <div class="alert alert-danger"  *ngIf="error">{{ error }}</div>
+    <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading" novalidate>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" class="form-control" formControlName="name"
+            [class.is-invalid]="f['name'].invalid && f['name'].touched" placeholder="Enter product name">
+          <span class="invalid-feedback" *ngIf="f['name'].invalid && f['name'].touched">Required (min 3 chars).</span>
+        </div>
+
+        <div class="form-group">
+          <label>Category *</label>
+          <select class="form-control" formControlName="categoryId" [class.is-invalid]="f['categoryId'].invalid && f['categoryId'].touched">
+            <option value="">-- Select Category --</option>
+            <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+          </select>
+          <span class="invalid-feedback" *ngIf="f['categoryId'].invalid && f['categoryId'].touched">Select a category.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea class="form-control" formControlName="description"
+          [class.is-invalid]="f['description'].invalid && f['description'].touched"
+          placeholder="Product description..."></textarea>
+        <span class="invalid-feedback" *ngIf="f['description'].invalid && f['description'].touched">Required.</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Price (Rs.) *</label>
+          <input type="number" class="form-control" formControlName="price"
+            [class.is-invalid]="f['price'].invalid && f['price'].touched" placeholder="0.00" min="0">
+          <span class="invalid-feedback" *ngIf="f['price'].invalid && f['price'].touched">Valid price required.</span>
+        </div>
+        <div class="form-group">
+          <label>Stock Quantity *</label>
+          <input type="number" class="form-control" formControlName="stockQuantity"
+            [class.is-invalid]="f['stockQuantity'].invalid && f['stockQuantity'].touched" placeholder="0" min="0">
+          <span class="invalid-feedback" *ngIf="f['stockQuantity'].invalid && f['stockQuantity'].touched">Valid stock required.</span>
+        </div>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label>Product Image {{ isEdit ? '(optional, replaces existing)' : '*' }}</label>
+        <label class="file-upload-area" for="productFile">
+          <img *ngIf="previewUrl" [src]="previewUrl" alt="Preview" class="preview-img">
+          <div *ngIf="!previewUrl">
+            <div class="upload-icon">🖼️</div>
+            <p>Click to upload image (JPG, PNG)</p>
+          </div>
+          <input id="productFile" type="file" accept="image/*" (change)="onFileSelected($event)">
+        </label>
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary" [disabled]="loadingSave">
+          {{ loadingSave ? 'Saving...' : (isEdit ? '💾 Update Product' : '🚀 Create Product') }}
+        </button>
+        <a routerLink="/products" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

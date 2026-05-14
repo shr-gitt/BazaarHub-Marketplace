@@ -1,0 +1,12 @@
+.notif-list { display: flex; flex-direction: column; }
+.notif-item {
+  display: flex; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--border); transition: var(--transition);
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba(108,99,255,0.02); }
+  &.unread { background: rgba(108,99,255,0.06); .notif-title { font-weight: 700; color: var(--text-primary); } }
+}
+.notif-icon { font-size: 24px; padding-top: 4px; }
+.notif-content { flex: 1; }
+.notif-title { font-size: 14px; margin-bottom: 4px; color: var(--text-secondary); display:flex; align-items:center; }
+.notif-message { font-size: 14px; color: var(--text-primary); line-height: 1.4; margin-bottom: 8px; }
+.notif-time { font-size: 11px; color: var(--text-light); }
