@@ -1,4 +1,25 @@
-@use "../login/login.component.scss";
+.auth-page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 800px;
+
+  background: #fff;
+
+  border-radius: 20px;
+
+  padding: 40px;
+
+  box-sizing: border-box;
+}
 
 .role-selector {
   display: flex;
@@ -32,5 +53,62 @@
 
   .role-icon {
     font-size: 24px;
+  }
+}
+
+.btn-primary {
+  width: 100%;
+
+  padding: 14px 18px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #00a651,
+    #008f45
+  );
+
+  color: white;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+
+  box-shadow:
+    0 8px 24px rgba(0, 166, 81, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 28px rgba(0, 166, 81, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  a {
+    color: var(--primary);
+    font-weight: 600;
   }
 }

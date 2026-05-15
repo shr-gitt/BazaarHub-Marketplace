@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 
 interface NavItem {
   label: string;
@@ -48,7 +48,7 @@ export class SidebarComponent implements OnInit {
     {
       label: 'My Profile',
       icon: '🏢',
-      route: '/vendor/profile',
+      route: '/profile',
       roles: ['VENDOR'],
     },
 
@@ -74,12 +74,6 @@ export class SidebarComponent implements OnInit {
       label: 'Orders',
       icon: '📋',
       route: '/orders',
-      roles: ['ADMIN', 'VENDOR', 'CUSTOMER'],
-    },
-    {
-      label: 'Notifications',
-      icon: '🔔',
-      route: '/notifications',
       roles: ['ADMIN', 'VENDOR', 'CUSTOMER'],
     },
   ];

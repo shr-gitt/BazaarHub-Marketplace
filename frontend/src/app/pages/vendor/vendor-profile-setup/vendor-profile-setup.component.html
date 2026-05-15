@@ -39,7 +39,7 @@
         <input class="form-control" formControlName="registrationNo" />
       </div>
 
-      <div formGroupName="addressRequestDto">
+      <!-- <div formGroupName="addressRequestDto">
         <div class="form-grid">
           <div class="form-group">
             <label>Province</label>
@@ -51,7 +51,7 @@
             <input class="form-control" formControlName="district" />
           </div>
         </div>
-
+ 
         <div class="form-grid">
           <div class="form-group">
             <label>Municipality</label>
@@ -79,7 +79,9 @@
             <input class="form-control" formControlName="postalCode" />
           </div>
         </div>
-      </div>
+      </div> -->
+
+      <app-address [group]="addressForm"></app-address>
 
       <button class="btn-primary" type="submit">Create Vendor Profile</button>
     </form>

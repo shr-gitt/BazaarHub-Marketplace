@@ -55,8 +55,13 @@ export class VendorSelectionComponent implements OnInit {
   }
 
   onCreateVendor(): void {
-    this.router.navigate(['/vendor/profile'], {
+    this.router.navigate(['/vendor/profile-setup'], {
       state: { isUpdate: false },
     });
+  }
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
   }
 }

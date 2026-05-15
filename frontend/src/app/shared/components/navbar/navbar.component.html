@@ -1,25 +1,23 @@
 <nav class="navbar">
-  <a routerLink="/" class="brand">BazaarHub</a>
+  <div class="navbar-left">
+    <span class="page-title"></span>
+  </div>
 
-  <nav class="sidebar-nav">
-    <a
-      *ngFor="let item of filteredNav"
-      [routerLink]="item.route"
-      routerLinkActive="active"
-      class="nav-item"
-      >
-      <span class="nav-label" >{{ item.label }}</span>
+  <div class="navbar-right">
+    <!-- Notification Bell -->
+    <a routerLink="/notifications" class="notif-btn" *ngIf="true">
+      <span class="bell-icon">🔔</span>
+      <span class="badge-dot" *ngIf="unreadCount > 0">{{
+        unreadCount > 99 ? "99+" : unreadCount
+      }}</span>
     </a>
-  </nav>
 
-  <div class="nav-links">
-    <a routerLink="/customer/dashboard" *ngIf="auth.isCustomer()">Customer</a>
-    <a routerLink="/vendor/dashboard" *ngIf="auth.isVendor()">Vendor</a>
-    <a routerLink="/admin/dashboard" *ngIf="auth.isAdmin()">Admin</a>
-
-    <a routerLink="/login" *ngIf="!auth.isLoggedIn()">Login</a>
-    <a routerLink="/register" *ngIf="!auth.isLoggedIn()">Register</a>
-
-    <button *ngIf="auth.isLoggedIn()" (click)="logout()">Logout</button>
+    <!-- User Dropdown Trigger -->
+    <div class="user-chip">
+      <div class="chip-avatar">{{ userId }}</div>
+      <div class="chip-info">
+        <span class="chip-role">{{ role }}</span>
+      </div>
+    </div>
   </div>
 </nav>

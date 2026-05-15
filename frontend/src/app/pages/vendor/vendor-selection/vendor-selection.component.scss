@@ -80,11 +80,54 @@
 /* Create button */
 .create {
   margin-top: 30px;
+  margin-bottom: 30px;
   color: #4da3ff;
   cursor: pointer;
   font-weight: 500;
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.75rem 1.5rem;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: #d14848;
+  color: #ffffff;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2);
+
+  &:hover {
+    background-color: #da1b1b;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(220, 38, 38, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
   }
 }
