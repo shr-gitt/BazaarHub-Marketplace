@@ -18,12 +18,9 @@ import { CustomerDashboardComponent } from './pages/customer/customer-dashboard/
 
 // Features (Products)
 import { RecommendedProductsComponent } from './pages/products/recommended-products/recommended-products.component';
-import { CreateProductComponent } from './pages/products/create-product/create-product.component';
-import { EditProductComponent } from './pages/products/edit-product/edit-product.component';
 
 // Pages
 import { CartComponent } from './pages/cart/cart.component';
-import { OrderListComponent } from './pages/orders/order-list/order-list.component';
 import { CheckoutComponent } from './pages/orders/checkout/checkout.component';
 import { CategoryListComponent } from './pages/categories/category-list/category-list.component';
 import { CategoryFormComponent } from './pages/categories/category-form/category-form.component';
@@ -34,6 +31,9 @@ import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-la
 import { roleGuard } from './core/guards/role.guard';
 import { ProductListComponent } from './pages/products/product-list/product-list.component';
 import { ProductDetailComponent } from './pages/products/product-detail/product-detail.component';
+import { OrderListComponent } from './pages/orders/order-list/order-list.component';
+import { VendorSelectionComponent } from './pages/vendor/vendor-selection/vendor-selection.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 export const routes: Routes = [
   // Authentication Routes
@@ -53,6 +53,13 @@ export const routes: Routes = [
         path: 'vendor/profile-setup',
         component: VendorProfileSetupComponent,
         canActivate: [authGuard],
+      },
+
+      {
+        path: 'vendor/selection',
+        component: VendorSelectionComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'VENDOR' },
       },
     ],
   },
@@ -91,6 +98,12 @@ export const routes: Routes = [
         data: { expectedRole: 'CUSTOMER' },
       },
       { path: 'notifications', component: NotificationsComponent },
+      {
+        path: 'profile',
+        component: ProfileComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: ['VENDOR', 'CUSTOMER', 'ADMIN'] },
+      },
     ],
   },
 
@@ -101,21 +114,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       // Vendor
+
       {
         path: 'vendor/dashboard',
         component: VendorDashboardComponent,
-        canActivate: [roleGuard],
-        data: { expectedRole: 'VENDOR' },
-      },
-      {
-        path: 'vendor/products/create',
-        component: CreateProductComponent,
-        canActivate: [roleGuard],
-        data: { expectedRole: 'VENDOR' },
-      },
-      {
-        path: 'vendor/products/edit/:id',
-        component: EditProductComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'VENDOR' },
       },

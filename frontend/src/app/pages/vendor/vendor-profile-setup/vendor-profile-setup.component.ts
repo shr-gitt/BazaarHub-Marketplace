@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { AddressComponent } from '../../../shared/components/address/address.component';
+
 import {
   FormBuilder,
   FormGroup,
@@ -12,7 +14,7 @@ import { Router, RouterModule } from '@angular/router';
 @Component({
   selector: 'app-vendor-profile-setup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, AddressComponent],
   templateUrl: './vendor-profile-setup.component.html',
   styleUrl: './vendor-profile-setup.component.scss',
 })
@@ -81,5 +83,9 @@ export class VendorProfileSetupComponent {
       err?.message ||
       'Something went wrong. Please try again.'
     );
+  }
+
+  get addressForm(): FormGroup {
+    return this.profileForm.get('addressRequestDto') as FormGroup;
   }
 }
