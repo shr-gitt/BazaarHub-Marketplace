@@ -1,0 +1,98 @@
+<div class="homepage-clean">
+  <section class="hero-clean">
+    <div class="container hero-container">
+      <div class="hero-text">
+        <span class="badge-fresh">100% Authentic Quality</span>
+        <h1>New & Authentic<br />Products for You</h1>
+        <p>
+          Discover thousands of local vendors offering the best deals with
+          ultra-fast delivery. Your one-stop shop for everything you need.
+        </p>
+
+        <div class="search-box">
+          <span class="material-icons search-icon">search</span>
+          <input type="text" placeholder="Search for products, categories..." />
+          <button class="btn btn-primary">Search</button>
+        </div>
+
+        <div class="hero-highlights">
+          <span
+            ><span class="material-icons">local_shipping</span> Free Delivery on
+            orders over $50</span
+          >
+          <span
+            ><span class="material-icons">verified</span> Verified Local
+            Vendors</span
+          >
+        </div>
+      </div>
+
+      <div class="hero-image-wrapper">
+        <div class="hero-image-bg"></div>
+        <img src="assets/cart_hero.png" alt="Cart Overview" class="hero-img" />
+      </div>
+    </div>
+  </section>
+
+  <section class="categories-clean">
+    <div class="container">
+      <div class="category-list">
+        <div class="category-pill active">All Products</div>
+        <div class="category-pill">Gadgets</div>
+        <div class="category-pill">Electronics</div>
+        <div class="category-pill">Fashion</div>
+        <div class="category-pill">Home & Kitchen</div>
+        <div class="category-pill">Daily Needs</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="products-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Recommended For You</h2>
+        <a routerLink="/products" class="view-all"
+          >View All <span class="material-icons">arrow_forward</span></a
+        >
+      </div>
+
+      <div class="loader-container" *ngIf="isLoading">
+        <app-loading-spinner></app-loading-spinner>
+      </div>
+
+      <div
+        class="product-grid"
+        *ngIf="!isLoading && recommendedProducts.length > 0"
+      >
+        <app-product-card
+          *ngFor="let product of recommendedProducts"
+          [product]="product"
+        ></app-product-card>
+      </div>
+
+      <div
+        class="empty-state-clean"
+        *ngIf="!isLoading && recommendedProducts.length === 0"
+      >
+        <span class="material-icons">inventory_2</span>
+        <h3>No Products Available Right Now</h3>
+        <p>Our vendors are currently restocking. Check back soon!</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="promo-clean">
+    <div class="container promo-banner">
+      <div class="promo-content">
+        <h2>Become a Vendor Today</h2>
+        <p>Join thousands of sellers growing their business with BazaarHub.</p>
+        <button
+          (click)="authService.open('REGISTER')"
+          class="btn btn-outline-white"
+        >
+          Register as Vendor
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

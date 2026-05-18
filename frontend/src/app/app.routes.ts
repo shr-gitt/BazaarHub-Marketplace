@@ -34,14 +34,22 @@ import { ProductDetailComponent } from './pages/products/product-detail/product-
 import { OrderListComponent } from './pages/orders/order-list/order-list.component';
 import { VendorSelectionComponent } from './pages/vendor/vendor-selection/vendor-selection.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { PublicLayoutComponent } from './layout/public-layout/public-layout.component';
+import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
-  // Authentication Routes
+  {
+    path: '',
+    component: PublicLayoutComponent,
+    children: [
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'home', component: HomeComponent },
+    ],
+  },
   {
     path: '',
     component: AuthLayoutComponent,
     children: [
-      { path: '', redirectTo: 'login', pathMatch: 'full' },
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       {
@@ -64,7 +72,6 @@ export const routes: Routes = [
     ],
   },
 
-  // Customer / Main Routes
   {
     path: '',
     component: MainLayoutComponent,
@@ -107,14 +114,11 @@ export const routes: Routes = [
     ],
   },
 
-  // Dashboard Routes (Vendor & Admin)
   {
     path: '',
     component: DashboardLayoutComponent,
     canActivate: [authGuard],
     children: [
-      // Vendor
-
       {
         path: 'vendor/dashboard',
         component: VendorDashboardComponent,
@@ -128,7 +132,6 @@ export const routes: Routes = [
         data: { expectedRole: 'VENDOR' },
       },
 
-      // Admin
       {
         path: 'admin/dashboard',
         component: AdminDashboardComponent,
@@ -162,5 +165,5 @@ export const routes: Routes = [
     ],
   },
 
-  { path: '**', redirectTo: 'login' },
+  { path: '**', redirectTo: 'home' },
 ];
