@@ -1,0 +1,43 @@
+<header class="pub-nav">
+  <a routerLink="/home" class="pub-brand">BazaarHub</a>
+  <div class="pub-nav-links">
+    <a routerLink="/home" class="pub-link">Home</a>
+    <button
+      (click)="authService.open('LOGIN')"
+      class="btn btn-secondary btn-sm"
+    >
+      Login
+    </button>
+    <button
+      (click)="authService.open('REGISTER')"
+      class="btn btn-primary btn-sm"
+    >
+      Sign Up
+    </button>
+  </div>
+</header>
+
+<main>
+  <router-outlet></router-outlet>
+</main>
+
+<app-auth-modal
+  *ngIf="showAuthModal"
+  [initialMode]="authMode"
+  (close)="authService.close()"
+></app-auth-modal>
+
+<footer class="pub-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">BazaarHub</span>
+    <span class="footer-copy">&copy; 2026 BazaarHub. All rights reserved.</span>
+    <div class="footer-links">
+      <button (click)="authService.open('LOGIN')" class="foot-btn">
+        Login
+      </button>
+      <button (click)="authService.open('REGISTER')" class="foot-btn">
+        Register
+      </button>
+    </div>
+  </div>
+</footer>
