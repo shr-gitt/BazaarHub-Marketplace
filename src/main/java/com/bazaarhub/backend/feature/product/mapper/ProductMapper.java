@@ -28,6 +28,7 @@ public class ProductMapper {
                 product.getDiscountPrice(),
                 product.getStockQuantity(),
                 product.getImageUrl(),
+                product.getCategory().getId(),
                 product.getCategory().getName(),
                 product.getStatus(),
                 product.getVendor().getShopName(),

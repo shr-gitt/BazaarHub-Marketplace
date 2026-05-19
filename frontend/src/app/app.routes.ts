@@ -21,7 +21,6 @@ import { RecommendedProductsComponent } from './pages/products/recommended-produ
 
 // Pages
 import { CartComponent } from './pages/cart/cart.component';
-import { CheckoutComponent } from './pages/orders/checkout/checkout.component';
 import { CategoryListComponent } from './pages/categories/category-list/category-list.component';
 import { CategoryFormComponent } from './pages/categories/category-form/category-form.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
@@ -31,11 +30,12 @@ import { DashboardLayoutComponent } from './layout/dashboard-layout/dashboard-la
 import { roleGuard } from './core/guards/role.guard';
 import { ProductListComponent } from './pages/products/product-list/product-list.component';
 import { ProductDetailComponent } from './pages/products/product-detail/product-detail.component';
-import { OrderListComponent } from './pages/orders/order-list/order-list.component';
 import { VendorSelectionComponent } from './pages/vendor/vendor-selection/vendor-selection.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { PublicLayoutComponent } from './layout/public-layout/public-layout.component';
 import { HomeComponent } from './pages/home/home.component';
+import { EditProductComponent } from './pages/products/edit-product/edit-product.component';
+import { CreateProductComponent } from './pages/products/create-product/create-product.component';
 
 export const routes: Routes = [
   {
@@ -86,24 +86,30 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { expectedRole: 'CUSTOMER' },
       },
-      {
-        path: 'checkout',
-        component: CheckoutComponent,
-        canActivate: [roleGuard],
-        data: { expectedRole: 'CUSTOMER' },
-      },
+
+      //ToDO: Add cart checkout flow
+
+      // {
+      //   path: 'checkout',
+      //   component: CheckoutComponent,
+      //   canActivate: [roleGuard],
+      //   data: { expectedRole: 'CUSTOMER' },
+      // },
       {
         path: 'customer/dashboard',
         component: CustomerDashboardComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'CUSTOMER' },
       },
-      {
-        path: 'customer/orders',
-        component: OrderListComponent,
-        canActivate: [roleGuard],
-        data: { expectedRole: 'CUSTOMER' },
-      },
+
+      //ToDO: Add customer orders flow
+
+      // {
+      //   path: 'customer/orders',
+      //   component: OrderListComponent,
+      //   canActivate: [roleGuard],
+      //   data: { expectedRole: 'CUSTOMER' },
+      // },
       { path: 'notifications', component: NotificationsComponent },
       {
         path: 'profile',
@@ -125,12 +131,34 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { expectedRole: 'VENDOR' },
       },
+
       {
-        path: 'vendor/orders',
-        component: OrderListComponent,
+        path: 'vendor/products',
+        component: ProductListComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'VENDOR' },
       },
+      {
+        path: 'vendor/products/create',
+        component: CreateProductComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'VENDOR' },
+      },
+      {
+        path: 'vendor/products/edit/:id',
+        component: EditProductComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'VENDOR' },
+      },
+
+      //ToDO: Add vendor Order route
+
+      // {
+      //   path: 'vendor/orders',
+      //   component: OrderListComponent,
+      //   canActivate: [roleGuard],
+      //   data: { expectedRole: 'VENDOR' },
+      // },
 
       {
         path: 'admin/dashboard',
@@ -156,12 +184,14 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { expectedRole: 'ADMIN' },
       },
-      {
-        path: 'admin/orders',
-        component: OrderListComponent,
-        canActivate: [roleGuard],
-        data: { expectedRole: 'ADMIN' },
-      },
+      //ToDO: Admin order
+
+      // {
+      //   path: 'admin/orders',
+      //   component: OrderListComponent,
+      //   canActivate: [roleGuard],
+      //   data: { expectedRole: 'ADMIN' },
+      // },
     ],
   },
 

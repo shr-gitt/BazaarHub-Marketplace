@@ -51,6 +51,11 @@ public class GlobalExceptionHandler {
         log.error("Unexpected error occurred", ex);
         return buildErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleRuntimeException(RuntimeException ex) {
+        log.error("Unexpected error occurred", ex);
+        return buildErrorResponse("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponseDto<?>> httpMessageNotReadableException(HttpMessageNotReadableException ex) {

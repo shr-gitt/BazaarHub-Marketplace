@@ -25,6 +25,8 @@ public class ProductResponseDto implements Serializable {
 
     private String imageUrl;
 
+    private Long categoryId;
+
     private String category;
 
     private ProductStatus status;

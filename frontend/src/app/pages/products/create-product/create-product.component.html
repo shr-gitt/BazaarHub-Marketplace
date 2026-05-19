@@ -1,0 +1,154 @@
+<section class="create-product-page">
+  <div class="page-header">
+    <div>
+      <h1>Add Product</h1>
+      <p>Add a new product to your BazaarHub store.</p>
+    </div>
+
+    <button type="button" class="btn-outline" (click)="cancel()">Cancel</button>
+  </div>
+
+  <form class="product-card" [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="form-grid">
+      <div class="form-section">
+        <h2>Product Information</h2>
+
+        <div class="form-group">
+          <label>Product Name</label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Enter product name"
+          />
+
+          <small
+            *ngIf="
+              productForm.get('name')?.touched &&
+              productForm.get('name')?.invalid
+            "
+          >
+            Product name is required.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea
+            rows="5"
+            formControlName="description"
+            placeholder="Write product description"
+          ></textarea>
+
+          <small
+            *ngIf="
+              productForm.get('description')?.touched &&
+              productForm.get('description')?.invalid
+            "
+          >
+            Description is required.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price</label>
+            <input type="number" formControlName="price" placeholder="0" />
+
+            <small
+              *ngIf="
+                productForm.get('price')?.touched &&
+                productForm.get('price')?.invalid
+              "
+            >
+              Valid price is required.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Discount Price</label>
+            <input
+              type="number"
+              formControlName="discountPrice"
+              placeholder="Optional"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Stock Quantity</label>
+            <input
+              type="number"
+              formControlName="stockQuantity"
+              placeholder="0"
+            />
+
+            <small
+              *ngIf="
+                productForm.get('stockQuantity')?.touched &&
+                productForm.get('stockQuantity')?.invalid
+              "
+            >
+              Stock quantity is required.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Category ID</label>
+            <input type="number" formControlName="categoryId" placeholder="1" />
+
+            <small
+              *ngIf="
+                productForm.get('categoryId')?.touched &&
+                productForm.get('categoryId')?.invalid
+              "
+            >
+              Category is required.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-section">
+        <h2>Product Image</h2>
+
+        <label class="image-upload">
+          <input
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+          />
+
+          <div *ngIf="!imagePreview" class="upload-placeholder">
+            <span class="material-icons">cloud_upload</span>
+            <p>Click to upload product image</p>
+          </div>
+
+          <img
+            *ngIf="imagePreview"
+            [src]="imagePreview"
+            alt="Product preview"
+          />
+        </label>
+      </div>
+    </div>
+
+    <div class="alert error" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <div class="alert success" *ngIf="success">
+      {{ success }}
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="cancel()">
+        Cancel
+      </button>
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? "Creating..." : "Add Product" }}
+      </button>
+    </div>
+  </form>
+</section>

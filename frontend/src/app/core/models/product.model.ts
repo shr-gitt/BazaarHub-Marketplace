@@ -18,6 +18,8 @@ export interface ProductResponse {
   discountPrice?: number;
   stockQuantity: number;
   imageUrl?: string;
+
+  categoryId: number;
   category: string;
   status: ProductStatus;
   vendorName: string;

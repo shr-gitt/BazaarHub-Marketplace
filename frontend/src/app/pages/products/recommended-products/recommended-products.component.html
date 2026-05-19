@@ -1,1 +1,75 @@
-<p>recommended-products works!</p>
+<section class="recommended-section">
+  <div class="section-header">
+    <div>
+      <h2>Recommended Products</h2>
+      <p>Products selected based on your preferences.</p>
+    </div>
+  </div>
+
+  <div class="loading-box" *ngIf="loading">Loading recommended products...</div>
+
+  <div class="error-box" *ngIf="error && !loading">
+    {{ error }}
+  </div>
+
+  <div class="empty-box" *ngIf="!loading && !error && products.length === 0">
+    No recommended products found.
+  </div>
+
+  <div class="product-grid" *ngIf="!loading && products.length > 0">
+    <div class="product-card" *ngFor="let product of products">
+      <div class="image-wrapper">
+        <img
+          *ngIf="product.imageUrl; else noImage"
+          [src]="product.imageUrl"
+          [alt]="product.name"
+        />
+
+        <ng-template #noImage>
+          <div class="no-image">
+            <span class="material-icons">image_not_supported</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="product-info">
+        <span class="category">{{ product.category }}</span>
+
+        <h3>{{ product.name }}</h3>
+
+        <p class="description">
+          {{ product.description }}
+        </p>
+
+        <div class="price-row">
+          <span class="price" [class.has-discount]="product.discountPrice">
+            Rs. {{ product.price }}
+          </span>
+
+          <span class="discount-price" *ngIf="product.discountPrice">
+            Rs. {{ product.discountPrice }}
+          </span>
+        </div>
+
+        <div class="meta-row">
+          <span>{{ product.stockQuantity }} in stock</span>
+          <span>{{ product.vendorName }}</span>
+        </div>
+
+        <a class="view-btn" [routerLink]="['/products', product.id]">
+          View Details
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="page === 0">Previous</button>
+
+    <span>Page {{ page + 1 }} of {{ totalPages }}</span>
+
+    <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">
+      Next
+    </button>
+  </div>
+</section>
