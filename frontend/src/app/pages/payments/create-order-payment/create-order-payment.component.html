@@ -1,0 +1,104 @@
+<div
+  *ngIf="isLoading"
+  class="flex justify-content-center align-items-center"
+  style="height: 300px"
+>
+  <p-progress-spinner strokeWidth="4" />
+</div>
+
+<div *ngIf="!isLoading">
+  <h2 class="checkout-title">Payment</h2>
+
+  <div class="grid checkout-grid">
+    <div class="col-12 md:col-5 sticky-summary">
+      <app-order-summary></app-order-summary>
+    </div>
+
+    <div class="col-12 md:col-7 flex flex-column gap-4">
+      <p-card styleClass="form-card">
+        <ng-template pTemplate="header">
+          <div class="card-header">
+            <span class="card-header-title">Payment Method</span>
+          </div>
+        </ng-template>
+
+        <form [formGroup]="paymentForm" class="flex flex-column gap-5">
+          <div class="flex flex-column gap-4">
+            <div
+              class="payment-option"
+              [class.selected]="
+                paymentForm.get('paymentType')?.value === 'CASH_ON_DELIVERY'
+              "
+              (click)="
+                paymentForm.get('paymentType')?.setValue('CASH_ON_DELIVERY')
+              "
+            >
+              <p-radiobutton
+                name="paymentType"
+                value="CASH_ON_DELIVERY"
+                formControlName="paymentType"
+                inputId="paymentType1"
+              />
+              <label for="paymentType1" class="option-label">
+                <i class="pi pi-money-bill"></i>
+                Cash on Delivery
+              </label>
+            </div>
+            <div
+              class="payment-option"
+              [class.selected]="
+                paymentForm.get('paymentType')?.value === 'WALLET'
+              "
+              (click)="paymentForm.get('paymentType')?.setValue('WALLET')"
+            >
+              <p-radiobutton
+                name="paymentType"
+                value="WALLET"
+                formControlName="paymentType"
+                inputId="paymentType2"
+              />
+              <label for="paymentType1" class="option-label">
+                <i class="pi pi-wallet"></i>
+                eSewa
+              </label>
+            </div>
+            <div
+              class="payment-option"
+              [class.selected]="
+                paymentForm.get('paymentType')?.value === 'MOBILE_BANKING'
+              "
+              (click)="
+                paymentForm.get('paymentType')?.setValue('MOBILE_BANKING')
+              "
+            >
+              <p-radiobutton
+                name="paymentType"
+                value="MOBILE_BANKING"
+                formControlName="paymentType"
+                inputId="paymentType1"
+              />
+              <label for="paymentType3" class="option-label">
+                <i class="pi pi-credit-card"></i>
+                Mobile Banking
+              </label>
+            </div>
+          </div>
+        </form>
+      </p-card>
+
+      <div *ngIf="errorMessage" class="error-banner">
+        <i class="pi pi-exclamation-triangle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <p-button
+        label="Perform Payment"
+        iconPos="left"
+        styleClass="proceed-btn"
+        [loading]="isSubmitting"
+        [disabled]="isSubmitting"
+        (onClick)="proceedToPayment()"
+      />
+    </div>
+  </div>
+</div>

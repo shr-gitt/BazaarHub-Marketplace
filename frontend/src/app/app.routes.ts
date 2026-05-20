@@ -36,6 +36,9 @@ import { PublicLayoutComponent } from './layout/public-layout/public-layout.comp
 import { HomeComponent } from './pages/home/home.component';
 import { EditProductComponent } from './pages/products/edit-product/edit-product.component';
 import { CreateProductComponent } from './pages/products/create-product/create-product.component';
+import { OrderListComponent } from './pages/orders/order-list/order-list.component';
+import { OrderCheckoutComponent } from './pages/orders/order-checkout/order-checkout.component';
+import { OrderPaymentComponent } from './pages/payments/order-payment/order-payment.component';
 
 export const routes: Routes = [
   {
@@ -87,17 +90,21 @@ export const routes: Routes = [
         data: { expectedRole: 'CUSTOMER' },
       },
 
-      //ToDO: Add cart checkout flow
-
-      // {
-      //   path: 'checkout',
-      //   component: CheckoutComponent,
-      //   canActivate: [roleGuard],
-      //   data: { expectedRole: 'CUSTOMER' },
-      // },
       {
-        path: 'customer/dashboard',
-        component: CustomerDashboardComponent,
+        path: 'orders',
+        component: OrderListComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'CUSTOMER' },
+      },
+      {
+        path: 'checkout',
+        component: OrderCheckoutComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'CUSTOMER' },
+      },
+      {
+        path: 'payment',
+        component: OrderPaymentComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'CUSTOMER' },
       },
@@ -110,6 +117,12 @@ export const routes: Routes = [
       //   canActivate: [roleGuard],
       //   data: { expectedRole: 'CUSTOMER' },
       // },
+      {
+        path: 'customer/dashboard',
+        component: CustomerDashboardComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'CUSTOMER' },
+      },
       { path: 'notifications', component: NotificationsComponent },
       {
         path: 'profile',
@@ -120,11 +133,14 @@ export const routes: Routes = [
     ],
   },
 
+  // Dashboard Routes (Vendor & Admin)
   {
     path: '',
     component: DashboardLayoutComponent,
     canActivate: [authGuard],
     children: [
+      // Vendor
+
       {
         path: 'vendor/dashboard',
         component: VendorDashboardComponent,
@@ -160,6 +176,7 @@ export const routes: Routes = [
       //   data: { expectedRole: 'VENDOR' },
       // },
 
+      // Admin
       {
         path: 'admin/dashboard',
         component: AdminDashboardComponent,

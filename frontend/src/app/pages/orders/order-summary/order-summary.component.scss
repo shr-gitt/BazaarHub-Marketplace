@@ -1,0 +1,110 @@
+$esewa-green: #60BB46;
+$esewa-green-xlight: #f4fbf0;
+$text-primary: #1a1a1a;
+$text-secondary: #6b7280;
+$border-color: #e5e7eb;
+
+::ng-deep .summary-card,
+::ng-deep .form-card {
+  border-radius: 14px !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07) !important;
+  border: 1px solid $border-color !important;
+  overflow: hidden;
+
+  .p-card-body {
+    padding: 0 !important;
+  }
+
+  .p-card-content {
+    padding: 1.25rem 1.5rem 1.5rem !important;
+  }
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: $esewa-green-xlight;
+  border-radius: 8px;
+  border: 1px solid darken($esewa-green-xlight, 5%);
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.item-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.item-qty {
+  font-size: 0.75rem;
+  color: $text-secondary;
+}
+
+.item-price {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.price-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid $border-color;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-label {
+  font-size: 0.875rem;
+  color: $text-secondary;
+}
+
+.price-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $text-primary;
+}
+
+.price-free {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $esewa-green;
+}
+
+.total-row {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed $border-color;
+}
+
+.total-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.total-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $esewa-green;
+}

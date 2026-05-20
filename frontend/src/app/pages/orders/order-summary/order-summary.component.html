@@ -1,0 +1,33 @@
+<p-card styleClass="summary-card">
+  <ng-template pTemplate="header">
+    <div class="card-header">
+      <span class="card-header-title">Order Summary</span>
+      <span class="item-count">{{ cart?.items?.length || 0 }} item(s)</span>
+    </div>
+  </ng-template>
+
+  <div class="cart-items">
+    <div *ngFor="let item of cart?.items" class="cart-item"> <!-- ← safe navigation -->
+      <div class="item-info">
+        <span class="item-name">{{ item.productName }}</span>
+        <span class="item-qty">Qty: {{ item.quantity }}</span>
+      </div>
+      <span class="item-price">Rs. {{ item.pricePerUnit * item.quantity }}</span>
+    </div>
+  </div>
+
+  <div class="price-breakdown">
+    <div class="price-row">
+      <span class="price-label">Subtotal</span>
+      <span class="price-value">Rs. {{ subtotal }}</span>
+    </div>
+    <div class="price-row">
+      <span class="price-label">Delivery</span>
+      <span class="price-free">Free</span>
+    </div>
+    <div class="price-row total-row">
+      <span class="total-label">Total</span>
+      <span class="total-value">Rs. {{ subtotal }}</span>
+    </div>
+  </div>
+</p-card>

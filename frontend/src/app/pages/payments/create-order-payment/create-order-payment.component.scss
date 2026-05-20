@@ -1,0 +1,99 @@
+.checkout-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.checkout-grid {
+  align-items: flex-start;
+}
+
+.sticky-summary {
+  position: sticky;
+  top: 1.5rem;
+  align-self: flex-start;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+}
+
+.card-header-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.item-count {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.error-text {
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.error-banner {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; 
+  cursor: pointer;
+}
+
+.option-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem; 
+}
+
+::ng-deep .proceed-btn {
+  width: 100%;
+  justify-content: center;
+
+  &.p-button {
+    padding: 0.85rem 1.5rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    transition: background-color 0.2s ease, transform 0.1s ease !important;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+::ng-deep {
+  .p-inputtext:focus,
+  .p-textarea:focus {
+    box-shadow: 0 0 0 3px rgba(96, 187, 70, 0.15) !important;
+  }
+}

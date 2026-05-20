@@ -13,13 +13,17 @@ public class PaymentResponseDto {
     private Long id;
     private String transaction_uuid;
     private BigDecimal amount;
+    private BigDecimal taxAmount;
+    private BigDecimal totalAmount;
+    private BigDecimal serviceCharge;
+    private BigDecimal deliveryCharge;
+    private String productCode;
     private String paymentUrl;
     private PaymentStatus paymentStatus;
     private PaymentType paymentType;
     private String refId;
     private String successUrl;
     private String failureUrl;
-    private String merchantCode;
     private String signature;
     private String signedFieldNames;
 }

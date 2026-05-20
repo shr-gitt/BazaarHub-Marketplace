@@ -1,0 +1,119 @@
+$esewa-green: #60BB46;
+$esewa-green-dark: #4a9934;
+$esewa-green-light: #e8f5e2;
+$esewa-green-xlight: #f4fbf0;
+$text-primary: #1a1a1a;
+$text-secondary: #6b7280;
+$border-color: #e5e7eb;
+$error-color: #dc2626;
+$white: #ffffff;
+$page-bg: #f3f4f6;
+
+.checkout-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 1.5rem;
+}
+
+.checkout-grid {
+  align-items: flex-start;
+}
+
+.sticky-summary {
+  position: sticky;
+  top: 1.5rem;
+  align-self: flex-start;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid $border-color;
+  background-color: $white;
+}
+
+.card-header-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.item-count {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: $esewa-green;
+  background-color: $esewa-green-light;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.required-star {
+  color: $error-color;
+}
+
+.error-text {
+  font-size: 0.78rem;
+  color: $error-color;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.error-banner {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: $error-color;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+::ng-deep .proceed-btn {
+  width: 100%;
+  justify-content: center;
+
+  &.p-button {
+    background-color: $esewa-green !important;
+    border-color: $esewa-green !important;
+    padding: 0.85rem 1.5rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    transition: background-color 0.2s ease, transform 0.1s ease !important;
+
+    &:hover:not(:disabled) {
+      background-color: $esewa-green-dark !important;
+      border-color: $esewa-green-dark !important;
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+::ng-deep {
+  .p-inputtext:focus,
+  .p-textarea:focus {
+    border-color: $esewa-green !important;
+    box-shadow: 0 0 0 3px rgba(96, 187, 70, 0.15) !important;
+  }
+
+  .p-floatlabel:has(input:focus) label,
+  .p-floatlabel:has(textarea:focus) label {
+    color: $esewa-green !important;
+  }
+}

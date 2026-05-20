@@ -26,6 +26,7 @@ export interface VendorRequest {
 }
 
 export interface VendorResponse{
+  id: number;
   shopName: string;
   businessEmail: string;
   businessPhone: string;

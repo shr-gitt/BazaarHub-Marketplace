@@ -28,6 +28,7 @@ import com.bazaarhub.backend.shared.exception.EmptyCartCheckoutException;
 import com.bazaarhub.backend.shared.exception.InsufficientStockException;
 import com.bazaarhub.backend.shared.exception.InvalidOrderStateException;
 import com.bazaarhub.backend.shared.exception.OrderNotFoundException;
+import org.jspecify.annotations.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,6 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final NotificationService notificationService;
 
-
     @Override
     @Transactional
     @CachePut(cacheNames = CacheConfig.CREATE_ORDER_CACHE, key = "#userId")
@@ -69,6 +69,30 @@ public class OrderServiceImpl implements OrderService {
         }
         validateCartItems(cart);
 
+        Order order = buildOrder(orderRequestDTO, user, cart);
+        Order saveOrder = orderRepository.save(order);
+
+        notificationService.createNotification(user, "Order placed",
+                "Your order has been placed successfully.",
+                NotificationType.ORDER_PLACED,
+                saveOrder.getId());
+
+        for (CartItem cartItem : cart.getItems()) {
+            Product product = cartItem.getProduct();
+            Vendor vendor = product.getVendor();
+
+            notificationService.createNotification(
+                    vendor.getUser(),
+                    "New order received",
+                    "You received a new order for product: " + product.getName(),
+                    NotificationType.ORDER_RECEIVED,
+                    saveOrder.getId()
+            );
+        }
+        return orderMapper.mapToOrderResponseDTO(saveOrder);
+    }
+
+    private Order buildOrder(OrderRequestDto orderRequestDTO, User user, Cart cart) {
         Order order = new Order();
         order.setUser(user);
         order.setOrderStatus(OrderStatus.PENDING);
@@ -94,30 +118,7 @@ public class OrderServiceImpl implements OrderService {
             totalAmount = totalAmount.add(totalPrice);
         }
         order.setTotalAmount((totalAmount));
-        Order saveOrder = orderRepository.save(order);
-
-        notificationService.createNotification(user, "Order placed",
-                "Your order has been placed successfully.",
-                NotificationType.ORDER_PLACED,
-                saveOrder.getId());
-
-        for (CartItem cartItem : cart.getItems()) {
-            Product product = cartItem.getProduct();
-            Vendor vendor = product.getVendor();
-
-            notificationService.createNotification(
-                    vendor.getUser(),
-                    "New order received",
-                    "You received a new order for product: " + product.getName(),
-                    NotificationType.ORDER_RECEIVED,
-                    saveOrder.getId()
-            );
-        }
-
-        cart.getItems().clear();
-        cartRepository.save(cart);
-        return orderMapper.mapToOrderResponseDTO(saveOrder);
-
+        return order;
     }
 
     @Override
