@@ -1,0 +1,158 @@
+<section class="edit-product-page">
+  <div class="page-header">
+    <div>
+      <h1>Edit Product</h1>
+      <p>Update your BazaarHub product details.</p>
+    </div>
+
+    <button type="button" class="btn-outline" (click)="cancel()">Back</button>
+  </div>
+
+  <div class="loading-box" *ngIf="loading">Loading product...</div>
+
+  <form
+    *ngIf="!loading"
+    class="product-card"
+    [formGroup]="productForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <div class="form-grid">
+      <div class="form-section">
+        <h2>Product Information</h2>
+
+        <div class="form-group">
+          <label>Product Name</label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Enter product name"
+          />
+
+          <small
+            *ngIf="
+              productForm.get('name')?.touched &&
+              productForm.get('name')?.invalid
+            "
+          >
+            Product name is required.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea
+            rows="5"
+            formControlName="description"
+            placeholder="Write product description"
+          ></textarea>
+
+          <small
+            *ngIf="
+              productForm.get('description')?.touched &&
+              productForm.get('description')?.invalid
+            "
+          >
+            Description is required.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price</label>
+            <input type="number" formControlName="price" placeholder="0" />
+
+            <small
+              *ngIf="
+                productForm.get('price')?.touched &&
+                productForm.get('price')?.invalid
+              "
+            >
+              Valid price is required.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Discount Price</label>
+            <input
+              type="number"
+              formControlName="discountPrice"
+              placeholder="Optional"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Stock Quantity</label>
+            <input
+              type="number"
+              formControlName="stockQuantity"
+              placeholder="0"
+            />
+
+            <small
+              *ngIf="
+                productForm.get('stockQuantity')?.touched &&
+                productForm.get('stockQuantity')?.invalid
+              "
+            >
+              Stock quantity is required.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Category ID</label>
+            <input type="number" formControlName="categoryId" placeholder="1" />
+
+            <small
+              *ngIf="
+                productForm.get('categoryId')?.touched &&
+                productForm.get('categoryId')?.invalid
+              "
+            >
+              Category is required.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-section">
+        <h2>Current Image</h2>
+
+        <div class="image-preview" *ngIf="existingImageUrl; else noImage">
+          <img [src]="existingImageUrl" alt="Product image" />
+        </div>
+
+        <ng-template #noImage>
+          <div class="no-image">
+            <span class="material-icons">image_not_supported</span>
+            <p>No image available</p>
+          </div>
+        </ng-template>
+
+        <p class="image-note">
+          Image update is not included because your current update API only
+          accepts product DTO, not file upload.
+        </p>
+      </div>
+    </div>
+
+    <div class="alert error" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <div class="alert success" *ngIf="success">
+      {{ success }}
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="cancel()">
+        Cancel
+      </button>
+
+      <button type="submit" class="btn-primary" [disabled]="saving">
+        {{ saving ? "Updating..." : "Update Product" }}
+      </button>
+    </div>
+  </form>
+</section>
