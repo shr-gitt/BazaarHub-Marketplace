@@ -5,6 +5,7 @@ import com.bazaarhub.backend.feature.user.resource.response.UserResponseDto;
 import com.bazaarhub.backend.feature.user.service.UserService;
 import com.bazaarhub.backend.shared.aop.LogExecutionTime;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
+import com.bazaarhub.backend.shared.enums.Role;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class UserController {
 
     @PostMapping("/update-user/{id}")
     @LogExecutionTime
-    public ApiResponseDto<UserResponseDto> updateUserById(@PathVariable("id") Long userId,@Valid @RequestBody UserRequestDto userRequestDto) {
+    public ApiResponseDto<UserResponseDto> updateUserById(@PathVariable("id") Long userId, @Valid @RequestBody UserRequestDto userRequestDto) {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User updated successfully", userService.updateUserById(userId, userRequestDto));
     }
 
@@ -52,4 +53,19 @@ public class UserController {
         userService.deleteUserById(userId);
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "User deleted successfully");
     }
+
+    @PostMapping("/admin/create")
+    @LogExecutionTime
+    public ApiResponseDto<UserResponseDto> createAdmin(
+            @Valid @RequestBody UserRequestDto userRequestDto
+    ) {
+        userRequestDto.setRole(Role.ADMIN);
+
+        return new ApiResponseDto<>(
+                ResponseStatus.SUCCESS.value,
+                "Admin created successfully",
+                userService.createUser(userRequestDto)
+        );
+    }
+
 }

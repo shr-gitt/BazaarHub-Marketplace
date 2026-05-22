@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/admin/create").permitAll()
                         .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                         .requestMatchers("/api/vendor/approval/**")
                         .hasRole(Role.ADMIN.name())
@@ -79,6 +80,7 @@ public class SecurityConfig {
                         .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name(), Role.CUSTOMER.name())
                         .requestMatchers(HttpMethod.POST, "/api/vendor/**")
                         .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name())
+
                 )
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

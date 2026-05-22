@@ -36,9 +36,9 @@ import { PublicLayoutComponent } from './layout/public-layout/public-layout.comp
 import { HomeComponent } from './pages/home/home.component';
 import { EditProductComponent } from './pages/products/edit-product/edit-product.component';
 import { CreateProductComponent } from './pages/products/create-product/create-product.component';
-import { OrderListComponent } from './pages/orders/order-list/order-list.component';
 import { OrderCheckoutComponent } from './pages/orders/order-checkout/order-checkout.component';
-import { OrderPaymentComponent } from './pages/payments/order-payment/order-payment.component';
+import { OrderPaymentComponent } from './pages/payments/create-order-payment/create-order-payment.component';
+import { CreateAdminComponent } from './pages/admin/create-admin/create-admin.component';
 
 export const routes: Routes = [
   {
@@ -55,6 +55,10 @@ export const routes: Routes = [
     children: [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
+      {
+        path: 'internal/admin/create',
+        component: CreateAdminComponent,
+      },
       {
         path: 'customer/profile-setup',
         component: CustomerProfileSetupComponent,
@@ -90,12 +94,6 @@ export const routes: Routes = [
         data: { expectedRole: 'CUSTOMER' },
       },
 
-      {
-        path: 'orders',
-        component: OrderListComponent,
-        canActivate: [roleGuard],
-        data: { expectedRole: 'CUSTOMER' },
-      },
       {
         path: 'checkout',
         component: OrderCheckoutComponent,
@@ -148,12 +146,6 @@ export const routes: Routes = [
         data: { expectedRole: 'VENDOR' },
       },
 
-      {
-        path: 'vendor/products',
-        component: ProductListComponent,
-        canActivate: [roleGuard],
-        data: { expectedRole: 'VENDOR' },
-      },
       {
         path: 'vendor/products/create',
         component: CreateProductComponent,
