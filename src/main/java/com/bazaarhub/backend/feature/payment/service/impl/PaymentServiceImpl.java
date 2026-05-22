@@ -1,5 +1,8 @@
 package com.bazaarhub.backend.feature.payment.service.impl;
 
+import com.bazaarhub.backend.feature.cart.entity.Cart;
+import com.bazaarhub.backend.feature.cart.exception.CartNotFoundException;
+import com.bazaarhub.backend.feature.cart.repository.CartRepository;
 import com.bazaarhub.backend.feature.notification.enums.NotificationType;
 import com.bazaarhub.backend.feature.notification.service.NotificationService;
 import com.bazaarhub.backend.feature.order.entity.Order;
@@ -43,6 +46,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
+    private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
     private final EsewaSignatureUtil esewaSignatureUtil;
     private final RestTemplate restTemplate;
@@ -136,9 +140,20 @@ public class PaymentServiceImpl implements PaymentService {
             response.setPaymentUrl(paymentUrl);
             response.setSuccessUrl(successUrl);
             response.setFailureUrl(failureUrl);
-            response.setMerchantCode(merchantCode);
+            response.setProductCode(merchantCode);
             response.setSignature(signature);
             response.setSignedFieldNames("total_amount,transaction_uuid,product_code");
+        }
+        else{
+            Long userId = order.getUser().getId();
+
+            Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
+                log.error("Cart not found of user id : {}", userId);
+                return new CartNotFoundException("Cart not found");
+            });
+
+            cart.getItems().clear();
+            cartRepository.save(cart);
         }
         return response;
     }
@@ -261,6 +276,15 @@ public class PaymentServiceImpl implements PaymentService {
                 );
             }
 
+            Long userId = order.getUser().getId();
+
+            Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
+                log.error("Cart not found of user id : {}", userId);
+                return new CartNotFoundException("Cart not found");
+            });
+
+            cart.getItems().clear();
+            cartRepository.save(cart);
         } else {
             order.setPaymentStatus(PaymentStatus.FAILED);
             payment.setPaymentStatus(PaymentStatus.FAILED);

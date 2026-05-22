@@ -47,6 +47,12 @@ export const API_URLS = {
   UPDATE_ORDER_STATUS: (id: number) => `${BASE_URL}/orders/${id}/status`,
   CANCEL_ORDER: (id: number) => `${BASE_URL}/orders/${id}/cancel`,
 
+  //Payment
+  CREATE_PAYMENT: `${BASE_URL}/payment/create`,
+  CONFIRM_CASH_PAYMENT: `${BASE_URL}/payment/cash/confirm`,
+  GET_PAYMENT: (id: number) => `${BASE_URL}/payment/${id}`,
+  GET_PAYMENTS: `${BASE_URL}/payments`,
+
   // Notifications
   GET_NOTIFICATIONS: `${BASE_URL}/notifications`,
   GET_UNREAD_COUNT: `${BASE_URL}/notifications/unread-count`,
