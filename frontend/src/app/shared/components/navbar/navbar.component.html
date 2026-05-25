@@ -6,7 +6,7 @@
   <div class="navbar-right">
     <!-- Notification Bell -->
     <a routerLink="/notifications" class="notif-btn" *ngIf="true">
-      <span class="bell-icon">🔔</span>
+      <i class="pi pi-bell"></i>
       <span class="badge-dot" *ngIf="unreadCount > 0">{{
         unreadCount > 99 ? "99+" : unreadCount
       }}</span>

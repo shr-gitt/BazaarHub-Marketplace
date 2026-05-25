@@ -1,0 +1,77 @@
+<div class="products-page">
+  <div class="filters-sidebar">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h3 class="card-title text-lg">Categories</h3>
+      </div>
+      <div class="card-body p-0">
+        <div class="category-list">
+          <button
+            class="category-btn"
+            [class.active]="!selectedCategoryId"
+            (click)="filterByCategory(null)"
+          >
+            All Categories
+          </button>
+          <button
+            class="category-btn"
+            *ngFor="let cat of categories"
+            [class.active]="selectedCategoryId === cat.id"
+            (click)="filterByCategory(cat.id)"
+          >
+            {{ cat.name }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="products-content">
+    <div class="flex justify-between align-center mb-4">
+      <h2 class="text-2xl font-bold m-0">My Products</h2>
+    </div>
+
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+    <app-empty-state
+      *ngIf="!isLoading && products.length === 0"
+      icon="search_off"
+      title="No products found"
+      description="Try selecting a different category or check back later."
+    ></app-empty-state>
+
+    <div class="product-grid" *ngIf="!isLoading && products.length > 0">
+      <app-product-card
+        *ngFor="let product of products"
+        [product]="product"
+        [isVendorView]="true"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+      ></app-product-card>
+    </div>
+
+    <div class="pagination mt-4" *ngIf="totalPages > 1 && !isLoading">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 0"
+        (click)="loadProducts(vendorId, currentPage - 1)"
+      >
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <span class="pagination-info"
+        >Page {{ currentPage + 1 }} of {{ totalPages }}</span
+      >
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="loadProducts(vendorId, currentPage + 1)"
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </div>
+  <div class="alert alert-danger mb-3" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+</div>

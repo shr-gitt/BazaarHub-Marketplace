@@ -1,7 +1,7 @@
 .navbar {
   height: 10vh;
   background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #3e3d3d;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -9,7 +9,7 @@
   position: sticky;
   top: 0;
   z-index: 90;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 
   .navbar-left {
     .page-title {
@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
+  width: 30px;
   height: 38px;
   border-radius: 10px;
   background: var(--bg);
