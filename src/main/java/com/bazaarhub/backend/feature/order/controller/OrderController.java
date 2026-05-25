@@ -9,6 +9,10 @@ import com.bazaarhub.backend.shared.utils.AuthUtil;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,5 +46,16 @@ public class OrderController {
     @PatchMapping("/{orderId}/cancel")
     public ApiResponseDto<OrderResponseDto> cancelOrder(@PathVariable Long orderId) {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Order cancelled successfully.", orderService.cancelOrder(AuthUtil.getCurrentUserId(), orderId));
+    }
+
+    @GetMapping("/admin")
+    public ApiResponseDto<Page<OrderResponseDto>> getAllOrdersForAdmin(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return new ApiResponseDto<>(
+                ResponseStatus.SUCCESS.value,
+                "All orders fetched successfully.",
+                orderService.getAllOrdersForAdmin(AuthUtil.getCurrentUserId(), pageable)
+        );
     }
 }

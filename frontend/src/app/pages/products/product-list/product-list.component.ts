@@ -8,6 +8,10 @@ import { CategoryResponse } from '../../../core/models/category.model';
 import { ProductService } from '../../../services/product.service';
 import { CategoryService } from '../../../services/category.service';
 import { CartService } from '../../../services/cart.service';
+import { CardModule } from 'primeng/card';
+import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button';
+import { AuthService } from '../../../services/auth.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
@@ -20,6 +24,9 @@ import { MessageService } from 'primeng/api';
     LoadingSpinnerComponent,
     EmptyStateComponent,
     ToastModule,
+    CardModule,
+    TagModule,
+    ButtonModule,
   ],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
@@ -33,17 +40,23 @@ export class ProductListComponent implements OnInit {
   totalPages = 0;
   selectedCategoryId: number | null = null;
   allLoadedProducts: ProductResponse[] = [];
+  role: string | null = null;
 
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
     private cartService: CartService,
+    private authService: AuthService,
     private messageService: MessageService,
   ) {}
 
   ngOnInit() {
+    this.role = this.authService.getRole();
     this.loadCategories();
     this.loadProducts(0);
+  }
+  get isAdmin(): boolean {
+    return this.role === 'ADMIN';
   }
 
   loadCategories() {

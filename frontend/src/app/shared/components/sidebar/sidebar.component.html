@@ -1,14 +1,11 @@
 <aside class="sidebar" [class.collapsed]="collapsed">
-  <!-- Brand -->
   <div class="sidebar-brand">
-    <i class="pi pi-shopping-bag brand-icon"></i>
     <span class="brand-text" *ngIf="!collapsed">BazaarHub</span>
     <button class="collapse-btn" (click)="toggleCollapse()">
       {{ collapsed ? "→" : "←" }}
     </button>
   </div>
 
-  <!-- Navigation -->
   <nav class="sidebar-nav">
     <a
       *ngFor="let item of filteredNav"
@@ -25,11 +22,14 @@
     </a>
   </nav>
 
-  <!-- Logout -->
   <div class="sidebar-footer">
-    <button class="nav-item logout-btn" (click)="logout()">
-      <i class="pi pi-sign-out nav-icon"></i>
-      <span class="nav-label" *ngIf="!collapsed">Logout</span>
-    </button>
+    <button
+      pButton
+      type="button"
+      class="logout-btn"
+      icon="pi pi-sign-out"
+      [label]="collapsed ? '' : 'Logout'"
+      (click)="logout()"
+    ></button>
   </div>
 </aside>

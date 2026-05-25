@@ -56,7 +56,7 @@ export class VendorProductListComponent implements OnInit {
         }
       },
       error: () => {
-        this.errorMessage = 'Failed to load categories.'; 
+        this.errorMessage = 'Failed to load categories.';
       },
     });
   }

@@ -6,7 +6,6 @@ import {
   VendorRequest,
   ApprovalRequest,
   VendorResponse,
-  Vendor,
 } from '../core/models/vendor.model';
 
 @Injectable({ providedIn: 'root' })
@@ -16,27 +15,27 @@ export class VendorService {
   constructor(private http: HttpClient) {}
 
   // GET /api/vendors
-  getAll(page = 0, size = 10): Observable<ApiResponse<PageResponse<Vendor>>> {
+  getAll(page = 0, size = 10): Observable<ApiResponse<PageResponse<VendorResponse>>> {
     const params = new HttpParams().set('page', page).set('size', size);
-    return this.http.get<ApiResponse<PageResponse<Vendor>>>(
+    return this.http.get<ApiResponse<PageResponse<VendorResponse>>>(
       `${this.base}/vendors`,
       { params },
     );
   }
 
   //GET /api/vendors/my
-  getByUser(): Observable<ApiResponse<Vendor[]>> {
-    return this.http.get<ApiResponse<Vendor[]>>(`${this.base}/vendors/my`);
+  getByUser(): Observable<ApiResponse<VendorResponse[]>> {
+    return this.http.get<ApiResponse<VendorResponse[]>>(`${this.base}/vendors/my`);
   }
 
   // GET /api/vendor/{id}
-  getById(id: number): Observable<ApiResponse<Vendor>> {
-    return this.http.get<ApiResponse<Vendor>>(`${this.base}/vendor/${id}`);
+  getById(id: number): Observable<ApiResponse<VendorResponse>> {
+    return this.http.get<ApiResponse<VendorResponse>>(`${this.base}/vendor/${id}`);
   }
 
   // POST /api/vendor/create
-  create(dto: VendorRequest): Observable<ApiResponse<Vendor>> {
-    return this.http.post<ApiResponse<Vendor>>(
+  create(dto: VendorRequest): Observable<ApiResponse<VendorResponse>> {
+    return this.http.post<ApiResponse<VendorResponse>>(
       `${this.base}/vendor/create`,
       dto,
     );
@@ -63,8 +62,8 @@ export class VendorService {
   approve(
     vendorId: number,
     dto: ApprovalRequest,
-  ): Observable<ApiResponse<Vendor>> {
-    return this.http.post<ApiResponse<Vendor>>(
+  ): Observable<ApiResponse<VendorResponse>> {
+    return this.http.post<ApiResponse<VendorResponse>>(
       `${this.base}/vendor/approval/${vendorId}`,
       dto,
     );

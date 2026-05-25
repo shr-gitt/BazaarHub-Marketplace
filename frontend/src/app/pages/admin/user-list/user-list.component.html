@@ -1,0 +1,90 @@
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">User Management</h2>
+  </div>
+
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <app-empty-state
+    *ngIf="!isLoading && users.length === 0"
+    icon="people"
+    title="No users found"
+    description="There are currently no users in the system."
+  ></app-empty-state>
+
+  <div class="card-body p-0" *ngIf="!isLoading && users.length > 0">
+    <div class="table-container no-border-radius">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>#{{ user.id }}</td>
+            <td class="font-medium">
+              {{ user.firstName }} {{ user.lastName }}
+            </td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phoneNumber }}</td>
+            <td>
+              <span class="role-badge" [ngClass]="user.role.toLowerCase()">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="status-badge"
+                [ngClass]="{
+                  success: user.userStatus === 'ACTIVE',
+                  error: user.userStatus !== 'ACTIVE',
+                }"
+              >
+                {{ user.userStatus }}
+              </span>
+            </td>
+            <td class="text-right">
+              <div class="action-buttons">
+                <button
+                  class="icon-btn text-error"
+                  (click)="deleteUser(user.id)"
+                  title="Delete User"
+                  [disabled]="user.role === 'ADMIN'"
+                >
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 0"
+        (click)="loadUsers(currentPage - 1)"
+      >
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <span class="pagination-info"
+        >Page {{ currentPage + 1 }} of {{ totalPages }}</span
+      >
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="loadUsers(currentPage + 1)"
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</div>

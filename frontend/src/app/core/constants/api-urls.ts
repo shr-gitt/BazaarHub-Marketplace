@@ -7,6 +7,7 @@ export const API_URLS = {
 
   //Admin
   CREATE_ADMIN: `${BASE_URL}/admin/create`,
+  GET_ADMIN_ORDERS: `${BASE_URL}/orders/admin`,
 
   // Users
   REGISTER_USER: `${BASE_URL}/register-user`,
