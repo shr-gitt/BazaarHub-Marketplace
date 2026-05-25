@@ -5,6 +5,9 @@ export const API_URLS = {
   REGISTER: `${BASE_URL}/register`,
   LOGIN: `${BASE_URL}/login`,
 
+  //Admin
+  CREATE_ADMIN: `${BASE_URL}/admin/create`,
+
   // Users
   REGISTER_USER: `${BASE_URL}/register-user`,
   GET_USER: (id: number) => `${BASE_URL}/user/${id}`,

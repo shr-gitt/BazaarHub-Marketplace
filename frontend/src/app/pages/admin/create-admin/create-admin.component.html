@@ -1,0 +1,138 @@
+<section class="create-admin-page">
+  <p-card styleClass="admin-card">
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <div>
+          <h1>Create Admin</h1>
+        </div>
+
+        <p-button
+          label="Back"
+          icon="pi pi-arrow-left"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="cancel()"
+        />
+      </div>
+    </ng-template>
+
+    <p-divider />
+
+    <form [formGroup]="adminForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input
+            pInputText
+            id="firstName"
+            formControlName="firstName"
+            placeholder="Enter first name"
+            [class.ng-invalid]="isInvalid('firstName')"
+          />
+          <small *ngIf="isInvalid('firstName')">
+            First name is required.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input
+            pInputText
+            id="lastName"
+            formControlName="lastName"
+            placeholder="Enter last name"
+            [class.ng-invalid]="isInvalid('lastName')"
+          />
+          <small *ngIf="isInvalid('lastName')"> Last name is required. </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          pInputText
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="admin@example.com"
+          [class.ng-invalid]="isInvalid('email')"
+        />
+        <small *ngIf="isInvalid('email')"> Valid email is required. </small>
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input
+          pInputText
+          id="phoneNumber"
+          formControlName="phoneNumber"
+          placeholder="98XXXXXXXX"
+          [class.ng-invalid]="isInvalid('phoneNumber')"
+        />
+        <small *ngIf="isInvalid('phoneNumber')">
+          Phone number is required.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <p-select
+          inputId="gender"
+          [options]="genderOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="gender"
+          placeholder="Select gender"
+          styleClass="w-full"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <p-password
+          inputId="password"
+          formControlName="password"
+          [toggleMask]="true"
+          [feedback]="false"
+          placeholder="Enter password"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        />
+        <small *ngIf="isInvalid('password')">
+          Password must be at least 8 characters.
+        </small>
+      </div>
+
+      <p-message
+        *ngIf="error"
+        severity="error"
+        [text]="error"
+        styleClass="message-box"
+      />
+
+      <p-message
+        *ngIf="success"
+        severity="success"
+        [text]="success"
+        styleClass="message-box"
+      />
+
+      <div class="actions">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          [outlined]="true"
+          type="button"
+          (onClick)="cancel()"
+        />
+
+        <p-button
+          label="Create Admin"
+          icon="pi pi-user-plus"
+          type="submit"
+          [loading]="loading"
+        />
+      </div>
+    </form>
+  </p-card>
+</section>
