@@ -39,6 +39,7 @@ import { CreateProductComponent } from './pages/products/create-product/create-p
 import { OrderCheckoutComponent } from './pages/orders/order-checkout/order-checkout.component';
 import { OrderPaymentComponent } from './pages/payments/create-order-payment/create-order-payment.component';
 import { CreateAdminComponent } from './pages/admin/create-admin/create-admin.component';
+import { VendorProductListComponent } from './pages/products/vendor-product-list/vendor-product-list.component';
 
 export const routes: Routes = [
   {
@@ -82,11 +83,18 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [authGuard],
     children: [
       { path: 'products', component: ProductListComponent },
-      { path: 'products/recommended', component: RecommendedProductsComponent },
       { path: 'product/:id', component: ProductDetailComponent },
+    ],
+  },
+
+  {
+    path: '',
+    component: MainLayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: 'products/recommended', component: RecommendedProductsComponent },
       {
         path: 'cart',
         component: CartComponent,
@@ -106,15 +114,6 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { expectedRole: 'CUSTOMER' },
       },
-
-      //ToDO: Add customer orders flow
-
-      // {
-      //   path: 'customer/orders',
-      //   component: OrderListComponent,
-      //   canActivate: [roleGuard],
-      //   data: { expectedRole: 'CUSTOMER' },
-      // },
       {
         path: 'customer/dashboard',
         component: CustomerDashboardComponent,
@@ -127,6 +126,25 @@ export const routes: Routes = [
         component: ProfileComponent,
         canActivate: [roleGuard],
         data: { expectedRole: ['VENDOR', 'CUSTOMER', 'ADMIN'] },
+      },
+      {
+        path: 'vendor/products/:id',
+        component: VendorProductListComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'VENDOR' },
+      },
+
+      {
+        path: 'vendor/product/create',
+        component: CreateProductComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'VENDOR' },
+      },
+      {
+        path: 'vendor/product/edit/:id',
+        component: EditProductComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'VENDOR' },
       },
     ],
   },
@@ -147,6 +165,12 @@ export const routes: Routes = [
       },
 
       {
+        path: 'vendor/products',
+        component: ProductListComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'VENDOR' },
+      },
+      {
         path: 'vendor/products/create',
         component: CreateProductComponent,
         canActivate: [roleGuard],
@@ -158,15 +182,6 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { expectedRole: 'VENDOR' },
       },
-
-      //ToDO: Add vendor Order route
-
-      // {
-      //   path: 'vendor/orders',
-      //   component: OrderListComponent,
-      //   canActivate: [roleGuard],
-      //   data: { expectedRole: 'VENDOR' },
-      // },
 
       // Admin
       {
@@ -193,14 +208,6 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { expectedRole: 'ADMIN' },
       },
-      //ToDO: Admin order
-
-      // {
-      //   path: 'admin/orders',
-      //   component: OrderListComponent,
-      //   canActivate: [roleGuard],
-      //   data: { expectedRole: 'ADMIN' },
-      // },
     ],
   },
 

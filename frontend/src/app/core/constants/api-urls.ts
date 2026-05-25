@@ -18,6 +18,7 @@ export const API_URLS = {
   // Products
   CREATE_PRODUCT: `${BASE_URL}/create-product`,
   GET_PRODUCT: (id: number) => `${BASE_URL}/product/${id}`,
+  GET_PRODUCTS_BY_VENDOR: (id:number) => `${BASE_URL}/product/vendor/${id}`,
   GET_PRODUCTS: `${BASE_URL}/products`,
   GET_RECOMMENDED_PRODUCTS: `${BASE_URL}/products/recommended`,
   UPDATE_PRODUCT: (id: number) => `${BASE_URL}/update-product/${id}`,
