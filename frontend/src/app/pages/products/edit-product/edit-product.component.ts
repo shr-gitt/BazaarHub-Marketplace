@@ -9,18 +9,22 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ProductService } from '../../../services/product.service';
-import { AuthService } from '../../../services/auth.service';
 import {
   ProductRequest,
   ProductResponse,
 } from '../../../core/models/product.model';
+import { VendorContextService } from '../../../services/vendor-context.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-edit-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ToastModule, ButtonModule],
   templateUrl: './edit-product.component.html',
   styleUrl: './edit-product.component.scss',
+  providers: [MessageService],
 })
 export class EditProductComponent implements OnInit {
   productForm: FormGroup;
@@ -28,21 +32,20 @@ export class EditProductComponent implements OnInit {
   productId!: number;
   loading = false;
   saving = false;
-  error = '';
-  success = '';
 
   existingImageUrl: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
-    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
+    private messageService: MessageService,
+    private vendorContextService: VendorContextService,
   ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
-      description: ['', Validators.required],
+      description: [''],
       price: [null, [Validators.required, Validators.min(1)]],
       discountPrice: [null],
       stockQuantity: [null, [Validators.required, Validators.min(1)]],
@@ -54,7 +57,11 @@ export class EditProductComponent implements OnInit {
     this.productId = Number(this.route.snapshot.paramMap.get('id'));
 
     if (!this.productId) {
-      this.error = 'Invalid product ID.';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Invalid product ID.',
+      });
       return;
     }
 
@@ -63,7 +70,6 @@ export class EditProductComponent implements OnInit {
 
   loadProduct(): void {
     this.loading = true;
-    this.error = '';
 
     this.productService.getById(this.productId).subscribe({
       next: (res) => {
@@ -72,7 +78,11 @@ export class EditProductComponent implements OnInit {
         const product: ProductResponse | undefined = res.data;
 
         if (!product) {
-          this.error = 'Product not found.';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Product not found.',
+          });
           return;
         }
 
@@ -89,27 +99,34 @@ export class EditProductComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || 'Failed to load product.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err.error?.message || 'Failed to load product.',
+        });
       },
     });
   }
 
   onSubmit(): void {
+    this.productForm.markAllAsTouched();
+
     if (this.productForm.invalid) {
-      this.productForm.markAllAsTouched();
       return;
     }
 
-    const vendorId = this.authService.getUserId();
+    const vendorId = this.vendorContextService.getVendorId();
 
     if (!vendorId) {
-      this.error = 'Vendor not found. Please login again.';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Vendor not found. Please login again.',
+      });
       return;
     }
 
     this.saving = true;
-    this.error = '';
-    this.success = '';
 
     const dto: ProductRequest = {
       name: this.productForm.value.name,
@@ -126,7 +143,11 @@ export class EditProductComponent implements OnInit {
     this.productService.update(this.productId, dto).subscribe({
       next: () => {
         this.saving = false;
-        this.success = 'Product updated successfully!';
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Product updated successfully.',
+        });
 
         setTimeout(() => {
           this.router.navigate(['/vendor/products']);
@@ -134,7 +155,11 @@ export class EditProductComponent implements OnInit {
       },
       error: (err) => {
         this.saving = false;
-        this.error = err.error?.message || 'Failed to update product.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'Failed to update product.',
+        });
       },
     });
   }

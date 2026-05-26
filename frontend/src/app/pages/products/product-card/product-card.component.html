@@ -30,7 +30,20 @@
     </div>
 
     <div class="actions" *ngIf="!isVendorView">
-      <button class="cart-btn" (click)="onAddToCart()">Add to Cart</button>
+      <p-button
+        *ngIf="isCustomer; else loginBtn"
+        (click)="onAddToCart()"
+        [disabled]="addingToCart"
+        styleClass="w-full"
+      >
+        {{ addingToCart ? "Adding..." : "Add to Cart" }}
+      </p-button>
+
+      <ng-template #loginBtn>
+        <p-button (click)="authModelService.open('LOGIN')" styleClass="w-full">
+          Add to Cart
+        </p-button>
+      </ng-template>
     </div>
   </div>
 </div>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -9,20 +9,23 @@ import {
 import { Router } from '@angular/router';
 import { ProductService } from '../../../services/product.service';
 import { ProductRequest } from '../../../core/models/product.model';
-import { VendorService } from '../../../services/vendor.service';
+import { VendorContextService } from '../../../services/vendor-context.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-create-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ToastModule, ButtonModule],
   templateUrl: './create-product.component.html',
   styleUrl: './create-product.component.scss',
+  providers: [MessageService],
 })
-export class CreateProductComponent {
+export class CreateProductComponent implements OnInit {
   productForm: FormGroup;
   loading = false;
-  error = '';
-  success = '';
+  imageError = false;
 
   vendorId: number | null = null;
 
@@ -32,12 +35,13 @@ export class CreateProductComponent {
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
-    private vendorService: VendorService,
+    private vendorContextService: VendorContextService,
     private router: Router,
+    private messageService: MessageService,
   ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
-      description: ['', Validators.required],
+      description: [''],
       price: [null, [Validators.required, Validators.min(1)]],
       discountPrice: [null, Validators.min(1)],
       stockQuantity: [null, [Validators.required, Validators.min(1)]],
@@ -46,29 +50,11 @@ export class CreateProductComponent {
   }
 
   ngOnInit(): void {
-    this.loadMyVendor();
-  }
-
-  private loadMyVendor(): void {
-    this.vendorService.getMyVendors().subscribe({
-      next: (res) => {
-        const vendor = res.data?.[0];
-
-        if (!vendor) {
-          this.error =
-            'Vendor profile not found. Please create vendor profile first.';
-          return;
-        }
-
-        this.vendorId = vendor.id;
-      },
-      error: () => {
-        this.error = 'Failed to load vendor profile.';
-      },
-    });
+    this.vendorId = this.vendorContextService.getVendorId();
   }
 
   onImageSelected(event: Event): void {
+    this.imageError = false;
     const input = event.target as HTMLInputElement;
 
     if (!input.files || input.files.length === 0) return;
@@ -83,19 +69,18 @@ export class CreateProductComponent {
   }
 
   onSubmit(): void {
+    this.productForm.markAllAsTouched();
+
     if (this.productForm.invalid) {
-      this.productForm.markAllAsTouched();
       return;
     }
 
     if (!this.selectedImage) {
-      this.error = 'Product image is required.';
+      this.imageError = true;
       return;
     }
 
     this.loading = true;
-    this.error = '';
-    this.success = '';
 
     const dto: ProductRequest = {
       name: this.productForm.value.name,
@@ -112,15 +97,23 @@ export class CreateProductComponent {
     this.productService.create(dto, this.selectedImage).subscribe({
       next: () => {
         this.loading = false;
-        this.success = 'Product created successfully!';
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Product created successfully.',
+        });
 
         setTimeout(() => {
-          this.router.navigate(['/vendor/products']);
+          this.router.navigate(['/vendor/products', this.vendorId]);
         }, 1000);
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || 'Failed to create product';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'Failed to create product.',
+        });
       },
     });
   }

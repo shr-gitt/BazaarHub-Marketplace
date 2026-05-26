@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthModalComponent } from '../../shared/components/auth-model/auth-model.component';
 import { AuthModelService } from '../../services/auth-model.service';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-public-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, AuthModalComponent],
+  imports: [CommonModule, RouterModule, AuthModalComponent, ButtonModule],
   templateUrl: './public-layout.component.html',
   styleUrls: ['./public-layout.component.scss'],
 })

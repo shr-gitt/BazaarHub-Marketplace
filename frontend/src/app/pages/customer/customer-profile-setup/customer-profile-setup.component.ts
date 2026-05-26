@@ -12,6 +12,10 @@ import { Router } from '@angular/router';
 import { CustomerService } from '../../../services/customer-profile.service';
 import { AddressComponent } from '../../../shared/components/address/address.component';
 import { AddressResponseDto } from '../../../core/models/address.model';
+import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { AuthService } from '../../../services/auth.service';
 
 const CATEGORIES = [
   { id: 1, label: 'Electronics' },
@@ -27,9 +31,16 @@ const CATEGORIES = [
 @Component({
   selector: 'app-customer-profile-setup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AddressComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AddressComponent,
+    ButtonModule,
+    ToastModule,
+  ],
   templateUrl: './customer-profile-setup.component.html',
   styleUrls: ['./customer-profile-setup.component.scss'],
+  providers: [MessageService],
 })
 export class CustomerProfileSetupComponent implements OnInit {
   @Input() isUpdate = false;
@@ -39,29 +50,34 @@ export class CustomerProfileSetupComponent implements OnInit {
   loading = false;
   saving = false;
 
-  error = '';
-  success = '';
+  imageError = false;
 
   categories = CATEGORIES;
 
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
+  today = new Date().toISOString().split('T')[0];
+
   constructor(
     private fb: FormBuilder,
     private customerService: CustomerService,
     private router: Router,
+    private auth: AuthService,
+    private messageService: MessageService,
   ) {
     this.form = this.fb.group({
       dateOfBirth: ['', Validators.required],
 
       preferences: this.fb.array([], Validators.required),
 
+      profileImage: [null],
+
       addressRequestDto: this.fb.group({
         province: [''],
         district: [''],
         municipality: [''],
-        wardNo: [null, Validators.required],
+        wardNo: [null, [Validators.required, Validators.min(1)]],
         street: [''],
         postalCode: [''],
       }),
@@ -71,6 +87,10 @@ export class CustomerProfileSetupComponent implements OnInit {
   ngOnInit(): void {
     if (this.isUpdate) {
       this.load();
+    }
+
+    if (!this.isUpdate) {
+      this.form.get('profileImage')?.setValidators(Validators.required);
     }
   }
 
@@ -145,8 +165,16 @@ export class CustomerProfileSetupComponent implements OnInit {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
 
+    this.imageError = false;
+
     if (input.files?.length) {
       this.selectedFile = input.files[0];
+
+      this.form.patchValue({
+        profileImage: this.selectedFile,
+      });
+
+      this.form.get('profileImage')?.updateValueAndValidity();
 
       const reader = new FileReader();
 
@@ -159,19 +187,13 @@ export class CustomerProfileSetupComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    this.form.markAllAsTouched();
 
-    if (!this.isUpdate && !this.selectedFile) {
-      this.error = 'Profile image is required.';
+    if (this.form.invalid) {
       return;
     }
 
     this.saving = true;
-    this.error = '';
-    this.success = '';
 
     if (this.isUpdate) {
       this.update();
@@ -192,21 +214,25 @@ export class CustomerProfileSetupComponent implements OnInit {
 
     this.customerService.create(formData).subscribe({
       next: () => {
-        this.success =
-          'Customer profile created successfully. Redirecting to login...';
-
+        this.auth.logout();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Customer profile created successfully.',
+        });
         this.saving = false;
-
-        localStorage.clear();
 
         setTimeout(() => {
           this.router.navigate(['/login']);
-        }, 2000);
+        }, 1000);
       },
 
       error: (err) => {
-        this.error =
-          err?.error?.message || 'Failed to create customer profile.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'Failed to create customer profile.',
+        });
 
         this.saving = false;
       },
@@ -214,18 +240,23 @@ export class CustomerProfileSetupComponent implements OnInit {
   }
 
   private update(): void {
-    console.log(this.form.value);
-
     const customerId = Number(localStorage.getItem('customerId'));
 
     this.customerService.update(customerId, this.form.value).subscribe({
       next: () => {
-        this.success = 'Customer profile updated.';
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Customer profile updated successfully.',
+        });
         this.saving = false;
-        this.isUpdate = true;
       },
       error: (err) => {
-        this.error = err?.error?.message || 'Failed to update profile.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'Failed to update profile.',
+        });
         this.saving = false;
       },
     });

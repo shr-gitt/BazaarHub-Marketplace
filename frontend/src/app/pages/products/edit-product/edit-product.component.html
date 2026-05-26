@@ -1,11 +1,11 @@
 <section class="edit-product-page">
+  <p-toast position="top-right" [life]="3000"></p-toast>
+
   <div class="page-header">
     <div>
       <h1>Edit Product</h1>
       <p>Update your BazaarHub product details.</p>
     </div>
-
-    <button type="button" class="btn-outline" (click)="cancel()">Back</button>
   </div>
 
   <div class="loading-box" *ngIf="loading">Loading product...</div>
@@ -21,10 +21,14 @@
         <h2>Product Information</h2>
 
         <div class="form-group">
-          <label>Product Name</label>
+          <label>Product Name <span style="color: red">*</span></label>
           <input
             type="text"
             formControlName="name"
+            [class.is-invalid]="
+              productForm.get('name')?.invalid &&
+              productForm.get('name')?.touched
+            "
             placeholder="Enter product name"
           />
 
@@ -43,6 +47,10 @@
           <textarea
             rows="5"
             formControlName="description"
+            [class.is-invalid]="
+              productForm.get('description')?.invalid &&
+              productForm.get('description')?.touched
+            "
             placeholder="Write product description"
           ></textarea>
 
@@ -58,8 +66,16 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Price</label>
-            <input type="number" formControlName="price" placeholder="0" />
+            <label>Price <span style="color: red">*</span></label>
+            <input
+              type="number"
+              formControlName="price"
+              [class.is-invalid]="
+                productForm.get('price')?.invalid &&
+                productForm.get('price')?.touched
+              "
+              placeholder="0"
+            />
 
             <small
               *ngIf="
@@ -67,7 +83,13 @@
                 productForm.get('price')?.invalid
               "
             >
-              Valid price is required.
+              <ng-container
+                *ngIf="productForm.get('price')?.errors?.['required']"
+                >Price is required.</ng-container
+              >
+              <ng-container *ngIf="productForm.get('price')?.errors?.['min']"
+                >Price must be at least 1.</ng-container
+              >
             </small>
           </div>
 
@@ -83,10 +105,14 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Stock Quantity</label>
+            <label>Stock Quantity <span style="color: red">*</span></label>
             <input
               type="number"
               formControlName="stockQuantity"
+              [class.is-invalid]="
+                productForm.get('stockQuantity')?.invalid &&
+                productForm.get('stockQuantity')?.touched
+              "
               placeholder="0"
             />
 
@@ -96,13 +122,28 @@
                 productForm.get('stockQuantity')?.invalid
               "
             >
-              Stock quantity is required.
+              <ng-container
+                *ngIf="productForm.get('stockQuantity')?.errors?.['required']"
+                >Stock quantity is required.</ng-container
+              >
+              <ng-container
+                *ngIf="productForm.get('stockQuantity')?.errors?.['min']"
+                >Stock must be at least 1.</ng-container
+              >
             </small>
           </div>
 
           <div class="form-group">
-            <label>Category ID</label>
-            <input type="number" formControlName="categoryId" placeholder="1" />
+            <label>Category ID <span style="color: red">*</span></label>
+            <input
+              type="number"
+              formControlName="categoryId"
+              [class.is-invalid]="
+                productForm.get('categoryId')?.invalid &&
+                productForm.get('categoryId')?.touched
+              "
+              placeholder="1"
+            />
 
             <small
               *ngIf="
@@ -137,22 +178,14 @@
       </div>
     </div>
 
-    <div class="alert error" *ngIf="error">
-      {{ error }}
-    </div>
-
-    <div class="alert success" *ngIf="success">
-      {{ success }}
-    </div>
-
     <div class="form-actions">
-      <button type="button" class="btn-secondary" (click)="cancel()">
+      <p-button type="button" severity="secondary" (click)="cancel()">
         Cancel
-      </button>
+      </p-button>
 
-      <button type="submit" class="btn-primary" [disabled]="saving">
+      <p-button type="submit" [disabled]="saving || productForm.invalid">
         {{ saving ? "Updating..." : "Update Product" }}
-      </button>
+      </p-button>
     </div>
   </form>
 </section>

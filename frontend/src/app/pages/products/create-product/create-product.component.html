@@ -1,11 +1,11 @@
 <section class="create-product-page">
+  <p-toast position="top-right" [life]="3000"></p-toast>
+
   <div class="page-header">
     <div>
       <h1>Add Product</h1>
       <p>Add a new product to your BazaarHub store.</p>
     </div>
-
-    <button type="button" class="btn-outline" (click)="cancel()">Cancel</button>
   </div>
 
   <form class="product-card" [formGroup]="productForm" (ngSubmit)="onSubmit()">
@@ -14,10 +14,14 @@
         <h2>Product Information</h2>
 
         <div class="form-group">
-          <label>Product Name</label>
+          <label>Product Name <span style="color: red">*</span></label>
           <input
             type="text"
             formControlName="name"
+            [class.is-invalid]="
+              productForm.get('name')?.invalid &&
+              productForm.get('name')?.touched
+            "
             placeholder="Enter product name"
           />
 
@@ -36,6 +40,10 @@
           <textarea
             rows="5"
             formControlName="description"
+            [class.is-invalid]="
+              productForm.get('description')?.invalid &&
+              productForm.get('description')?.touched
+            "
             placeholder="Write product description"
           ></textarea>
 
@@ -51,8 +59,16 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Price</label>
-            <input type="number" formControlName="price" placeholder="0" />
+            <label>Price <span style="color: red">*</span></label>
+            <input
+              type="number"
+              formControlName="price"
+              [class.is-invalid]="
+                productForm.get('price')?.invalid &&
+                productForm.get('price')?.touched
+              "
+              placeholder="0"
+            />
 
             <small
               *ngIf="
@@ -60,7 +76,13 @@
                 productForm.get('price')?.invalid
               "
             >
-              Valid price is required.
+              <ng-container
+                *ngIf="productForm.get('price')?.errors?.['required']"
+                >Price is required.</ng-container
+              >
+              <ng-container *ngIf="productForm.get('price')?.errors?.['min']"
+                >Price must be at least 1.</ng-container
+              >
             </small>
           </div>
 
@@ -76,10 +98,14 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Stock Quantity</label>
+            <label>Stock Quantity <span style="color: red">*</span></label>
             <input
               type="number"
               formControlName="stockQuantity"
+              [class.is-invalid]="
+                productForm.get('stockQuantity')?.invalid &&
+                productForm.get('stockQuantity')?.touched
+              "
               placeholder="0"
             />
 
@@ -89,13 +115,27 @@
                 productForm.get('stockQuantity')?.invalid
               "
             >
-              Stock quantity is required.
+              <ng-container
+                *ngIf="productForm.get('stockQuantity')?.errors?.['required']"
+                >Stock quantity is required.</ng-container
+              >
+              <ng-container
+                *ngIf="productForm.get('stockQuantity')?.errors?.['min']"
+                >Stock must be at least 1.</ng-container
+              >
             </small>
           </div>
 
           <div class="form-group">
-            <label>Category ID</label>
-            <input type="number" formControlName="categoryId" placeholder="1" />
+            <label>Category ID <span style="color: red">*</span></label>
+            <input
+              type="number"
+              formControlName="categoryId"
+              [class.is-invalid]="
+                productForm.get('categoryId')?.invalid &&
+                productForm.get('categoryId')?.touched
+              "
+            />
 
             <small
               *ngIf="
@@ -110,7 +150,7 @@
       </div>
 
       <div class="image-section">
-        <h2>Product Image</h2>
+        <h2>Product Image <span style="color: red">*</span></h2>
 
         <label class="image-upload">
           <input
@@ -130,25 +170,20 @@
             alt="Product preview"
           />
         </label>
+        <small class="text-error" *ngIf="imageError">
+          Product image is required.
+        </small>
       </div>
     </div>
 
-    <div class="alert error" *ngIf="error">
-      {{ error }}
-    </div>
-
-    <div class="alert success" *ngIf="success">
-      {{ success }}
-    </div>
-
     <div class="form-actions">
-      <button type="button" class="btn-secondary" (click)="cancel()">
+      <p-button type="button" severity="secondary" (click)="cancel()">
         Cancel
-      </button>
+      </p-button>
 
-      <button type="submit" class="btn-primary" [disabled]="loading">
+      <p-button type="submit" [disabled]="loading || productForm.invalid">
         {{ loading ? "Creating..." : "Add Product" }}
-      </button>
+      </p-button>
     </div>
   </form>
 </section>

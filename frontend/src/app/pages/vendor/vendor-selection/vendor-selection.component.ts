@@ -5,19 +5,20 @@ import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { VendorContextService } from '../../../services/vendor-context.service';
+import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-vendor-selection',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonModule, ToastModule],
   templateUrl: './vendor-selection.component.html',
-  styleUrl: './vendor-selection.component.scss',
+  styleUrls: ['./vendor-selection.component.scss'],
+  providers: [MessageService],
 })
 export class VendorSelectionComponent implements OnInit {
   loading = false;
-  saving = false;
-  error = '';
-  success = '';
   vendors: Vendor[] = [];
 
   constructor(
@@ -25,6 +26,7 @@ export class VendorSelectionComponent implements OnInit {
     private auth: AuthService,
     private router: Router,
     private vendorContext: VendorContextService,
+    private messageService: MessageService,
   ) {}
 
   ngOnInit(): void {
@@ -33,7 +35,14 @@ export class VendorSelectionComponent implements OnInit {
 
   load(): void {
     const userId = this.auth.getUserId();
-    if (!userId) return;
+    if (!userId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'User session not found. Please log in again.',
+      });
+      return;
+    }
 
     this.loading = true;
 
@@ -44,6 +53,12 @@ export class VendorSelectionComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load vendors. Please try again.',
+        });
+        return;
       },
     });
   }

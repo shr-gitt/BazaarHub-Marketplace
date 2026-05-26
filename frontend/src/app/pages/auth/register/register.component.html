@@ -1,62 +1,112 @@
 <div class="auth-page">
+  <p-toast position="top-right" [life]="3000"></p-toast>
+
   <div class="auth-card register-card">
     <div class="auth-brand">
-      <h1>BazaarHub</h1>
-      <p>Create your free account</p>
+      <h1>Create your account</h1>
     </div>
-
-    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-    <div class="alert alert-success" *ngIf="success">{{ success }}</div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
       <div class="form-grid">
         <div class="form-group">
-          <label for="firstName">First Name</label>
+          <label for="firstName"
+            >First Name <span style="color: red">*</span></label
+          >
           <input
             id="firstName"
             type="text"
             class="form-control"
+            [class.is-invalid]="
+              f['firstName'].invalid && f['firstName'].touched
+            "
             formControlName="firstName"
             placeholder="Enter first name"
           />
+          <span
+            class="invalid-feedback"
+            *ngIf="f['firstName'].invalid && f['firstName'].touched"
+          >
+            <ng-container *ngIf="f['firstName'].errors?.['required']">
+              First name is required.
+            </ng-container>
+          </span>
         </div>
 
         <div class="form-group">
-          <label for="lastName">Last Name</label>
+          <label for="lastName"
+            >Last Name <span style="color: red">*</span></label
+          >
           <input
             id="lastName"
             type="text"
             class="form-control"
+            [class.is-invalid]="f['lastName'].invalid && f['lastName'].touched"
             formControlName="lastName"
             placeholder="Enter last name"
           />
+          <span
+            class="invalid-feedback"
+            *ngIf="f['lastName'].invalid && f['lastName'].touched"
+          >
+            <ng-container *ngIf="f['lastName'].errors?.['required']">
+              Last name is required.
+            </ng-container>
+          </span>
         </div>
       </div>
 
       <div class="form-grid">
         <div class="form-group">
-          <label for="phoneNumber">Phone Number</label>
+          <label for="phoneNumber"
+            >Phone Number <span style="color: red">*</span></label
+          >
           <input
             id="phoneNumber"
             type="text"
             class="form-control"
+            [class.is-invalid]="
+              f['phoneNumber'].invalid && f['phoneNumber'].touched
+            "
             formControlName="phoneNumber"
             placeholder="Enter phone number"
           />
+          <span
+            class="invalid-feedback"
+            *ngIf="f['phoneNumber'].invalid && f['phoneNumber'].touched"
+          >
+            <ng-container *ngIf="f['phoneNumber'].errors?.['required']">
+              Phone number is required.
+            </ng-container>
+            <ng-container *ngIf="f['phoneNumber'].errors?.['pattern']">
+              Enter a valid phone number.
+            </ng-container>
+          </span>
         </div>
 
         <div class="form-group">
-          <label for="gender">Gender</label>
-          <select id="gender" class="form-control" formControlName="gender">
+          <label for="gender">Gender <span style="color: red">*</span></label>
+          <select
+            id="gender"
+            class="form-control"
+            formControlName="gender"
+            [class.is-invalid]="f['gender'].invalid && f['gender'].touched"
+          >
+            <option value="" disabled selected>Select gender</option>
             <option value="MALE">Male</option>
             <option value="FEMALE">Female</option>
             <option value="OTHER">Other</option>
           </select>
+          <span
+            class="invalid-feedback"
+            *ngIf="f['gender'].invalid && f['gender'].touched"
+          >
+            Please select a gender.
+          </span>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">Email <span style="color: red">*</span></label>
         <input
           id="email"
           type="email"
@@ -79,7 +129,9 @@
       </div>
 
       <div class="form-group">
-        <label for="reg-password">Password</label>
+        <label for="reg-password"
+          >Password <span style="color: red">*</span></label
+        >
         <input
           id="reg-password"
           type="password"
@@ -100,9 +152,32 @@
           </ng-container>
         </span>
       </div>
-
       <div class="form-group">
-        <label>Register as</label>
+        <label for="reg-password"
+          >Confirm Password <span style="color: red">*</span></label
+        >
+        <input
+          id="reg-password"
+          type="password"
+          class="form-control"
+          [class.is-invalid]="
+            f['confirmPassword'].invalid && f['confirmPassword'].touched
+          "
+          formControlName="confirmPassword"
+          placeholder="Min. 8 characters"
+        />
+        <span class="invalid-feedback" *ngIf="f['confirmPassword'].touched">
+          <ng-container *ngIf="f['confirmPassword'].errors?.['required']">
+            Confirm password is required.
+          </ng-container>
+
+          <ng-container *ngIf="registerForm.hasError('passwordMismatch')">
+            Passwords do not match.
+          </ng-container>
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Register as <span style="color: red">*</span></label>
         <div class="role-selector">
           <label
             class="role-option"
@@ -116,10 +191,13 @@
         </div>
       </div>
 
-      <button type="submit" class="btn-primary" [disabled]="loading">
-        <span *ngIf="!loading">Create Account</span>
-        <span *ngIf="loading">Creating...</span>
-      </button>
+      <p-button
+        styleClass="w-full mt-4"
+        type="submit"
+        [disabled]="loading || registerForm.invalid"
+      >
+        {{ loading ? "Creating... " : "Create Account " }}
+      </p-button>
     </form>
 
     <div class="auth-footer">

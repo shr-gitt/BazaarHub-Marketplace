@@ -8,6 +8,8 @@ import { CategoryResponse } from '../../../core/models/category.model';
 import { ProductService } from '../../../services/product.service';
 import { CategoryService } from '../../../services/category.service';
 import { CartService } from '../../../services/cart.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-product-list',
@@ -17,9 +19,11 @@ import { CartService } from '../../../services/cart.service';
     ProductCardComponent,
     LoadingSpinnerComponent,
     EmptyStateComponent,
+    ToastModule,
   ],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
+  providers: [MessageService],
 })
 export class ProductListComponent implements OnInit {
   products: ProductResponse[] = [];
@@ -28,13 +32,13 @@ export class ProductListComponent implements OnInit {
   currentPage = 0;
   totalPages = 0;
   selectedCategoryId: number | null = null;
-
   allLoadedProducts: ProductResponse[] = [];
 
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
     private cartService: CartService,
+    private messageService: MessageService,
   ) {}
 
   ngOnInit() {
@@ -50,6 +54,13 @@ export class ProductListComponent implements OnInit {
             (c) => c.status === 'ACTIVE',
           );
         }
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load categories.',
+        });
       },
     });
   }
@@ -68,6 +79,11 @@ export class ProductListComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load products. Please try again.',
+        });
       },
     });
   }
@@ -97,10 +113,18 @@ export class ProductListComponent implements OnInit {
   onAddToCart(productId: number) {
     this.cartService.addItem({ productId, quantity: 1 }).subscribe({
       next: () => {
-        alert('Product added to cart!');
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Product added to cart successfully.',
+        });
       },
       error: (err) => {
-        alert(err.error?.message || 'Failed to add product to cart.');
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'Failed to add product to cart.',
+        });
       },
     });
   }
