@@ -4,29 +4,14 @@
       <span class="material-icons">close</span>
     </button>
 
-    <div class="modal-header">
-      <div class="tabs">
-        <button [class.active]="mode === 'LOGIN'" (click)="toggleMode('LOGIN')">
-          Login
-        </button>
-        <button
-          [class.active]="mode === 'REGISTER'"
-          (click)="toggleMode('REGISTER')"
-        >
-          Sign Up
-        </button>
-      </div>
-    </div>
-
     <div class="modal-body">
-      <!-- LOGIN FORM -->
       <div *ngIf="mode === 'LOGIN'" class="auth-form">
         <h2>Welcome Back</h2>
         <p class="subtitle">Please enter your details to sign in.</p>
 
         <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
           <div class="form-group">
-            <label>Email Address</label>
+            <label>Email Address <span style="color: red">*</span></label>
             <input
               type="email"
               formControlName="email"
@@ -44,7 +29,7 @@
           </div>
 
           <div class="form-group">
-            <label>Password</label>
+            <label>Password <span style="color: red">*</span></label>
             <div class="password-input">
               <input
                 [type]="showPassword ? 'text' : 'password'"
@@ -81,75 +66,9 @@
           >
             {{ loading ? "Signing in..." : "Sign In" }}
           </button>
-        </form>
-      </div>
-
-      <!-- REGISTER FORM -->
-      <div *ngIf="mode === 'REGISTER'" class="auth-form">
-        <h2>Create Account</h2>
-        <p class="subtitle">Join BazaarHub today.</p>
-
-        <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
-          <div class="form-row">
-            <div class="form-group">
-              <label>First Name</label>
-              <input
-                type="text"
-                formControlName="firstName"
-                placeholder="John"
-              />
-            </div>
-            <div class="form-group">
-              <label>Last Name</label>
-              <input type="text" formControlName="lastName" placeholder="Doe" />
-            </div>
+          <div class="auth-footer">
+            Don't have an account? <a routerLink="/register">Create one</a>
           </div>
-
-          <div class="form-group">
-            <label>Email Address</label>
-            <input
-              type="email"
-              formControlName="email"
-              placeholder="name@example.com"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Phone Number</label>
-            <input
-              type="text"
-              formControlName="phoneNumber"
-              placeholder="98XXXXXXXX"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>I want to be a</label>
-            <select formControlName="role" class="custom-select">
-              <option value="CUSTOMER">Customer</option>
-              <option value="VENDOR">Vendor (Seller)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              formControlName="password"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div class="alert error" *ngIf="error">{{ error }}</div>
-          <div class="alert success" *ngIf="success">{{ success }}</div>
-
-          <button
-            type="submit"
-            class="btn btn-primary btn-block"
-            [disabled]="loading"
-          >
-            {{ loading ? "Creating account..." : "Sign Up" }}
-          </button>
         </form>
       </div>
     </div>

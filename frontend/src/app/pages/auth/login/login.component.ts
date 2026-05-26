@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {
   ReactiveFormsModule,
+  FormsModule,
   FormBuilder,
   FormGroup,
   Validators,
@@ -9,13 +10,24 @@ import {
 import { Router, RouterModule } from '@angular/router';
 
 import { AuthService } from '../../../services/auth.service';
+import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    FormsModule,
+    ButtonModule,
+    ToastModule,
+  ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
+  providers: [MessageService],
 })
 export class LoginComponent {
   loginForm: FormGroup;
@@ -27,6 +39,7 @@ export class LoginComponent {
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
+    private messageService: MessageService,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -50,8 +63,8 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
+    this.loginForm.markAllAsTouched();
     if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
       return;
     }
     this.loading = true;
@@ -63,10 +76,12 @@ export class LoginComponent {
         this.redirectByRole();
       },
       error: (err) => {
-        console.log('LOGIN ERROR:', err);
-
         this.loading = false;
-        this.error = this.getErrorMessage(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Login Failed',
+          detail: err?.error?.message || 'Invalid credentials',
+        });
       },
     });
   }
@@ -75,14 +90,5 @@ export class LoginComponent {
     if (role === 'ADMIN') this.router.navigate(['/admin/dashboard']);
     else if (role === 'VENDOR') this.router.navigate(['/vendor/selection']);
     else this.router.navigate(['/customer/dashboard']);
-  }
-
-  private getErrorMessage(err: any): string {
-    return (
-      err?.error?.message ||
-      err?.error?.data?.message ||
-      err?.message ||
-      'Something went wrong. Please try again.'
-    );
   }
 }

@@ -20,22 +20,20 @@ public class ProductMapper {
     }
 
     public ProductResponseDto mapToProductResponse(Product product) {
-        return new ProductResponseDto(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getDiscountPrice(),
-                product.getStockQuantity(),
-                product.getImageUrl(),
-                product.getCategory().getId(),
-                product.getCategory().getName(),
-                product.getStatus(),
-                product.getVendor().getShopName(),
-                product.getCreatedAt(),
-                product.getModifiedAt()
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+        productResponseDto.setId(product.getId());
+        productResponseDto.setName(product.getName());
+        productResponseDto.setDescription(product.getDescription());
+        productResponseDto.setPrice(product.getPrice());
+        productResponseDto.setDiscountPrice(product.getDiscountPrice());
+        productResponseDto.setStockQuantity(product.getStockQuantity());
+        productResponseDto.setCategoryId(product.getCategory().getId());
+        productResponseDto.setCategory(product.getCategory().getName());
+        productResponseDto.setStatus(product.getStatus());
+        productResponseDto.setVendorName(product.getVendor().getShopName());
+        productResponseDto.setCreatedAt(product.getCreatedAt());
+        productResponseDto.setModifiedAt(product.getModifiedAt());
 
-        );
-
+        return productResponseDto;
     }
 }

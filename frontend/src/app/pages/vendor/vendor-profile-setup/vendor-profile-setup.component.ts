@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { AddressComponent } from '../../../shared/components/address/address.component';
 
@@ -9,26 +8,37 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
+import { VendorService } from '../../../services/vendor.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-vendor-profile-setup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, AddressComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AddressComponent,
+    ToastModule,
+    ButtonModule,
+  ],
   templateUrl: './vendor-profile-setup.component.html',
   styleUrl: './vendor-profile-setup.component.scss',
+  providers: [MessageService],
 })
 export class VendorProfileSetupComponent {
   profileForm: FormGroup;
   loading = false;
-  error = '';
-  success = '';
 
-  private baseUrl = 'http://localhost:8080/api';
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
     private router: Router,
+    private auth: AuthService,
+    private vendorService: VendorService,
+    private messageService: MessageService,
   ) {
     this.profileForm = this.fb.group({
       shopName: ['', Validators.required],
@@ -41,7 +51,7 @@ export class VendorProfileSetupComponent {
         province: ['', Validators.required],
         district: ['', Validators.required],
         municipality: ['', Validators.required],
-        wardNo: ['', Validators.required],
+        wardNo: [null, [Validators.required, Validators.min(1)]],
         street: ['', Validators.required],
         postalCode: ['', Validators.required],
       }),
@@ -49,40 +59,35 @@ export class VendorProfileSetupComponent {
   }
 
   onSubmit(): void {
+    this.profileForm.markAllAsTouched();
+
     if (this.profileForm.invalid) {
-      this.profileForm.markAllAsTouched();
       return;
     }
 
     this.loading = true;
-    this.error = '';
-    this.success = '';
-    this.http
-      .post(`${this.baseUrl}/vendor/create`, this.profileForm.value)
-      .subscribe({
-        next: () => {
-          this.loading = false;
-          this.success =
-            'Vendor profile created successfully. Redirecting to login...';
-          localStorage.clear();
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 1500);
-        },
-        error: (err) => {
-          console.log('VENDOR PROFILE ERROR:', err);
-          this.loading = false;
-          this.error = this.getErrorMessage(err);
-        },
-      });
-  }
-  private getErrorMessage(err: any): string {
-    return (
-      err?.error?.message ||
-      err?.error?.data?.message ||
-      err?.message ||
-      'Something went wrong. Please try again.'
-    );
+    this.vendorService.create(this.profileForm.value).subscribe({
+      next: () => {
+        this.auth.logout();
+        this.loading = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Vendor profile created successfully.',
+        });
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 1500);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'Failed to create vendor profile.',
+        });
+      },
+    });
   }
 
   get addressForm(): FormGroup {

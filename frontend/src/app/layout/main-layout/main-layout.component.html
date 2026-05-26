@@ -1,0 +1,13 @@
+<div class="main-layout">
+  <app-navbar (toggleSidebar)="sidebarOpen = !sidebarOpen"></app-navbar>
+
+  <div class="layout-body">
+    <app-sidebar (close)="sidebarOpen = false"></app-sidebar>
+
+    <main class="content-area" [class.sidebar-open]="sidebarOpen">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

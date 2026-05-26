@@ -1,4 +1,6 @@
 <div class="homepage-clean">
+  <p-toast position="top-right" [life]="3000"></p-toast>
+
   <section class="hero-clean">
     <div class="container hero-container">
       <div class="hero-text">
@@ -12,7 +14,7 @@
         <div class="search-box">
           <span class="material-icons search-icon">search</span>
           <input type="text" placeholder="Search for products, categories..." />
-          <button class="btn btn-primary">Search</button>
+          <p-button>Search</p-button>
         </div>
 
         <div class="hero-highlights">
@@ -86,10 +88,7 @@
       <div class="promo-content">
         <h2>Become a Vendor Today</h2>
         <p>Join thousands of sellers growing their business with BazaarHub.</p>
-        <button
-          (click)="authService.open('REGISTER')"
-          class="btn btn-outline-white"
-        >
+        <button (click)="openRegister()" class="btn btn-outline-white">
           Register as Vendor
         </button>
       </div>
