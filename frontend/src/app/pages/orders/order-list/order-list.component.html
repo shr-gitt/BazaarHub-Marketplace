@@ -1,0 +1,130 @@
+<div class="orders-container">
+  <div class="flex justify-between align-center mb-4">
+    <h1 class="page-title m-0">My Orders</h1>
+  </div>
+
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <app-empty-state
+    *ngIf="!isLoading && orders.length === 0"
+    icon="receipt_long"
+    title="No orders found"
+    description="You haven't placed any orders yet."
+    actionLabel="Start Shopping"
+    (action)="navigateHome()"
+  ></app-empty-state>
+
+  <div class="orders-list" *ngIf="!isLoading && orders.length > 0">
+    <div class="card mb-4" *ngFor="let order of orders">
+      <div
+        class="card-header bg-secondary flex justify-between align-center mobile-col"
+      >
+        <div class="order-meta flex gap-4">
+          <div>
+            <div class="text-sm text-secondary uppercase font-semibold">
+              Order Placed
+            </div>
+            <div class="font-medium">
+              {{ order.createdAt | date: "mediumDate" }}
+            </div>
+          </div>
+          <div>
+            <div class="text-sm text-secondary uppercase font-semibold">
+              Total
+            </div>
+            <div class="font-medium">NPR {{ order.totalAmount }}</div>
+          </div>
+          <div class="hide-mobile">
+            <div class="text-sm text-secondary uppercase font-semibold">
+              Order #
+            </div>
+            <div class="font-medium">{{ order.id }}</div>
+          </div>
+        </div>
+
+        <div class="order-status-badge">
+          <span
+            class="status-badge"
+            [ngClass]="getStatusClass(order.orderStatus)"
+          >
+            {{ order.orderStatus }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <h4 class="mt-0 mb-3 font-semibold">Items in Order</h4>
+        <div class="order-items">
+          <div class="order-item" *ngFor="let item of order.items">
+            <div class="item-img-placeholder">
+              <span class="material-icons text-tertiary">inventory_2</span>
+            </div>
+            <div class="item-info">
+              <a
+                [routerLink]="['/product', item.productId]"
+                class="item-name font-medium"
+                >{{ item.productName }}</a
+              >
+              <div class="item-price text-sm text-secondary">
+                NPR {{ item.pricePerUnit }} × {{ item.quantity }} = NPR
+                {{ item.totalPrice }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="order-actions mt-4 pt-4 border-top flex justify-between align-center"
+        >
+          <div class="shipping-info text-sm">
+            <span class="font-semibold text-secondary">Shipping to:</span>
+            {{ order.shippingAddress }}
+          </div>
+
+          <div
+            class="actions flex gap-2"
+            *ngIf="isCustomer && order.orderStatus === 'PENDING'"
+          >
+            <button
+              class="btn btn-secondary text-error"
+              (click)="cancelOrder(order.id)"
+            >
+              Cancel Order
+            </button>
+          </div>
+
+          <div
+            class="actions flex gap-2"
+            *ngIf="
+              isVendor &&
+              order.orderStatus !== 'DELIVERED' &&
+              order.orderStatus !== 'CANCELLED'
+            "
+          >
+            <button
+              class="btn btn-sm btn-primary"
+              *ngIf="order.orderStatus === 'PENDING'"
+              (click)="updateStatus(order.id, 'CONFIRMED')"
+            >
+              Confirm
+            </button>
+            <button
+              class="btn btn-sm btn-primary"
+              *ngIf="order.orderStatus === 'CONFIRMED'"
+              (click)="updateStatus(order.id, 'SHIPPED')"
+            >
+              Mark Shipped
+            </button>
+            <button
+              class="btn btn-sm btn-success"
+              *ngIf="order.orderStatus === 'SHIPPED'"
+              (click)="updateStatus(order.id, 'DELIVERED')"
+            >
+              Mark Delivered
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

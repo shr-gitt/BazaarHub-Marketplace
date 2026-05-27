@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, RouterLinkActive } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { RippleModule } from 'primeng/ripple';
 import { AuthService } from '../../../services/auth.service';
 import { VendorContextService } from '../../../services/vendor-context.service';
-import { ButtonModule } from 'primeng/button';
 
 interface NavItem {
   label: string;
@@ -15,7 +16,7 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, ButtonModule],
+  imports: [CommonModule, RouterModule, ButtonModule, RippleModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
@@ -27,7 +28,6 @@ export class SidebarComponent implements OnInit {
   sidebarVisible = true;
 
   navItems: NavItem[] = [
-    // Admin
     {
       label: 'Admin Dashboard',
       icon: 'pi-building',
@@ -46,8 +46,25 @@ export class SidebarComponent implements OnInit {
       route: '/admin/vendors',
       roles: ['ADMIN'],
     },
+    {
+      label: 'Products',
+      icon: 'pi pi-box',
+      route: '/admin/products',
+      roles: ['ADMIN'],
+    },
+    {
+      label: 'Categories',
+      icon: 'pi pi-tags',
+      route: '/admin/categories',
+      roles: ['ADMIN'],
+    },
+    {
+      label: 'Orders',
+      icon: 'pi pi-shopping-bag',
+      route: '/admin/orders',
+      roles: ['ADMIN'],
+    },
 
-    // Vendor
     {
       label: 'Vendor Dashboard',
       icon: 'pi-shop',
@@ -60,55 +77,35 @@ export class SidebarComponent implements OnInit {
       route: '/vendor/products',
       roles: ['VENDOR'],
     },
-    {
-      label: 'Add New Products',
-      icon: 'pi-plus',
-      route: '/vendor/product/create',
-      roles: ['VENDOR'],
-    },
 
-    // Customer
     {
       label: 'Home',
-      icon: 'pi-home',
+      icon: 'pi pi-home',
       route: '/customer/dashboard',
       roles: ['CUSTOMER'],
     },
     {
       label: 'My Cart',
-      icon: 'pi-shopping-cart',
+      icon: 'pi pi-shopping-cart',
       route: '/cart',
       roles: ['CUSTOMER'],
     },
 
-    // Shared
     {
       label: 'Products',
       icon: 'pi-box',
       route: '/products',
-      roles: ['ADMIN', 'CUSTOMER'],
-    },
-    {
-      label: 'Categories',
-      icon: 'pi-th-large',
-      route: '/categories',
-      roles: ['ADMIN'],
+      roles: ['CUSTOMER'],
     },
     {
       label: 'Orders',
-      icon: 'pi-list-check',
-      route: '/vendor/orders',
-      roles: ['ADMIN', 'VENDOR'],
-    },
-    {
-      label: 'Orders',
-      icon: 'pi-list-check',
+      icon: 'pi pi-list',
       route: '/orders',
       roles: ['CUSTOMER'],
     },
     {
       label: 'My Profile',
-      icon: 'pi-building',
+      icon: 'pi pi-user',
       route: '/profile',
       roles: ['VENDOR', 'CUSTOMER'],
     },
@@ -131,8 +128,6 @@ export class SidebarComponent implements OnInit {
     this.id = this.auth.getUserId();
     if (this.role == 'VENDOR') {
       this.vendorId = this.vendorContextService.getVendorId();
-
-      console.log('Vendor ID:', this.vendorId);
     }
   }
 

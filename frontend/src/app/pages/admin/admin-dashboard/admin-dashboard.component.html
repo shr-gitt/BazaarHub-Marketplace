@@ -1,1 +1,65 @@
-<p>admin-dashboard works!</p>
+<section class="admin-dashboard">
+  <p-card styleClass="dashboard-header">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p>System overview and management.</p>
+    </div>
+  </p-card>
+
+  <div class="stats-grid">
+    <p-card styleClass="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon bg-blue">
+          <span class="material-icons">people</span>
+        </div>
+        <div>
+          <h3>Users</h3>
+          <p>Manage</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon bg-green">
+          <span class="material-icons">storefront</span>
+        </div>
+        <div>
+          <h3>Vendors</h3>
+          <p>Approve</p>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon bg-purple">
+          <span class="material-icons">category</span>
+        </div>
+        <div>
+          <h3>Categories</h3>
+          <p>Organize</p>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <p-card header="Quick Actions" styleClass="quick-actions-card">
+    <div class="actions-grid">
+      <a routerLink="/admin/users" pButton class="action-btn">
+        <span class="material-icons">group</span>
+        <span>User Management</span>
+      </a>
+
+      <a routerLink="/admin/vendors" pButton class="action-btn">
+        <span class="material-icons">fact_check</span>
+        <span>Vendor Approvals</span>
+      </a>
+
+      <a routerLink="/admin/categories" pButton class="action-btn">
+        <span class="material-icons">category</span>
+        <span>Category Management</span>
+      </a>
+    </div>
+  </p-card>
+</section>

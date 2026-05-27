@@ -39,6 +39,9 @@ import { CreateProductComponent } from './pages/products/create-product/create-p
 import { OrderCheckoutComponent } from './pages/orders/order-checkout/order-checkout.component';
 import { OrderPaymentComponent } from './pages/payments/create-order-payment/create-order-payment.component';
 import { CreateAdminComponent } from './pages/admin/create-admin/create-admin.component';
+import { VendorApprovalComponent } from './pages/vendor/vendor-approval/vendor-approval.component';
+import { UserListComponent } from './pages/admin/user-list/user-list.component';
+import { AdminOrdersComponent } from './pages/orders/admin-orders/admin-orders.component';
 import { VendorProductListComponent } from './pages/products/vendor-product-list/vendor-product-list.component';
 
 export const routes: Routes = [
@@ -205,6 +208,31 @@ export const routes: Routes = [
       {
         path: 'admin/categories/edit/:id',
         component: CategoryFormComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'ADMIN' },
+      },
+      {
+        path: 'admin/users',
+        component: UserListComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'ADMIN' },
+      },
+      {
+        path: 'admin/vendors',
+        component: VendorApprovalComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'ADMIN' },
+      },
+      {
+        path: 'admin/products',
+        component: ProductListComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'ADMIN' },
+      },
+
+      {
+        path: 'admin/orders',
+        component: AdminOrdersComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'ADMIN' },
       },

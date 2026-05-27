@@ -1,0 +1,104 @@
+<div class="card">
+  <div class="card-header flex justify-between align-center">
+    <h2 class="card-title">Vendor Approvals</h2>
+  </div>
+
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <app-empty-state
+    *ngIf="!isLoading && vendors.length === 0"
+    icon="fact_check"
+    title="No vendors found"
+    description="There are currently no vendor applications to review."
+  ></app-empty-state>
+
+  <div class="card-body p-0" *ngIf="!isLoading && vendors.length > 0">
+    <div class="table-container no-border-radius">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Shop Name</th>
+            <th>Email / Phone</th>
+            <th>PAN / Reg No.</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let vendor of vendors">
+            <td class="font-medium">{{ vendor.shopName }}</td>
+            <td>
+              <div>{{ vendor.businessEmail }}</div>
+              <div class="text-sm text-secondary">
+                {{ vendor.businessPhone }}
+              </div>
+            </td>
+            <td>
+              <div>{{ vendor.panCardNo }}</div>
+              <div class="text-sm text-secondary">
+                {{ vendor.registrationNo }}
+              </div>
+            </td>
+            <td>
+              <span
+                class="status-badge"
+                [ngClass]="{
+                  success: vendor.approvalStatus === 'APPROVED',
+                  warning: vendor.approvalStatus === 'PENDING',
+                  error: vendor.approvalStatus === 'REJECTED',
+                }"
+              >
+                {{ vendor.approvalStatus }}
+              </span>
+            </td>
+            <td class="text-right">
+              <div
+                class="action-buttons"
+                *ngIf="vendor.approvalStatus === 'PENDING'"
+              >
+                <button
+                  class="btn btn-sm btn-success"
+                  (click)="updateStatus(vendor.id, 'APPROVED')"
+                >
+                  Approve
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="updateStatus(vendor.id, 'REJECTED')"
+                >
+                  Reject
+                </button>
+              </div>
+              <div
+                *ngIf="vendor.approvalStatus !== 'PENDING'"
+                class="text-sm text-secondary"
+              >
+                Processed
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 0"
+        (click)="loadVendors(currentPage - 1)"
+      >
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <span class="pagination-info"
+        >Page {{ currentPage + 1 }} of {{ totalPages }}</span
+      >
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="loadVendors(currentPage + 1)"
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</div>

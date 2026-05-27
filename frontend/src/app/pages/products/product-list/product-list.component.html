@@ -1,11 +1,11 @@
 <div class="products-page">
-  <p-toast position="top-right" [life]="3000"></p-toast>
-
+  <!-- Sidebar -->
   <div class="filters-sidebar">
     <div class="card mb-4">
       <div class="card-header">
         <h3 class="card-title text-lg">Categories</h3>
       </div>
+
       <div class="card-body p-0">
         <div class="category-list">
           <button
@@ -15,6 +15,7 @@
           >
             All Categories
           </button>
+
           <button
             class="category-btn"
             *ngFor="let cat of categories"
@@ -28,10 +29,12 @@
     </div>
   </div>
 
-  <!-- Products Grid -->
+  <!-- Products -->
   <div class="products-content">
     <div class="flex justify-between align-center mb-4">
-      <h2 class="text-2xl font-bold m-0">All Products</h2>
+      <h2 class="text-2xl font-bold m-0">
+        {{ isAdmin ? "Product Management" : "All Products" }}
+      </h2>
     </div>
 
     <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
@@ -43,14 +46,103 @@
       description="Try selecting a different category or check back later."
     ></app-empty-state>
 
-    <div class="product-grid" *ngIf="!isLoading && products.length > 0">
-      <app-product-card
-        *ngFor="let product of products"
-        [product]="product"
-        (addToCart)="onAddToCart($event)"
-      ></app-product-card>
-    </div>
+    <!-- ADMIN VIEW -->
+    <ng-container *ngIf="!isLoading && products.length > 0">
+      <div class="admin-product-list" *ngIf="isAdmin; else customerProducts">
+        <p-card
+          *ngFor="let product of products"
+          styleClass="admin-product-card"
+        >
+          <div class="admin-product-wrapper">
+            <div class="product-image-box">
+              <img [src]="product.imageUrl" [alt]="product.name" />
+            </div>
 
+            <div class="product-detail">
+              <div class="top-section">
+                <div>
+                  <h3>{{ product.name }}</h3>
+                  <p>{{ product.description }}</p>
+                </div>
+
+                <p-tag
+                  [value]="product.status || 'ACTIVE'"
+                  severity="success"
+                ></p-tag>
+              </div>
+
+              <div class="product-meta">
+                <div>
+                  <span class="meta-label">Category</span>
+                  <span>{{ product.category }}</span>
+                </div>
+
+                <div>
+                  <span class="meta-label">Vendor</span>
+                  <span>{{ product.vendorName || "N/A" }}</span>
+                </div>
+
+                <div>
+                  <span class="meta-label">Price</span>
+                  <span>Rs. {{ product.price }}</span>
+                </div>
+
+                <div>
+                  <span class="meta-label">Discount</span>
+                  <span>
+                    Rs. {{ product.discountPrice || product.price }}
+                  </span>
+                </div>
+
+                <div>
+                  <span class="meta-label">Stock</span>
+                  <span>{{ product.stockQuantity }}</span>
+                </div>
+              </div>
+
+              <div class="admin-actions">
+                <button
+                  pButton
+                  type="button"
+                  label="View"
+                  icon="pi pi-eye"
+                  severity="contrast"
+                ></button>
+
+                <button
+                  pButton
+                  type="button"
+                  label="Edit"
+                  icon="pi pi-pencil"
+                  severity="success"
+                ></button>
+
+                <button
+                  pButton
+                  type="button"
+                  label="Delete"
+                  icon="pi pi-trash"
+                  severity="danger"
+                ></button>
+              </div>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- CUSTOMER VIEW -->
+      <ng-template #customerProducts>
+        <div class="product-grid">
+          <app-product-card
+            *ngFor="let product of products"
+            [product]="product"
+            (addToCart)="onAddToCart($event)"
+          ></app-product-card>
+        </div>
+      </ng-template>
+    </ng-container>
+
+    <!-- Pagination -->
     <div class="pagination mt-4" *ngIf="totalPages > 1 && !isLoading">
       <button
         class="pagination-btn"
@@ -59,9 +151,11 @@
       >
         <span class="material-icons">chevron_left</span>
       </button>
-      <span class="pagination-info"
-        >Page {{ currentPage + 1 }} of {{ totalPages }}</span
-      >
+
+      <span class="pagination-info">
+        Page {{ currentPage + 1 }} of {{ totalPages }}
+      </span>
+
       <button
         class="pagination-btn"
         [disabled]="currentPage >= totalPages - 1"

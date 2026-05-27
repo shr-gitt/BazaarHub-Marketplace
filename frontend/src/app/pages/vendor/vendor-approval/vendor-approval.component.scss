@@ -1,0 +1,43 @@
+
+      .flex {
+        display: flex;
+      }
+      .justify-between {
+        justify-content: space-between;
+      }
+      .align-center {
+        align-items: center;
+      }
+      .p-0 {
+        padding: 0 !important;
+      }
+      .no-border-radius {
+        border-radius: 0;
+        border: none;
+      }
+      .font-medium {
+        font-weight: 500;
+      }
+      .text-sm {
+        font-size: 0.875rem;
+      }
+      .text-secondary {
+        color: var(--text-secondary);
+      }
+      .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+      }
+      .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+      }
+      .btn-success {
+        background-color: var(--success-color);
+        color: white;
+        border: none;
+      }
+      .btn-success:hover {
+        background-color: #059669;
+      }

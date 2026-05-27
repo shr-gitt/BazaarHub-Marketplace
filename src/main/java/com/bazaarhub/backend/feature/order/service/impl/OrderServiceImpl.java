@@ -20,15 +20,11 @@ import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
 import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
-import com.bazaarhub.backend.shared.enums.OrderStatus;
-import com.bazaarhub.backend.shared.enums.PaymentStatus;
-import com.bazaarhub.backend.shared.enums.ProductStatus;
-import com.bazaarhub.backend.shared.enums.UserStatus;
-import com.bazaarhub.backend.shared.exception.EmptyCartCheckoutException;
-import com.bazaarhub.backend.shared.exception.InsufficientStockException;
-import com.bazaarhub.backend.shared.exception.InvalidOrderStateException;
-import com.bazaarhub.backend.shared.exception.OrderNotFoundException;
+import com.bazaarhub.backend.shared.enums.*;
+import com.bazaarhub.backend.shared.exception.*;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -207,6 +203,23 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.mapToOrderResponseDTO(savedOrder);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderResponseDto> getAllOrdersForAdmin(Long adminId, Pageable pageable) {
+        User admin = userRepository.findById(adminId).orElseThrow(() -> {
+            log.error("Admin not found of id : {}", adminId);
+            return new UserNotFoundException("User not found");
+        });
+
+        if (admin.getRole() != Role.ADMIN) {
+            log.error("You are not authorized to view all orders.");
+            throw new UnauthorizedAccessException("You are not authorized to view all orders.");
+        }
+
+        return orderRepository.findAllByOrderByCreatedAtDesc(pageable)
+                .map(orderMapper::mapToOrderResponseDTO);
+    }
+
     private void validateCartItems(Cart cart) {
         for (CartItem item : cart.getItems()) {
             Product product = item.getProduct();
@@ -229,4 +242,5 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidOrderStateException("Order status cannot be changed from " + currentStatus);
         }
     }
+
 }

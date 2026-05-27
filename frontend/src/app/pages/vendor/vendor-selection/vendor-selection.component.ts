@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Vendor } from '../../../core/models/vendor.model';
 import { VendorService } from '../../../services/vendor.service';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
@@ -8,6 +7,7 @@ import { VendorContextService } from '../../../services/vendor-context.service';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { VendorResponse } from '../../../core/models/vendor.model';
 
 @Component({
   selector: 'app-vendor-selection',
@@ -19,7 +19,7 @@ import { MessageService } from 'primeng/api';
 })
 export class VendorSelectionComponent implements OnInit {
   loading = false;
-  vendors: Vendor[] = [];
+  vendors: VendorResponse[] = [];
 
   constructor(
     private vendorService: VendorService,
@@ -63,7 +63,7 @@ export class VendorSelectionComponent implements OnInit {
     });
   }
 
-  selectVendor(vendor: Vendor): void {
+  selectVendor(vendor: VendorResponse): void {
     this.vendorContext.setVendorId(vendor.id);
 
     this.router.navigate(['/vendor/dashboard']);
