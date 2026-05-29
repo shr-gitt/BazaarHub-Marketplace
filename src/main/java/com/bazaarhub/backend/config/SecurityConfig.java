@@ -64,10 +64,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/admin/create").permitAll()
                         .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers("/api/vendor/approval/**")
-                        .hasRole(Role.ADMIN.name())
-                        .requestMatchers("/api/vendor/delete/**")
-                        .hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.GET, "/api/category/**")
                         .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name(), Role.CUSTOMER.name())
                         .requestMatchers(HttpMethod.POST, "/api/category/**")
@@ -77,10 +73,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/category/**")
                         .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name())
                         .requestMatchers(HttpMethod.GET, "/api/vendor/**")
-                        .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name(), Role.CUSTOMER.name())
+                        .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name(),Role.CUSTOMER.name())
                         .requestMatchers(HttpMethod.POST, "/api/vendor/**")
                         .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name())
-
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 )
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

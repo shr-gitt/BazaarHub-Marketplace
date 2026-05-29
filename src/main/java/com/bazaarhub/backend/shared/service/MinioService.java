@@ -1,15 +1,14 @@
 package com.bazaarhub.backend.shared.service;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
+import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -49,9 +48,28 @@ public class MinioService {
                             .build()
             );
 
-            return minioUrl + "/" + bucketName + "/" + filename;
+            return filename;
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload file." + e.getMessage(), e);
         }
     }
+
+    public String getImageUrl(String fileName) {
+        try{
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket("bazaarhub")
+                            .object(fileName)
+                            .expiry(1, TimeUnit.HOURS)
+                            .build()
+            );
+        }
+        catch (Exception ex){
+            throw new RuntimeException(
+                    "Failed to generate presigned URL",
+                    ex
+            );
+        }
+}
 }

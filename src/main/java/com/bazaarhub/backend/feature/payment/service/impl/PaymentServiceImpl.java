@@ -21,6 +21,9 @@ import com.bazaarhub.backend.feature.payment.resource.request.PaymentRequestDto;
 import com.bazaarhub.backend.feature.payment.resource.response.PaymentResponseDto;
 import com.bazaarhub.backend.feature.payment.service.PaymentService;
 import com.bazaarhub.backend.feature.points.service.PointsService;
+import com.bazaarhub.backend.feature.product.service.ProductService;
+import com.bazaarhub.backend.shared.enums.OrderPaymentStatus;
+import com.bazaarhub.backend.shared.enums.OrderStatus;
 import com.bazaarhub.backend.shared.enums.PaymentStatus;
 import com.bazaarhub.backend.shared.exception.OrderNotFoundException;
 import com.bazaarhub.backend.shared.exception.OrderPaidException;
@@ -37,6 +40,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -51,6 +55,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final EsewaSignatureUtil esewaSignatureUtil;
     private final RestTemplate restTemplate;
     private final PointsService pointsService;
+    private final ProductService productService;
     private final NotificationService notificationService;
 
     @Value("${esewa.merchant.code}")
@@ -76,8 +81,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Page<PaymentResponseDto> getAllPayments(Pageable pageable) {
-        log.info("Fetching all payments.");
-
         Pageable pages = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         return paymentRepository.findAll(pages)
                 .map(paymentMapper::mapToPaymentResponse);
@@ -85,8 +88,6 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponseDto getPaymentById(Long id) {
-        log.info("Getting payment by id {}", id);
-
         Payment payment = paymentRepository.findById(id).orElseThrow(
                 () -> {
                     log.error("Could not find payment with payment [id={}] in getPaymentById", id);
@@ -100,12 +101,15 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PaymentResponseDto createPayment(Long id, PaymentRequestDto paymentRequestDto) {
-        log.info("Creating payment.");
+        log.info("Creating payment. userId:{}", id);
 
         Order order = orderRepository.findById(paymentRequestDto.getOrderId())
-                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+                .orElseThrow(() -> {
+                    log.error("Order not found. orderId{}:", paymentRequestDto.getOrderId());
+                    return new OrderNotFoundException("Order not found");
+                });
 
-        if (PaymentStatus.PAID == order.getPaymentStatus()) {
+        if (OrderPaymentStatus.PAID == order.getPaymentStatus()) {
             throw new OrderPaidException("Order already paid");
         }
 
@@ -124,8 +128,14 @@ public class PaymentServiceImpl implements PaymentService {
         String pid = "ORD-" + order.getId() + "-" + System.currentTimeMillis();
         payment.setPid(pid);
         payment.setPaymentType(paymentType);
-        payment.setPaymentStatus(PaymentStatus.PENDING);
-
+        if (PaymentType.WALLET.equals(paymentType)) {
+            payment.setPaymentStatus(PaymentStatus.PENDING);
+            payment.setExpiresAt(LocalDateTime.now().plusMinutes(5));
+        }
+        else{
+            payment.setPaymentStatus(PaymentStatus.CASH_PENDING);
+            payment.setExpiresAt(null);
+        }
         String dataToSign = "total_amount=" + order.getTotalAmount()
                 + ",transaction_uuid=" + pid
                 + ",product_code=" + merchantCode;
@@ -134,7 +144,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         PaymentResponseDto response = paymentMapper.mapToPaymentResponse(savedPayment);
 
-        if (paymentType.equals(PaymentType.WALLET)) {
+        if (PaymentType.WALLET.equals(paymentType)) {
             String signature = esewaSignatureUtil.generateSignature(dataToSign);
 
             response.setPaymentUrl(paymentUrl);
@@ -148,7 +158,7 @@ public class PaymentServiceImpl implements PaymentService {
             Long userId = order.getUser().getId();
 
             Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
-                log.error("Cart not found of user id : {}", userId);
+                log.error("Cart not found. userId : {}", userId);
                 return new CartNotFoundException("Cart not found");
             });
 
@@ -162,7 +172,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentResponseDto confirmCashPayment(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+                .orElseThrow(() ->{
+                    log.error("Payment not found. paymentId: {}", paymentId);
+                    return new PaymentNotFoundException("Payment not found");
+                });
 
         if (PaymentType.CASH_ON_DELIVERY != payment.getPaymentType()) {
             throw new WrongPaymentTypeException("Wrong payment type.");
@@ -173,7 +186,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
-        payment.getOrder().setPaymentStatus(PaymentStatus.PAID);
+        payment.getOrder().setPaymentStatus(OrderPaymentStatus.PAID);
         orderRepository.save(payment.getOrder());
 
         notificationService.createNotification(
@@ -198,7 +211,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean verifyWithEsewa(Payment payment) {
-        log.info("Verifying with eSewa");
+        log.info("Verifying with eSewa, paymentId: {}", payment.getId());
         String url = UriComponentsBuilder.fromUriString(verifyUrl)
                 .queryParam("product_code", merchantCode)
                 .queryParam("total_amount", payment.getAmount())
@@ -229,7 +242,10 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("Verifying payment.");
 
         Payment payment = paymentRepository.findByPid(pid)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+                .orElseThrow(() ->{
+                    log.error("Payment not found. pid: {}", pid);
+                    return new PaymentNotFoundException("Payment not found");
+                });
 
         if (PaymentStatus.SUCCESS == payment.getPaymentStatus()) {
             if (!refId.equals(payment.getRefId())) {
@@ -237,7 +253,7 @@ public class PaymentServiceImpl implements PaymentService {
                 return frontendFailureUrl;
             }
 
-            log.warn("Duplicate callback received for already-completed payment [pid={}]", pid);
+            log.error("Duplicate callback received for already-completed payment [pid={}]", pid);
             return frontendSuccessUrl;
         }
 
@@ -254,7 +270,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (verified) {
             pointsService.updateUserPoints(order.getUser(), order.getTotalAmount());
-            order.setPaymentStatus(PaymentStatus.PAID);
+            order.setPaymentStatus(OrderPaymentStatus.PAID);
             payment.setPaymentStatus(PaymentStatus.SUCCESS);
             payment.setRefId(refId);
 
@@ -279,14 +295,14 @@ public class PaymentServiceImpl implements PaymentService {
             Long userId = order.getUser().getId();
 
             Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
-                log.error("Cart not found of user id : {}", userId);
+                log.error("Cart not found. userId : {}", userId);
                 return new CartNotFoundException("Cart not found");
             });
 
             cart.getItems().clear();
             cartRepository.save(cart);
         } else {
-            order.setPaymentStatus(PaymentStatus.FAILED);
+            order.setPaymentStatus(OrderPaymentStatus.FAILED);
             payment.setPaymentStatus(PaymentStatus.FAILED);
             notificationService.createNotification(
                     order.getUser(),
@@ -301,6 +317,12 @@ public class PaymentServiceImpl implements PaymentService {
         orderRepository.save(order);
         paymentRepository.save(payment);
 
+        log.info(
+                "Payment verified successfully. paymentId={}, orderId={}",
+                payment.getId(),
+                order.getId()
+        );
+
         return verified ? frontendSuccessUrl
                 : frontendFailureUrl;
     }
@@ -308,14 +330,32 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public void markPaymentFailed(String pid) {
-
-        log.info("Marking payment failed.");
+        log.info("Marking payment failed. pid: {}", pid);
 
         Payment payment = paymentRepository.findByPid(pid)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
-        if (payment.getOrder() != null) {
-            payment.getOrder().setPaymentStatus(PaymentStatus.FAILED);
+                .orElseThrow(() ->{
+                    log.error(" Payment not found. pid: {}", pid);
+                    return new PaymentNotFoundException("Payment not found");
+                });
+
+        Order order = payment.getOrder();
+        if (payment.getPaymentStatus() == PaymentStatus.FAILED) {
+            return;
         }
+
+        if (payment.getPaymentStatus() == PaymentStatus.SUCCESS) {
+            return;
+        }
+
+        for (OrderItem item : order.getOrderItems()) {
+            productService.restoreStock(
+                    item.getProduct().getId(),
+                    item.getQuantity()
+            );
+        }
+
+        order.setPaymentStatus(OrderPaymentStatus.FAILED);
+        order.setOrderStatus(OrderStatus.CANCELLED);
         payment.setPaymentStatus(PaymentStatus.FAILED);
         notificationService.createNotification(
                 payment.getUser(),

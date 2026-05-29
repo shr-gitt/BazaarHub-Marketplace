@@ -1,7 +1,7 @@
 package com.bazaarhub.backend.feature.order.resources.response;
 
+import com.bazaarhub.backend.shared.enums.OrderPaymentStatus;
 import com.bazaarhub.backend.shared.enums.OrderStatus;
-import com.bazaarhub.backend.shared.enums.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ public class OrderResponseDto implements Serializable {
     private List<OrderItemResponseDto> items = new ArrayList<>();
     private BigDecimal totalAmount;
     private OrderStatus orderStatus;
-    private PaymentStatus paymentStatus;
+    private OrderPaymentStatus paymentStatus;
     private String shippingAddress;
     private String contactNumber;
     private String remarks;

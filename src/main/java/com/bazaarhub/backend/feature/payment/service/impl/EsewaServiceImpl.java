@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 
@@ -58,8 +59,13 @@ public class EsewaServiceImpl implements EsewaService {
     public String processEsewaFailure (String encodedData){
         log.info("Processing failure payment through eSewa.");
 
+        if (encodedData == null || encodedData.isBlank()) {
+            log.error("eSewa failure callback received without data.");
+            return frontendFailureUrl;
+        }
+
         try {
-            String decoded = new String(Base64.getDecoder().decode(encodedData));
+            String decoded = new String(Base64.getDecoder().decode(encodedData), StandardCharsets.UTF_8);
             Map<String, String> data = objectMapper.readValue(decoded, Map.class);
 
             if (!esewaSignatureUtil.verifyCallback(data)) {

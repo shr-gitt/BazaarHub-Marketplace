@@ -2,8 +2,8 @@ package com.bazaarhub.backend.feature.order.entity;
 
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.shared.entity.BaseEntity;
+import com.bazaarhub.backend.shared.enums.OrderPaymentStatus;
 import com.bazaarhub.backend.shared.enums.OrderStatus;
-import com.bazaarhub.backend.shared.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +32,7 @@ public class Order extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
-    private PaymentStatus paymentStatus;
+    private OrderPaymentStatus paymentStatus;
 
     @Column(name = "total_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;

@@ -11,9 +11,15 @@ public interface ProductService {
 
     ProductResponseDto getProductById(Long productId);
 
+    Page<ProductResponseDto> getProductsByVendorId(Long vendorId, Pageable pageable);
+
     Page<ProductResponseDto> getAllProduct(Pageable pageable);
 
     ProductResponseDto updateProductById(Long productId, ProductRequestDto productRequestDto);
+
+    void reserveStock(Long productId, Integer quantity);
+
+    void restoreStock(Long productId, Integer quantity);
 
     void deleteProductById(Long productId);
 

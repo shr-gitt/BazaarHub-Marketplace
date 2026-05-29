@@ -16,13 +16,13 @@ import com.bazaarhub.backend.feature.order.resources.request.OrderStatusUpdateRe
 import com.bazaarhub.backend.feature.order.resources.response.OrderResponseDto;
 import com.bazaarhub.backend.feature.order.service.OrderService;
 import com.bazaarhub.backend.feature.product.entity.Product;
+import com.bazaarhub.backend.feature.product.service.ProductService;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
 import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import com.bazaarhub.backend.shared.enums.*;
 import com.bazaarhub.backend.shared.exception.*;
-import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,39 +39,53 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderServiceImpl implements OrderService {
-
-    private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
     private final OrderMapper orderMapper;
+    private final UserRepository userRepository;
     private final CartRepository cartRepository;
+    private final ProductService productService;
+    private final OrderRepository orderRepository;
     private final NotificationService notificationService;
 
     @Override
     @Transactional
     @CachePut(cacheNames = CacheConfig.CREATE_ORDER_CACHE, key = "#userId")
     public OrderResponseDto placeOrder(Long userId, OrderRequestDto orderRequestDTO) {
+        log.info(
+                "Placing order. userId={}",
+                userId
+        );
+
         User user = userRepository.findByIdAndUserStatusNot(userId, UserStatus.DELETED).orElseThrow(() -> {
-            log.error("User not found of id : {}", userId);
-            return new UserNotFoundException("User not found");
+            log.error("Place order failed. User not found of id : {}", userId);
+            return new UserNotFoundException("User not found.");
         });
 
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
-            log.error("Cart not found of user id : {}", userId);
-            return new CartNotFoundException("Cart not found");
+            log.error("Place order failed. Cart not found of user id : {}", userId);
+            return new CartNotFoundException("Cart not found.");
         });
 
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new EmptyCartCheckoutException("Cannot place order from an empty cart.");
         }
+
         validateCartItems(cart);
 
         Order order = buildOrder(orderRequestDTO, user, cart);
         Order saveOrder = orderRepository.save(order);
 
-        notificationService.createNotification(user, "Order placed",
+        for (CartItem cartItem : cart.getItems()) {
+            Product product = cartItem.getProduct();
+            productService.reserveStock(product.getId(), cartItem.getQuantity());
+        }
+
+        notificationService.createNotification(
+                user,
+                "Order placed",
                 "Your order has been placed successfully.",
                 NotificationType.ORDER_PLACED,
-                saveOrder.getId());
+                saveOrder.getId()
+        );
 
         for (CartItem cartItem : cart.getItems()) {
             Product product = cartItem.getProduct();
@@ -92,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setOrderStatus(OrderStatus.PENDING);
-        order.setPaymentStatus(PaymentStatus.PENDING);
+        order.setPaymentStatus(OrderPaymentStatus.PENDING);
         order.setShippingAddress(orderRequestDTO.getShippingAddress());
         order.setContactNumber(orderRequestDTO.getContactNumber());
         order.setRemarks(orderRequestDTO.getRemark());
@@ -110,7 +124,6 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setPricePerUnit(unitPrice);
             orderItem.setTotalPrice(totalPrice);
             order.addOrderItem(orderItem);
-            product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
             totalAmount = totalAmount.add(totalPrice);
         }
         order.setTotalAmount((totalAmount));
@@ -122,8 +135,8 @@ public class OrderServiceImpl implements OrderService {
     @Cacheable(cacheNames = CacheConfig.GET_ORDER_CACHE, key = "#orderId")
     public OrderResponseDto getOrderById(Long userId, Long orderId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId).orElseThrow(() -> {
-            log.error("Order not found of id: {}", orderId);
-            return new OrderNotFoundException("Order Not Found Exception");
+            log.error("Get Order By Id failed. Order not found. orderId: {}", orderId);
+            return new OrderNotFoundException("Order Not Found Exception.");
         });
         return orderMapper.mapToOrderResponseDTO(order);
     }
@@ -139,11 +152,16 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @CachePut(cacheNames = CacheConfig.UPDATE_ORDER_CACHE, key = "#orderId")
     public OrderResponseDto updateOrderStatus(Long orderId, OrderStatusUpdateRequestDto requestDTO) {
+        log.info(
+                "Updating order status. orderId={}",
+                orderId
+        );
+
         Order order = orderRepository.findById(orderId).orElseThrow(() -> {
-            log.error("Order not found of id: {}", orderId);
-            return new OrderNotFoundException("Order Not Found Exception");
+            log.error("Update order failed. Order not found. orderId: {}", orderId);
+            return new OrderNotFoundException("Order Not Found.");
         });
-        validateOrderStatusTransition(order.getOrderStatus(), requestDTO.getOrderStatus());
+        validateOrderStatusTransition(order.getOrderStatus());
         order.setOrderStatus(requestDTO.getOrderStatus());
         Order saveOrder = orderRepository.save(order);
         notificationService.createNotification(
@@ -160,22 +178,27 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @CachePut(cacheNames = CacheConfig.CANCEL_ORDER_CACHE, key = "#orderId")
     public OrderResponseDto cancelOrder(Long userId, Long orderId) {
+        log.info(
+                "Canceling order. orderId={}",
+                orderId
+        );
+
         Order order = orderRepository.findById(orderId).orElseThrow(() -> {
-            log.error("Order not found of id: {}", orderId);
-            return new OrderNotFoundException("Order Not Found Exception");
+            log.error("Cancel order failed. Order not found. orderId: {}", orderId);
+            return new OrderNotFoundException("Order Not Found.");
         });
         if (order.getOrderStatus() == OrderStatus.SHIPPED || order.getOrderStatus() == OrderStatus.DELIVERED) {
-            log.error("Invalid order of id: {}", orderId);
+            log.error("Cancel order failed. Invalid order. orderId: {}", orderId);
             throw new InvalidOrderStateException("Order cannot be cancelled after shipping or delivery.");
         }
 
         if (order.getOrderStatus() == OrderStatus.CANCELLED) {
-            log.error("Order is already cancelled of id: {}", orderId);
+            log.error("Cancel order failed. Order is already cancelled. orderId: {}", orderId);
             throw new InvalidOrderStateException("Order is already cancelled.");
         }
         for (OrderItem orderItem : order.getOrderItems()) {
             Product product = orderItem.getProduct();
-            product.setStockQuantity(product.getStockQuantity() + orderItem.getQuantity());
+            productService.restoreStock(product.getId(), orderItem.getQuantity());
         }
 
         order.setOrderStatus(OrderStatus.CANCELLED);
@@ -225,22 +248,21 @@ public class OrderServiceImpl implements OrderService {
             Product product = item.getProduct();
 
             if (product.getStatus() != ProductStatus.ACTIVE) {
-                log.error("Product is inactive of id: {}", product.getId());
+                log.error("Cart item validation failed. Product is inactive. productId: {}", product.getId());
                 throw new InvalidOrderStateException("Product '" + product.getName() + "' is inactive and cannot be ordered.");
             }
 
             if (product.getStockQuantity() == null || product.getStockQuantity() < item.getQuantity()) {
-                log.error("Insufficient product stock of id: {}", product.getId());
+                log.error("Cart item validation failed. Insufficient product stock of id: {}", product.getId());
                 throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
             }
         }
     }
 
-    private void validateOrderStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {
+    private void validateOrderStatusTransition(OrderStatus currentStatus) {
         if (currentStatus == OrderStatus.CANCELLED || currentStatus == OrderStatus.DELIVERED) {
-            log.error("Order status cannot be changed");
+            log.error("Order status transition validation failed. Order status cannot be changed");
             throw new InvalidOrderStateException("Order status cannot be changed from " + currentStatus);
         }
     }
-
 }
