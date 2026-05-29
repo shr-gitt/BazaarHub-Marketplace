@@ -4,8 +4,6 @@ import com.bazaarhub.backend.feature.category.entity.Category;
 import com.bazaarhub.backend.feature.category.repository.CategoryRepository;
 import com.bazaarhub.backend.feature.customerProfile.repository.CustomerProfileRepository;
 import com.bazaarhub.backend.feature.product.entity.Product;
-import com.bazaarhub.backend.feature.product.exception.InvalidDiscountPriceException;
-import com.bazaarhub.backend.feature.product.exception.InvalidPriceException;
 import com.bazaarhub.backend.feature.product.exception.ProductNotFoundException;
 import com.bazaarhub.backend.feature.product.mapper.ProductMapper;
 import com.bazaarhub.backend.feature.product.repository.ProductRepository;
@@ -21,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 

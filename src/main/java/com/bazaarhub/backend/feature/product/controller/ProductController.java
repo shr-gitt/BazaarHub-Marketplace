@@ -37,6 +37,12 @@ public class ProductController {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Product fetched successfully.", productService.getProductById(productId));
     }
 
+    @GetMapping("/vendor-product/{vendorId}")
+    @LogExecutionTime
+    public ApiResponseDto<Page<ProductResponseDto>> getProductsByVendorId(@PathVariable("vendorId") Long vendorId, @PageableDefault(sort = "modifiedAt", direction = Sort.Direction.DESC) Pageable pageable){
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor products fetched successfully", productService.getProductsByVendorId(vendorId, pageable));
+    }
+
     @GetMapping("/products")
     @LogExecutionTime
     public ApiResponseDto<Page<ProductResponseDto>> getAllProducts(@PageableDefault(sort = "modifiedAt", direction = Sort.Direction.DESC) Pageable pageable) {

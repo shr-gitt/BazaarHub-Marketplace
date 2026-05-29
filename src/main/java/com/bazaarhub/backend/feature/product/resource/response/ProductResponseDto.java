@@ -1,15 +1,15 @@
 package com.bazaarhub.backend.feature.product.resource.response;
 
 import com.bazaarhub.backend.shared.enums.ProductStatus;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
-@AllArgsConstructor
+@Setter
 public class ProductResponseDto implements Serializable {
     private Long id;
 

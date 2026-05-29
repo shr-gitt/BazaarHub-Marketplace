@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -28,6 +29,8 @@ public class Payment extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String pid;    // unique payment identifier ->transaction_uuid
     private String refId;  // returned after verification
+
+    private LocalDateTime expiresAt;
 
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;

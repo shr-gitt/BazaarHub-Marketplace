@@ -8,8 +8,6 @@ import com.bazaarhub.backend.feature.category.exception.CategoryAlreadyExistsExc
 import com.bazaarhub.backend.feature.category.exception.CategoryNotFoundException;
 import com.bazaarhub.backend.feature.payment.exception.*;
 import com.bazaarhub.backend.feature.points.exception.PointsNotFoundException;
-import com.bazaarhub.backend.feature.product.exception.InvalidDiscountPriceException;
-import com.bazaarhub.backend.feature.product.exception.InvalidPriceException;
 import com.bazaarhub.backend.feature.product.exception.ProductNotFoundException;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.PhoneNumberAlreadyExistsException;
@@ -171,16 +169,10 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("Product not found.", HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(InvalidPriceException.class)
-    public ResponseEntity<ApiResponseDto<?>> handleInvalidPriceException(InvalidPriceException ex) {
-        log.error("Invalid price.", ex);
-        return buildErrorResponse("Invalid Price", HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(InvalidDiscountPriceException.class)
-    public ResponseEntity<ApiResponseDto<?>> handleInvalidPriceException(InvalidDiscountPriceException ex) {
-        log.error("Invalid discount price.", ex);
-        return buildErrorResponse("Invalid discount Price", HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(ClientValidationException.class)
+    public ResponseEntity<ApiResponseDto<?>> handleInvalidPriceException(ClientValidationException ex) {
+        log.error("Client validation exception.", ex);
+        return buildErrorResponse("One or more inputs are invalid.", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(InsufficientStockException.class)

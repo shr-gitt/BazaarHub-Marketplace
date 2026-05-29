@@ -3,7 +3,6 @@ package com.bazaarhub.backend.shared.enums;
 public enum PaymentStatus {
     SUCCESS,
     PENDING,
-    PAID,
+    CASH_PENDING,
     FAILED,
-    REFUNDED
 }

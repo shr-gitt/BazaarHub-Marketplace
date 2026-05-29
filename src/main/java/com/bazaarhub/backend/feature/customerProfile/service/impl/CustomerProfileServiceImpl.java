@@ -44,10 +44,10 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     @Transactional
     @CachePut(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#result.id")
     public CustomerProfileResponseDTO createCustomerProfile(Long userId, CustomerProfileRequestDTO customerProfileRequestDTO, MultipartFile file) {
-        log.info("Creating vendor profile for userId={}", userId);
+        log.info("Creating customer profile. userId={}", userId);
 
         User user = userRepository.findById(userId).orElseThrow(() -> {
-            log.error("User not found by id : {}", userId);
+            log.error("Create customer profile failed. User not found. userId : {}", userId);
             return new UserNotFoundException("User not found with given id.");
         });
 
@@ -78,16 +78,19 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     @Cacheable(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#id")
     public CustomerProfileResponseDTO getCustomerProfileById(Long id) {
         CustomerProfile profile = customerProfileRepository.findById(id).orElseThrow(() -> {
-            log.error("Customer Profile Not Found.");
+            log.error("Customer Profile Not Found. customerProfileId: {}", id);
             return new CustomerProfileNotFoundException("Customer profile not found with given id.");
         });
         return customerProfileMapper.mapToCustomerProfileResponseDTO(profile);
     }
 
     @Override
-    @Cacheable(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#id")
+    @Cacheable(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#userId")
     public CustomerProfileResponseDTO getCustomerProfileByUser(Long userId) {
-        CustomerProfile profile = customerProfileRepository.findByUserId(userId);
+        CustomerProfile profile = customerProfileRepository.findByUser_Id(userId).orElseThrow(() -> {
+            log.error("Customer profile not found. userId: {}",userId);
+            return new CustomerProfileNotFoundException("Customer profile not found.");
+        });
         return customerProfileMapper.mapToCustomerProfileResponseDTO(profile);
     }
 
@@ -98,12 +101,12 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
         log.info("Updating customer profile of id={}", id);
 
         CustomerProfile customerProfile = customerProfileRepository.findById(id).orElseThrow(() -> {
-            log.error("Customer profile fetch failed. Profile not found with id={}", id);
+            log.error("Customer profile fetch failed. Profile not found. productId={}", id);
             return new CustomerProfileNotFoundException("Customer profile not found with given id.");
         });
 
         if(!customerProfile.getUser().getId().equals(userId)){
-            log.error("Customer profile update failed. due to unauthorized access. userId={}, profileId={}",
+            log.error("Unauthorized customer profile update attempt. userId={}, profileId={}",
                     userId,
                     id);
             throw new UnauthorizedAccessException("You are not authorized to update this customer profile.");

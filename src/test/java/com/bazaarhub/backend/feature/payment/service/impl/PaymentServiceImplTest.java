@@ -14,6 +14,7 @@ import com.bazaarhub.backend.feature.payment.resource.request.PaymentRequestDto;
 import com.bazaarhub.backend.feature.payment.resource.response.PaymentResponseDto;
 import com.bazaarhub.backend.feature.points.service.PointsService;
 import com.bazaarhub.backend.feature.user.entity.User;
+import com.bazaarhub.backend.shared.enums.OrderPaymentStatus;
 import com.bazaarhub.backend.shared.enums.PaymentStatus;
 import com.bazaarhub.backend.shared.exception.OrderNotFoundException;
 import com.bazaarhub.backend.shared.exception.OrderPaidException;
@@ -93,7 +94,7 @@ class PaymentServiceImplTest {
         ReflectionTestUtils.setField(order, "id", 1L);
         order.setUser(user);
         order.setTotalAmount(new BigDecimal("1000.00"));
-        order.setPaymentStatus(PaymentStatus.PENDING);
+        order.setPaymentStatus(OrderPaymentStatus.PENDING);
 
         payment = new Payment();
         ReflectionTestUtils.setField(payment, "id", 1L);
@@ -139,7 +140,7 @@ class PaymentServiceImplTest {
         String result = paymentService.verifyPayment("ORD-1-1714000000000", "REF123", "1000.0");
 
         assertEquals(frontendSuccessUrl, result);
-        assertEquals(PaymentStatus.PAID, order.getPaymentStatus());
+        assertEquals(OrderPaymentStatus.PAID, order.getPaymentStatus());
         assertEquals(PaymentStatus.SUCCESS, payment.getPaymentStatus());
         assertEquals("REF123", payment.getRefId());
     }
