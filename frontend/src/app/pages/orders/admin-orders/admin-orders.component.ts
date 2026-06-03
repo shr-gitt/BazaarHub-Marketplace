@@ -5,13 +5,16 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { OrderResponse } from '../../../core/models/order.model';
 import { OrderService } from '../../../services/order.service';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-admin-orders',
   standalone: true,
-  imports: [CommonModule, TableModule, TagModule, ButtonModule],
+  imports: [CommonModule, TableModule, TagModule, ButtonModule, ToastModule],
   templateUrl: './admin-orders.component.html',
   styleUrl: './admin-orders.component.scss',
+  providers: [MessageService],
 })
 export class AdminOrdersComponent implements OnInit {
   orders: OrderResponse[] = [];
@@ -21,7 +24,10 @@ export class AdminOrdersComponent implements OnInit {
   pageSize = 10;
   totalRecords = 0;
 
-  constructor(private orderService: OrderService) {}
+  constructor(
+    private orderService: OrderService,
+    private messageService: MessageService,
+  ) {}
 
   ngOnInit(): void {
     this.loadOrders(0);
@@ -37,7 +43,11 @@ export class AdminOrdersComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Failed to load admin orders:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Creating admin failed.',
+          detail: err.error?.message || 'Failed to load admin orders.',
+        });
         this.isLoading = false;
       },
     });

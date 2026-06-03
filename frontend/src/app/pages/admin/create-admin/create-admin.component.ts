@@ -18,6 +18,8 @@ import { DividerModule } from 'primeng/divider';
 
 import { UserService } from '../../../services/user.service';
 import { UserRequest } from '../../../core/models/user.model';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-create-admin',
@@ -32,15 +34,15 @@ import { UserRequest } from '../../../core/models/user.model';
     SelectModule,
     MessageModule,
     DividerModule,
+    ToastModule,
   ],
   templateUrl: './create-admin.component.html',
   styleUrl: './create-admin.component.scss',
+  providers: [MessageService],
 })
 export class CreateAdminComponent {
   adminForm: FormGroup;
   loading = false;
-  error = '';
-  success = '';
 
   genderOptions = [
     { label: 'Male', value: 'MALE' },
@@ -51,6 +53,7 @@ export class CreateAdminComponent {
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
+    private messageService: MessageService,
     private router: Router,
   ) {
     this.adminForm = this.fb.group({
@@ -64,14 +67,13 @@ export class CreateAdminComponent {
   }
 
   onSubmit(): void {
+    this.adminForm.markAllAsTouched();
+
     if (this.adminForm.invalid) {
-      this.adminForm.markAllAsTouched();
       return;
     }
 
     this.loading = true;
-    this.error = '';
-    this.success = '';
 
     const dto: UserRequest = {
       ...this.adminForm.value,
@@ -81,7 +83,11 @@ export class CreateAdminComponent {
     this.userService.createAdmin(dto).subscribe({
       next: () => {
         this.loading = false;
-        this.success = 'Admin created successfully.';
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Admin Created',
+          detail: 'Admin created successfully.',
+        });
 
         setTimeout(() => {
           this.router.navigate(['/admin/dashboard']);
@@ -89,7 +95,11 @@ export class CreateAdminComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || 'Failed to create admin.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Creating admin failed.',
+          detail: err.error?.message || 'Failed to create admin.',
+        });
       },
     });
   }

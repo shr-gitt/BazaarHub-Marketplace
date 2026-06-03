@@ -5,11 +5,17 @@ import { VendorResponse } from '../../../core/models/vendor.model';
 import { ApprovalStatus } from '../../../core/models/enums.model';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-vendor-approval',
   standalone: true,
-  imports: [CommonModule, LoadingSpinnerComponent, EmptyStateComponent],
+  imports: [
+    CommonModule,
+    LoadingSpinnerComponent,
+    EmptyStateComponent,
+    ButtonModule,
+  ],
   templateUrl: './vendor-approval.component.html',
   styleUrls: ['./vendor-approval.component.scss'],
 })

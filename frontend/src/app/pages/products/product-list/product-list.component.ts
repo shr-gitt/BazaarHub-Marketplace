@@ -129,7 +129,7 @@ export class ProductListComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Product added to cart successfully.',
+          detail: 'Product added to cart.',
         });
       },
       error: (err) => {

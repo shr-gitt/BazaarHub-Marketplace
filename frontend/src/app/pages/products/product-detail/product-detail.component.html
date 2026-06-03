@@ -1,5 +1,7 @@
 <app-loading-spinner *ngIf="isLoading" [fullPage]="true"></app-loading-spinner>
 
+<p-toast position="top-right" [life]="3000"></p-toast>
+
 <div *ngIf="!isLoading && product" class="product-detail-container">
   <div class="breadcrumb mb-4">
     <a routerLink="/products">Products</a> &gt;
@@ -77,7 +79,7 @@
               <button (click)="decreaseQty()" [disabled]="quantity <= 1">
                 -
               </button>
-              <input type="number" [(ngModel)]="quantity" readonly />
+              <span class="qty-value">{{ quantity }}</span>
               <button
                 (click)="increaseQty()"
                 [disabled]="quantity >= product.stockQuantity"
@@ -117,6 +119,7 @@
       <app-product-card
         *ngFor="let rec of recommendedProducts"
         [product]="rec"
+        [isVendorView]="false"
         (addToCart)="onRecommendedAddToCart($event)"
       ></app-product-card>
     </div>

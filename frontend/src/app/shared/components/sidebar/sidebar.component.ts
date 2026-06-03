@@ -77,7 +77,18 @@ export class SidebarComponent implements OnInit {
       route: '/vendor/products',
       roles: ['VENDOR'],
     },
-
+    {
+      label: 'Add New Products',
+      icon: 'pi-plus',
+      route: '/vendor/product/create',
+      roles: ['VENDOR'],
+    },
+    {
+      label: 'Orders',
+      icon: 'pi-list-check',
+      route: '/vendor/orders',
+      roles: ['VENDOR'],
+    },
     {
       label: 'Home',
       icon: 'pi pi-home',

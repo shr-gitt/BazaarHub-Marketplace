@@ -10,9 +10,11 @@ import com.bazaarhub.backend.feature.notification.service.NotificationService;
 import com.bazaarhub.backend.feature.order.entity.Order;
 import com.bazaarhub.backend.feature.order.entity.OrderItem;
 import com.bazaarhub.backend.feature.order.mapper.OrderMapper;
+import com.bazaarhub.backend.feature.order.repository.OrderItemRepository;
 import com.bazaarhub.backend.feature.order.repository.OrderRepository;
 import com.bazaarhub.backend.feature.order.resources.request.OrderRequestDto;
 import com.bazaarhub.backend.feature.order.resources.request.OrderStatusUpdateRequestDto;
+import com.bazaarhub.backend.feature.order.resources.response.OrderItemResponseDto;
 import com.bazaarhub.backend.feature.order.resources.response.OrderResponseDto;
 import com.bazaarhub.backend.feature.order.service.OrderService;
 import com.bazaarhub.backend.feature.product.entity.Product;
@@ -44,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final ProductService productService;
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final NotificationService notificationService;
 
     @Override
@@ -123,6 +126,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPricePerUnit(unitPrice);
             orderItem.setTotalPrice(totalPrice);
+            orderItem.setOrderStatus(OrderStatus.PENDING);
             order.addOrderItem(orderItem);
             totalAmount = totalAmount.add(totalPrice);
         }
@@ -151,27 +155,27 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     @CachePut(cacheNames = CacheConfig.UPDATE_ORDER_CACHE, key = "#orderId")
-    public OrderResponseDto updateOrderStatus(Long orderId, OrderStatusUpdateRequestDto requestDTO) {
+    public OrderItemResponseDto updateOrderStatus(Long orderId, OrderStatusUpdateRequestDto requestDTO) {
         log.info(
                 "Updating order status. orderId={}",
                 orderId
         );
 
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> {
+        OrderItem orderItem = orderItemRepository.findById(orderId).orElseThrow(() -> {
             log.error("Update order failed. Order not found. orderId: {}", orderId);
             return new OrderNotFoundException("Order Not Found.");
         });
-        validateOrderStatusTransition(order.getOrderStatus());
-        order.setOrderStatus(requestDTO.getOrderStatus());
-        Order saveOrder = orderRepository.save(order);
+        validateOrderStatusTransition(orderItem.getOrderStatus());
+        orderItem.setOrderStatus(requestDTO.getOrderStatus());
+        OrderItem saveOrderItem = orderItemRepository.save(orderItem);
         notificationService.createNotification(
-                saveOrder.getUser(),
+                saveOrderItem.getOrder().getUser(),
                 "Order status updated.",
-                "Your order status has been updated." + saveOrder.getOrderStatus(),
+                "Your order status has been updated." + saveOrderItem.getOrderStatus(),
                 NotificationType.ORDER_STATUS_UPDATED,
-                saveOrder.getId()
+                saveOrderItem.getId()
         );
-        return orderMapper.mapToOrderResponseDTO(saveOrder);
+        return orderMapper.mapToOrderItemResponseDTO(saveOrderItem);
     }
 
     @Override
@@ -241,6 +245,20 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(orderMapper::mapToOrderResponseDTO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderItemResponseDto> getOrdersByVendorId(Long vendorId, Pageable pageable){
+        log.info("Fetching product. vendorId: {}", vendorId);
+        return orderItemRepository.findByProductVendorIdAndOrderPaymentStatusIn(
+                vendorId,
+                List.of(
+                        OrderPaymentStatus.PAID,
+                        OrderPaymentStatus.CASH_PENDING
+                ),
+                pageable
+        ).map(orderMapper::mapToOrderItemResponseDTO);
     }
 
     private void validateCartItems(Cart cart) {

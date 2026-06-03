@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse, PageResponse } from '../core/models/api-response.model';
 import { API_URLS } from '../core/constants/api-urls';
 import {
+  OrderItemResponse,
   OrderRequest,
   OrderResponse,
   OrderStatusUpdateRequest,
@@ -49,6 +50,21 @@ export class OrderService {
 
     return this.http.get<ApiResponse<PageResponse<OrderResponse>>>(
       API_URLS.GET_ADMIN_ORDERS,
+      { params },
+    );
+  }
+  getVendorOrders(
+    vendorId: number | null,
+    page = 0,
+    size = 20,
+  ): Observable<ApiResponse<PageResponse<OrderItemResponse>>> {
+    const params = new HttpParams()
+      .set('vendorId', vendorId!)
+      .set('page', page)
+      .set('size', size);
+
+    return this.http.get<ApiResponse<PageResponse<OrderItemResponse>>>(
+      API_URLS.GET_VENDOR_ORDERS(vendorId!),
       { params },
     );
   }

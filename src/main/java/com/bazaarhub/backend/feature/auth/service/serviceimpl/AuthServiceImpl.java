@@ -8,9 +8,11 @@ import com.bazaarhub.backend.feature.auth.security.CustomUserDetailsService;
 import com.bazaarhub.backend.feature.auth.security.JwtService;
 import com.bazaarhub.backend.feature.auth.service.AuthService;
 import com.bazaarhub.backend.feature.user.entity.User;
+import com.bazaarhub.backend.feature.user.enums.AdminAccessLevel;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
+import com.bazaarhub.backend.shared.enums.Role;
 import com.bazaarhub.backend.shared.enums.UserStatus;
 import com.bazaarhub.backend.shared.exception.InvalidCredentialException;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +45,13 @@ public class AuthServiceImpl implements AuthService {
         user.setUserStatus(UserStatus.ACTIVE);
         user.setEmail(email);
         user.setRole(registerRequestDto.getRole());
+        if(Role.ADMIN == registerRequestDto.getRole())
+            user.setAdminAccessLevel(AdminAccessLevel.BASIC);
         user.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         userRepository.save(user);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
-        String token = jwtService.generateToken(userDetails, Map.of("userId", user.getId(), "role", user.getRole() != null ? user.getRole() : "USER"));
+        String token = jwtService.generateToken(userDetails, Map.of("userId", user.getId(), "role", user.getRole() != null ? user.getRole() : "USER", "accessLevel", user.getAdminAccessLevel() != null ? user.getAdminAccessLevel() : "BASIC"));
         return new AuthResponse("Registration Successful", user.getId(), user.getRole(), token);
     }
 
@@ -65,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
-        String token = jwtService.generateToken(userDetails, Map.of("userId", user.getId(), "role", user.getRole() != null ? user.getRole() : "USER"));
+        String token = jwtService.generateToken(userDetails, Map.of("userId", user.getId(), "role", user.getRole() != null ? user.getRole() : "USER", "accessLevel", user.getAdminAccessLevel() != null ? user.getAdminAccessLevel() : "BASIC"));
         return new AuthResponse("Login Successful", user.getId(), user.getRole(), token);
     }
 }

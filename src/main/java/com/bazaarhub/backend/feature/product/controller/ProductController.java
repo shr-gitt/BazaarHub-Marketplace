@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ public class ProductController {
     @PostMapping(value = "/create-product",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @LogExecutionTime
+    @PreAuthorize("@vendorAuth.isApproved(#productRequestDto.getVendorId())")
     public ApiResponseDto<ProductResponseDto> createProduct(@Valid
                                                             @RequestPart("productRequestDto") ProductRequestDto productRequestDto,
                                                             @RequestPart("file") MultipartFile file) {

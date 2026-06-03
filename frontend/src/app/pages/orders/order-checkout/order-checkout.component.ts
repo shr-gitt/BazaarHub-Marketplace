@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -12,11 +12,11 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { OrderService } from '../../../services/order.service';
 import { OrderSummaryComponent } from '../order-summary/order-summary.component';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-order-checkout',
@@ -28,16 +28,15 @@ import { OrderSummaryComponent } from '../order-summary/order-summary.component'
     ButtonModule,
     InputTextModule,
     TextareaModule,
-    FloatLabelModule,
-    ProgressSpinnerModule,
     OrderSummaryComponent,
+    ToastModule,
   ],
   templateUrl: './order-checkout.component.html',
   styleUrl: './order-checkout.component.scss',
+  providers: [MessageService],
 })
 export class OrderCheckoutComponent {
   isSubmitting = false;
-  errorMessage = '';
 
   checkoutForm: FormGroup;
 
@@ -45,6 +44,7 @@ export class OrderCheckoutComponent {
     private fb: FormBuilder,
     private orderService: OrderService,
     private router: Router,
+    private messageService: MessageService,
   ) {
     this.checkoutForm = this.fb.group({
       shippingAddress: ['', Validators.required],
@@ -54,15 +54,16 @@ export class OrderCheckoutComponent {
       ],
       remark: [''],
     });
+
+    this.checkoutForm.valueChanges.subscribe(() => {});
   }
 
   placeOrder(): void {
+    this.checkoutForm.markAllAsTouched();
     if (this.checkoutForm.invalid) {
-      this.checkoutForm.markAllAsTouched();
       return;
     }
     this.isSubmitting = true;
-    this.errorMessage = '';
 
     this.orderService.placeOrder(this.checkoutForm.value).subscribe({
       next: (res) => {
@@ -75,8 +76,12 @@ export class OrderCheckoutComponent {
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.errorMessage =
-          err.error?.message || 'Failed to place order. Please try again.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail:
+            err?.error?.message || 'Something went wrong, try again later.',
+        });
       },
     });
   }

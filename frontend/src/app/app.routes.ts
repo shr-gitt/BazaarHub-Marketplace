@@ -43,6 +43,9 @@ import { VendorApprovalComponent } from './pages/vendor/vendor-approval/vendor-a
 import { UserListComponent } from './pages/admin/user-list/user-list.component';
 import { AdminOrdersComponent } from './pages/orders/admin-orders/admin-orders.component';
 import { VendorProductListComponent } from './pages/products/vendor-product-list/vendor-product-list.component';
+import { OrderListComponent } from './pages/orders/order-list/order-list.component';
+import { VendorOrdersComponent } from './pages/orders/vendor-orders/vendor-orders.component';
+import { UpdateProfileComponent } from './pages/update-profile/update-profile.component';
 
 export const routes: Routes = [
   {
@@ -79,6 +82,12 @@ export const routes: Routes = [
         component: VendorSelectionComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'VENDOR' },
+      },
+      {
+        path: 'profile/update',
+        component: UpdateProfileComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: ['VENDOR', 'CUSTOMER', 'ADMIN'] },
       },
     ],
   },
@@ -123,6 +132,12 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { expectedRole: 'CUSTOMER' },
       },
+      {
+        path: 'products',
+        component: ProductListComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'CUSTOMER' },
+      },
       { path: 'notifications', component: NotificationsComponent },
       {
         path: 'profile',
@@ -131,12 +146,23 @@ export const routes: Routes = [
         data: { expectedRole: ['VENDOR', 'CUSTOMER', 'ADMIN'] },
       },
       {
+        path: 'orders',
+        component: OrderListComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: ['CUSTOMER'] },
+      },
+      {
+        path: 'vendor/orders',
+        component: VendorOrdersComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: ['VENDOR', 'ADMIN'] },
+      },
+      {
         path: 'vendor/products/:id',
         component: VendorProductListComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'VENDOR' },
       },
-
       {
         path: 'vendor/product/create',
         component: CreateProductComponent,
@@ -163,13 +189,6 @@ export const routes: Routes = [
       {
         path: 'vendor/dashboard',
         component: VendorDashboardComponent,
-        canActivate: [roleGuard],
-        data: { expectedRole: 'VENDOR' },
-      },
-
-      {
-        path: 'vendor/products',
-        component: ProductListComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'VENDOR' },
       },

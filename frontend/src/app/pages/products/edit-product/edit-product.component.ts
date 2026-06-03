@@ -17,18 +17,21 @@ import { VendorContextService } from '../../../services/vendor-context.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { CategoryService } from '../../../services/category.service';
+import { CategoryResponse } from '../../../core/models/category.model';
+import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-edit-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastModule, ButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, ToastModule, ButtonModule, DropdownModule],
   templateUrl: './edit-product.component.html',
   styleUrl: './edit-product.component.scss',
   providers: [MessageService],
 })
 export class EditProductComponent implements OnInit {
   productForm: FormGroup;
-
+  categories: CategoryResponse[] = [];
   productId!: number;
   loading = false;
   saving = false;
@@ -41,6 +44,7 @@ export class EditProductComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private messageService: MessageService,
+    private categoryService: CategoryService,
     private vendorContextService: VendorContextService,
   ) {
     this.productForm = this.fb.group({
@@ -64,8 +68,19 @@ export class EditProductComponent implements OnInit {
       });
       return;
     }
-
+    this.loadCategories();
     this.loadProduct();
+  }
+
+  loadCategories(): void {
+    this.categoryService.getAll(0, 100).subscribe({
+      next: (res) => {
+        this.categories = res.data?.content || [];
+      },
+      error: (err) => {
+        console.error('Failed to load categories:', err);
+      },
+    });
   }
 
   loadProduct(): void {

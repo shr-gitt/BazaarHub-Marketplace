@@ -56,18 +56,15 @@
                 class="action-buttons"
                 *ngIf="vendor.approvalStatus === 'PENDING'"
               >
-                <button
-                  class="btn btn-sm btn-success"
-                  (click)="updateStatus(vendor.id, 'APPROVED')"
-                >
+                <p-button (click)="updateStatus(vendor.id, 'APPROVED')">
                   Approve
-                </button>
-                <button
-                  class="btn btn-sm btn-danger"
+                </p-button>
+                <p-button
+                  severity="danger"
                   (click)="updateStatus(vendor.id, 'REJECTED')"
                 >
                   Reject
-                </button>
+                </p-button>
               </div>
               <div
                 *ngIf="vendor.approvalStatus !== 'PENDING'"

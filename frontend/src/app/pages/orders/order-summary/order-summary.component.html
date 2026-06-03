@@ -1,3 +1,5 @@
+<p-toast position="top-right" [life]="3000"></p-toast>
+
 <p-card styleClass="summary-card">
   <ng-template pTemplate="header">
     <div class="card-header">
@@ -6,13 +8,22 @@
     </div>
   </ng-template>
 
+  <div
+    *ngIf="!cart?.items || cart?.items?.length === 0"
+    class="text-center p-4"
+  >
+    <span class="text-secondary">No items in cart.</span>
+  </div>
+
   <div class="cart-items">
-    <div *ngFor="let item of cart?.items" class="cart-item"> <!-- ← safe navigation -->
+    <div *ngFor="let item of cart?.items" class="cart-item">
       <div class="item-info">
         <span class="item-name">{{ item.productName }}</span>
         <span class="item-qty">Qty: {{ item.quantity }}</span>
       </div>
-      <span class="item-price">Rs. {{ item.pricePerUnit * item.quantity }}</span>
+      <span class="item-price"
+        >Rs. {{ item.pricePerUnit * item.quantity }}</span
+      >
     </div>
   </div>
 

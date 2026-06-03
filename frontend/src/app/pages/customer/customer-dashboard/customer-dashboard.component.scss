@@ -1,1 +1,91 @@
-// TODO: Add tests for CustomerDashboardComponent
+.dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        background: var(--bg-primary);
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border-color);
+      }
+      .section-container {
+        margin-bottom: 2rem;
+      }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+      .section-title {
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        margin: 0;
+      }
+      .view-all {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--primary-color);
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .quick-links-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+      .quick-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .quick-card:hover {
+        border-color: var(--primary-light);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+      .icon-circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        color: white;
+      }
+      .icon-circle .material-icons {
+        font-size: 2rem;
+      }
+      .bg-blue {
+        background-color: #3b82f6;
+      }
+      .bg-green {
+        background-color: #10b981;
+      }
+      .bg-purple {
+        background-color: #8b5cf6;
+      }
+
+      .quick-card h3 {
+        font-size: 1.125rem;
+        margin: 0 0 0.5rem 0;
+      }
+      .quick-card p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin: 0;
+      }

@@ -1,5 +1,6 @@
 package com.bazaarhub.backend.feature.user.entity;
 
+import com.bazaarhub.backend.feature.user.enums.AdminAccessLevel;
 import com.bazaarhub.backend.feature.user.enums.Gender;
 import com.bazaarhub.backend.shared.entity.BaseEntity;
 import com.bazaarhub.backend.shared.enums.Role;
@@ -39,6 +40,10 @@ public class User extends BaseEntity {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role = Role.VISITOR;
+
+    @Column(name = "admin_access_level")
+    @Enumerated(EnumType.STRING)
+    private AdminAccessLevel adminAccessLevel;
 
     @Column(name = "user_status", nullable = false)
     @Enumerated(EnumType.STRING)

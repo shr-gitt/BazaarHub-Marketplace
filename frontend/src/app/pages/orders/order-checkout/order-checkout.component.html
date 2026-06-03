@@ -1,3 +1,5 @@
+<p-toast position="top-right" [life]="3000"></p-toast>
+
 <h2 class="checkout-title">Checkout</h2>
 
 <div class="grid checkout-grid">
@@ -25,6 +27,7 @@
             rows="3"
             formControlName="shippingAddress"
             style="resize: none"
+            placeholder="Enter your full delivery address"
           ></textarea>
           <small
             class="error-text"
@@ -48,6 +51,7 @@
             [fluid]="true"
             type="text"
             formControlName="contactNumber"
+            placeholder="Enter 10-digit phone number"
           />
 
           <small
@@ -86,17 +90,12 @@
       </form>
     </p-card>
 
-    <div *ngIf="errorMessage" class="error-banner">
-      <i class="pi pi-exclamation-triangle"></i>
-      {{ errorMessage }}
-    </div>
-
     <p-button
       label="Place order"
       iconPos="right"
       styleClass="proceed-btn"
       [loading]="isSubmitting"
-      [disabled]="isSubmitting"
+      [disabled]="isSubmitting || checkoutForm.invalid"
       (onClick)="placeOrder()"
     />
   </div>

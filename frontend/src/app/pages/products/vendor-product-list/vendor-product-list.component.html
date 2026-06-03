@@ -1,9 +1,13 @@
 <div class="products-page">
+  <p-toast position="top-right" [life]="3000"></p-toast>
+
+  <!-- Sidebar -->
   <div class="filters-sidebar">
     <div class="card mb-4">
       <div class="card-header">
         <h3 class="card-title text-lg">Categories</h3>
       </div>
+
       <div class="card-body p-0">
         <div class="category-list">
           <button
@@ -13,6 +17,7 @@
           >
             All Categories
           </button>
+
           <button
             class="category-btn"
             *ngFor="let cat of categories"
@@ -26,52 +31,145 @@
     </div>
   </div>
 
-  <!-- Products Grid -->
+  <!-- Main Content -->
   <div class="products-content">
-    <div class="flex justify-between align-center mb-4">
-      <h2 class="text-2xl font-bold m-0">My Products</h2>
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h2>Product Management</h2>
+        <p>Manage and monitor all marketplace products.</p>
+      </div>
     </div>
 
-    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
-
+    <!-- Empty State -->
     <app-empty-state
       *ngIf="!isLoading && products.length === 0"
       icon="search_off"
       title="No products found"
       description="Try selecting a different category or check back later."
-    ></app-empty-state>
+    >
+    </app-empty-state>
 
-    <div class="product-grid" *ngIf="!isLoading && products.length > 0">
-      <app-product-card
-        *ngFor="let product of products"
-        [product]="product"
-        [isVendorView]="true"
-        (edit)="onEdit($event)"
-        (delete)="onDelete($event)"
-      ></app-product-card>
-    </div>
+    <!-- Table -->
+    <p-table
+      *ngIf="products.length > 0"
+      [value]="products"
+      [loading]="isLoading"
+      [showLoader]="false"
+      [paginator]="true"
+      [rows]="pageSize"
+      [totalRecords]="totalRecords"
+      [lazy]="true"
+      responsiveLayout="scroll"
+      [scrollable]="true"
+      scrollHeight="flex"
+      (onPage)="onPageChange($event)"
+    >
+      <!-- Header -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Stock</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
 
-    <div class="pagination mt-4" *ngIf="totalPages > 1 && !isLoading">
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage === 0"
-        (click)="loadProducts(vendorId, currentPage - 1)"
-      >
-        <span class="material-icons">chevron_left</span>
-      </button>
-      <span class="pagination-info"
-        >Page {{ currentPage + 1 }} of {{ totalPages }}</span
-      >
-      <button
-        class="pagination-btn"
-        [disabled]="currentPage >= totalPages - 1"
-        (click)="loadProducts(vendorId, currentPage + 1)"
-      >
-        <span class="material-icons">chevron_right</span>
-      </button>
-    </div>
-  </div>
-  <div class="alert alert-danger mb-3" *ngIf="errorMessage">
-    {{ errorMessage }}
+      <!-- Body -->
+      <ng-template pTemplate="body" let-product>
+        <tr>
+          <!-- Product -->
+          <td>
+            <div class="product-info">
+              <img
+                *ngIf="product.imageUrl"
+                [src]="product.imageUrl"
+                [alt]="product.name"
+                class="product-image"
+              />
+
+              <div>
+                <div class="product-name">
+                  {{ product.name }}
+                </div>
+
+                <div class="product-description">
+                  {{ product.description }}
+                </div>
+              </div>
+            </div>
+          </td>
+
+          <!-- Category -->
+          <td>
+            {{ product.category }}
+          </td>
+
+          <!-- Price -->
+          <td>
+            <div class="price-wrapper">
+              <span class="discount-price" *ngIf="product.discountPrice">
+                Rs. {{ product.discountPrice }}
+              </span>
+
+              <span class="amount" [class.strike]="product.discountPrice">
+                Rs. {{ product.price }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <span
+              class="status-badge"
+              [ngClass]="{
+                active: product.status === 'ACTIVE',
+                inactive: product.status !== 'ACTIVE',
+              }"
+            >
+              {{ product.status }}
+            </span>
+          </td>
+
+          <!-- Stock -->
+          <td>
+            <span [class.low-stock]="product.stockQuantity < 5">
+              {{ product.stockQuantity }}
+            </span>
+          </td>
+
+          <!-- Created -->
+          <td>
+            <span class="date">
+              {{ product.createdAt | date: "mediumDate" }}
+            </span>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="table-actions">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="p-button-sm p-button-text"
+                (click)="onEdit(product.id)"
+              ></button>
+
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-sm p-button-text p-button-danger"
+                (click)="onDelete(product.id)"
+              ></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 </div>

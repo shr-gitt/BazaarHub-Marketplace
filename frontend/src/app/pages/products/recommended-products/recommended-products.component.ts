@@ -4,13 +4,16 @@ import { RouterModule } from '@angular/router';
 
 import { ProductService } from '../../../services/product.service';
 import { ProductResponse } from '../../../core/models/product.model';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-recommended-products',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ToastModule],
   templateUrl: './recommended-products.component.html',
   styleUrl: './recommended-products.component.scss',
+  providers: [MessageService],
 })
 export class RecommendedProductsComponent implements OnInit {
   products: ProductResponse[] = [];
@@ -20,9 +23,11 @@ export class RecommendedProductsComponent implements OnInit {
   totalPages = 0;
 
   loading = false;
-  error = '';
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private messageService: MessageService,
+  ) {}
 
   ngOnInit(): void {
     this.loadRecommendedProducts();
@@ -30,18 +35,23 @@ export class RecommendedProductsComponent implements OnInit {
 
   loadRecommendedProducts(): void {
     this.loading = true;
-    this.error = '';
 
     this.productService.getRecommended(this.page, this.size).subscribe({
       next: (res) => {
         this.loading = false;
-        this.products = res.data.content;
-        this.totalPages = res.data.totalPages;
+        if (res.data) {
+          this.products = res.data.content;
+          this.totalPages = res.data.totalPages;
+        }
       },
       error: (err) => {
         this.loading = false;
-        this.error =
-          err.error?.message || 'Failed to load recommended products.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail:
+            err?.error?.message || 'Something went wrong, try again later.',
+        });
       },
     });
   }

@@ -1,5 +1,72 @@
-<section class="customer-products-section">
-  <app-recommended-products></app-recommended-products>
+<p-toast position="top-right" [life]="3000"></p-toast>
 
-  <app-product-list></app-product-list>
-</section>
+<div class="dashboard-header mb-4">
+  <div>
+    <h1 class="card-title">Welcome to BazaarHub</h1>
+    <p class="text-secondary mt-1">
+      Discover the best products from our verified vendors.
+    </p>
+  </div>
+  <p-button
+    label="Browse All Products"
+    icon="pi pi-shopping-cart"
+    routerLink="/products"
+  >
+  </p-button>
+</div>
+
+<!-- Recommended Products Section -->
+<div class="section-container">
+  <div class="section-header">
+    <h2 class="section-title">Recommended For You</h2>
+    <a routerLink="/products" class="view-all">View All</a>
+  </div>
+
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <app-empty-state
+    *ngIf="!isLoading && recommendedProducts.length === 0"
+    icon="inventory_2"
+    title="No products found"
+    description="Check back later for new arrivals."
+  ></app-empty-state>
+
+  <div
+    class="product-grid"
+    *ngIf="!isLoading && recommendedProducts.length > 0"
+  >
+    <app-product-card
+      *ngFor="let product of recommendedProducts"
+      [product]="product"
+      (addToCart)="addToCart(product.id)"
+    ></app-product-card>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="section-container mt-4">
+  <h2 class="section-title">Quick Links</h2>
+  <div class="quick-links-grid">
+    <a routerLink="/orders" class="quick-card">
+      <div class="icon-circle bg-blue">
+        <span class="material-icons">receipt_long</span>
+      </div>
+      <h3>My Orders</h3>
+      <p>Track, return, or buy things again</p>
+    </a>
+    <a routerLink="/cart" class="quick-card">
+      <div class="icon-circle bg-green">
+        <span class="material-icons">shopping_cart</span>
+      </div>
+      <h3>Shopping Cart</h3>
+      <p>View items you've added for purchase</p>
+    </a>
+    <a routerLink="/customer/profile" class="quick-card">
+      <div class="icon-circle bg-purple">
+        <span class="material-icons">manage_accounts</span>
+      </div>
+      <h3>Account Settings</h3>
+      <p>Manage your profile and addresses</p>
+    </a>
+  </div>
+</div>
