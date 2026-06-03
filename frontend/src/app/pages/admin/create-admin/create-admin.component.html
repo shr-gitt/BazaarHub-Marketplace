@@ -1,4 +1,6 @@
 <section class="create-admin-page">
+  <p-toast position="top-right" [life]="3000"></p-toast>
+
   <p-card styleClass="admin-card">
     <ng-template pTemplate="header">
       <div class="card-header">
@@ -102,20 +104,6 @@
           Password must be at least 8 characters.
         </small>
       </div>
-
-      <p-message
-        *ngIf="error"
-        severity="error"
-        [text]="error"
-        styleClass="message-box"
-      />
-
-      <p-message
-        *ngIf="success"
-        severity="success"
-        [text]="success"
-        styleClass="message-box"
-      />
 
       <div class="actions">
         <p-button

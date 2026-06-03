@@ -1,9 +1,10 @@
 package com.bazaarhub.backend.shared.enums;
 
 public enum OrderStatus {
-   SUCCESS,
+    SUCCESS,
     PENDING,
-    CONFIRMED,
+    PACKAGING,
+    PACKED,
     SHIPPED,
     DELIVERED,
     CANCELLED

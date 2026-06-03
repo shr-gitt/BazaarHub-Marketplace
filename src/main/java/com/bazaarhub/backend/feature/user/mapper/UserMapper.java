@@ -32,6 +32,7 @@ public class UserMapper {
                 user.getPhoneNumber(),
                 user.getGender(),
                 user.getRole(),
+                user.getAdminAccessLevel(),
                 user.getUserStatus(),
                 user.getCreatedAt(),
                 user.getModifiedAt()

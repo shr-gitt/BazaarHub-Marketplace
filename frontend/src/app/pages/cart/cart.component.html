@@ -1,102 +1,152 @@
-<div class="page-header">
-  <div>
-    <h2>🛒 My Cart</h2>
-    <p class="subtitle" *ngIf="cart">{{ cart.totalItems }} items</p>
-  </div>
-</div>
+<div class="cart-container">
+  <p-toast position="top-right" [life]="3000"></p-toast>
 
-<div class="alert alert-danger"  *ngIf="error">{{ error }}</div>
-<div class="alert alert-success" *ngIf="success">{{ success }}</div>
+  <h1 class="page-title mb-4">Shopping Cart</h1>
 
-<div *ngIf="loading" class="loading-overlay"><div class="spinner"></div></div>
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-<div *ngIf="!loading && cart && cart.items.length > 0" class="cart-layout">
-  <!-- Cart Items -->
-  <div class="cart-items">
-    <div class="card mb-4">
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Subtotal</th><th></th></tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of cart.items">
-              <td>
-                <div class="cart-product">
-                  <img *ngIf="item.productImageUrl" [src]="item.productImageUrl" alt="Product" class="item-img" onerror="this.style.display='none'">
-                  <div *ngIf="!item.productImageUrl" class="item-placeholder">📦</div>
-                  <span>{{ item.productName }}</span>
-                </div>
-              </td>
-              <td>Rs. {{ item.price | number }}</td>
-              <td>
-                <div class="qty-control">
-                  <button (click)="updateQty(item.productId, item.quantity - 1)">-</button>
-                  <input type="number" [value]="item.quantity" readonly>
-                  <button (click)="updateQty(item.productId, item.quantity + 1)">+</button>
-                </div>
-              </td>
-              <td><strong>Rs. {{ item.subtotal | number }}</strong></td>
-              <td><button class="btn btn-ghost btn-icon text-danger" (click)="removeItem(item.productId)">🗑️</button></td>
-            </tr>
-          </tbody>
-        </table>
+  <app-empty-state
+    *ngIf="!isLoading && (!cart || cart.items.length === 0)"
+    icon="shopping_cart"
+    title="Your cart is empty"
+    description="Looks like you haven't added anything to your cart yet."
+    actionLabel="Start Shopping"
+    (action)="navigateHome()"
+  ></app-empty-state>
+
+  <div class="cart-grid" *ngIf="!isLoading && cart && cart.items.length > 0">
+    <div class="cart-items-section">
+      <div class="card mb-4" *ngFor="let item of cart.items">
+        <div class="card-body p-4 flex align-center justify-between item-row">
+          <div class="item-details flex align-center gap-3">
+            <div class="item-image-placeholder">
+              <img
+                class="product-image"
+                [src]="imageSrc"
+                [alt]="item.productImage"
+              />
+            </div>
+            <div>
+              <h3 class="item-name m-0">
+                <a [routerLink]="['/product', item.productId]">{{
+                  item.productName
+                }}</a>
+              </h3>
+              <div
+                class="item-status text-sm mt-1"
+                [ngClass]="{
+                  'text-error': item.status !== 'AVAILABLE',
+                  'text-success': item.status === 'AVAILABLE',
+                }"
+              >
+                {{ item.status }}
+              </div>
+            </div>
+          </div>
+
+          <div class="item-actions flex align-center gap-4">
+            <div class="item-price text-right hide-mobile">
+              <div class="text-secondary text-sm">Price</div>
+              <div class="font-medium">NPR {{ item.pricePerUnit }}</div>
+            </div>
+
+            <div class="qty-controls">
+              <button
+                (click)="updateQuantity(item.productId, item.quantity - 1)"
+                [disabled]="item.quantity <= 1 || isUpdating"
+              >
+                -
+              </button>
+              <span class="qty-value">{{ item.quantity }}</span>
+              <button
+                (click)="updateQuantity(item.productId, item.quantity + 1)"
+                [disabled]="isUpdating"
+              >
+                +
+              </button>
+            </div>
+
+            <div class="item-total text-right">
+              <div class="text-secondary text-sm">Total</div>
+              <div class="font-bold">NPR {{ item.totalPrice }}</div>
+            </div>
+
+            <button
+              class="icon-btn text-error remove-btn"
+              (click)="removeItem(item.productId)"
+              [disabled]="isUpdating"
+              title="Remove"
+            >
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between align-center mt-4 pt-4 border-top">
+        <div *ngIf="!showClearConfirm">
+          <button
+            class="btn btn-secondary text-error"
+            (click)="showClearConfirm = true"
+            [disabled]="isUpdating"
+          >
+            <span class="material-icons mr-1" style="font-size: 1.1rem"
+              >delete_sweep</span
+            >
+            Clear Cart
+          </button>
+        </div>
+        <div *ngIf="showClearConfirm" class="flex gap-2 align-center">
+          <span class="text-sm">Remove all items?</span>
+          <button class="btn btn-error btn-sm" (click)="clearCart()">
+            Yes
+          </button>
+          <button
+            class="btn btn-secondary btn-sm"
+            (click)="showClearConfirm = false"
+          >
+            No
+          </button>
+        </div>
+        <a routerLink="/products" class="btn btn-secondary"
+          >Continue Shopping</a
+        >
       </div>
     </div>
-    <button class="btn btn-danger btn-outline" (click)="clearCart()">🗑️ Clear Cart</button>
-  </div>
 
-  <!-- Cart Summary -->
-  <div class="cart-summary">
-    <div class="card">
-      <div class="card-header"><h3>Order Summary</h3></div>
-      <div class="card-body summary-body">
-        <div class="summary-row"><span>Items ({{ cart.totalItems }})</span><span>Rs. {{ cart.totalAmount | number }}</span></div>
-        <div class="summary-row"><span>Shipping</span><span>Rs. 0</span></div>
-        <div class="summary-line"></div>
-        <div class="summary-row total"><span>Total</span><span>Rs. {{ cart.totalAmount | number }}</span></div>
-        <button class="btn btn-primary btn-lg btn-block mt-4" (click)="showCheckoutModal = true">🛍️ Proceed to Checkout</button>
+    <div class="cart-summary-section">
+      <div class="card summary-card">
+        <div class="card-header">
+          <h3 class="card-title text-lg">Order Summary</h3>
+        </div>
+        <div class="card-body">
+          <div class="summary-row">
+            <span>Subtotal ({{ cart.items.length }} items)</span>
+            <span class="font-medium">NPR {{ cart.totalPrice }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span class="text-secondary">Calculated at checkout</span>
+          </div>
+
+          <div class="summary-total mt-4 pt-3 border-top">
+            <span class="text-lg font-bold">Total</span>
+            <span class="text-xl font-bold text-primary"
+              >NPR {{ cart.totalPrice }}</span
+            >
+          </div>
+
+          <p-button
+            label="Proceed to Checkout"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            styleClass="btn btn-primary btn-lg w-100 mt-4 flex justify-center align-center"
+            [loading]="isSubmitting"
+            [disabled]="isSubmitting || hasUnavailableItems"
+            (onClick)="goToCheckout()"
+          />
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<div class="empty-state" *ngIf="!loading && (!cart || cart.items.length === 0)">
-  <div class="empty-icon">🛒</div>
-  <h4>Your cart is empty</h4>
-  <p>Looks like you haven't added anything to your cart yet.</p>
-  <a routerLink="/products" class="btn btn-primary mt-4">Browse Products</a>
-</div>
-
-<!-- Checkout Modal -->
-<div class="modal-overlay" *ngIf="showCheckoutModal" (click)="showCheckoutModal = false">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>Checkout Details</h3>
-      <button class="btn btn-ghost btn-icon" (click)="showCheckoutModal = false">✕</button>
-    </div>
-    
-    <div class="form-group">
-      <label>Shipping Address *</label>
-      <textarea class="form-control" [(ngModel)]="shippingAddress" placeholder="Enter delivery address..."></textarea>
-    </div>
-    <div class="form-group">
-      <label>Payment Method *</label>
-      <select class="form-control" [(ngModel)]="paymentMethod">
-        <option value="CASH_ON_DELIVERY">Cash on Delivery (COD)</option>
-        <option value="ESEWA">eSewa</option>
-      </select>
-    </div>
-
-    <div class="alert alert-warning">
-      You are about to place an order for <strong>Rs. {{ cart?.totalAmount | number }}</strong>.
-    </div>
-
-    <div class="flex gap-2">
-      <button class="btn btn-primary" (click)="placeOrder()" [disabled]="!shippingAddress || checkingOut">
-        {{ checkingOut ? 'Processing...' : '✅ Place Order' }}
-      </button>
-      <button class="btn btn-ghost" (click)="showCheckoutModal = false" [disabled]="checkingOut">Cancel</button>
     </div>
   </div>
 </div>

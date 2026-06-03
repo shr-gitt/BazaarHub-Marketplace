@@ -16,7 +16,14 @@ export interface OrderItemResponse {
   productName: string;
   quantity: number;
   pricePerUnit: number;
-  totalPrice: number;
+  totalAmount: number;
+  orderStatus: OrderStatus;
+  paymentStatus: PaymentStatus;
+  shippingAddress: string;
+  contactNumber: string;
+  remarks: string;
+  createdAt: string;
+  modifiedAt: string;
 }
 
 export interface OrderResponse {

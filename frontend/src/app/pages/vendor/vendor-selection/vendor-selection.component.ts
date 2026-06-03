@@ -8,11 +8,12 @@ import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { VendorResponse } from '../../../core/models/vendor.model';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-vendor-selection',
   standalone: true,
-  imports: [CommonModule, ButtonModule, ToastModule],
+  imports: [CommonModule, ButtonModule, ToastModule, TagModule],
   templateUrl: './vendor-selection.component.html',
   styleUrls: ['./vendor-selection.component.scss'],
   providers: [MessageService],
@@ -72,6 +73,13 @@ export class VendorSelectionComponent implements OnInit {
   onCreateVendor(): void {
     this.router.navigate(['/vendor/profile-setup'], {
       state: { isUpdate: false },
+    });
+  }
+
+  editVendor(vendor: VendorResponse): void {
+    this.vendorContext.setVendorId(vendor.id);
+    this.router.navigate(['/profile/update'], {
+      state: { isUpdate: true },
     });
   }
 

@@ -21,12 +21,14 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Order ID</th>
-        <th>User ID</th>
-        <th>Products</th>
+        <th>Product ID</th>
+        <th>Product</th>
         <th>Total</th>
         <th>Payment</th>
         <th>Status</th>
         <th>Contact</th>
+        <th>Shipping Address</th>
+        <th>Remarks</th>
         <th>Date</th>
       </tr>
     </ng-template>
@@ -36,14 +38,9 @@
         <td>
           <span class="order-id">#{{ order.id }}</span>
         </td>
+        <td>{{ order.productId }}</td>
 
-        <td>{{ order.userId }}</td>
-
-        <td>
-          <div class="product-list">
-            {{ getProductNames(order) }}
-          </div>
-        </td>
+        <td>{{ order.productName }}</td>
 
         <td>
           <span class="amount"> Rs. {{ order.totalAmount }} </span>
@@ -54,7 +51,15 @@
         </td>
 
         <td>
-          <p-tag [value]="order.orderStatus" severity="success"></p-tag>
+          <p-dropdown
+            [options]="orderStatusOptions"
+            [(ngModel)]="order.orderStatus"
+            (onChange)="onStatusChange(order, $event)"
+            optionLabel="label"
+            optionValue="value"
+            [style]="{ width: '140px' }"
+            appendTo="body"
+          ></p-dropdown>
         </td>
 
         <td>
@@ -62,6 +67,9 @@
             {{ order.contactNumber }}
           </span>
         </td>
+
+        <td>{{ order.shippingAddress }}</td>
+        <td>{{ order.remarks }}</td>
 
         <td>
           <span class="date">

@@ -4,10 +4,11 @@ import { ProductResponse } from '../../../core/models/product.model';
 import { AuthModelService } from '../../../services/auth-model.service';
 import { AuthService } from '../../../services/auth.service';
 import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [CommonModule, ButtonModule, ToastModule],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss',
 })

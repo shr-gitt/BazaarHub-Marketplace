@@ -1,6 +1,5 @@
 package com.bazaarhub.backend.feature.cart.service.impl;
 
-import com.bazaarhub.backend.config.CacheConfig;
 import com.bazaarhub.backend.feature.cart.entity.Cart;
 import com.bazaarhub.backend.feature.cart.entity.CartItem;
 import com.bazaarhub.backend.feature.cart.exception.CartItemNotFoundException;
@@ -23,9 +22,6 @@ import com.bazaarhub.backend.feature.user.repository.UserRepository;
 import com.bazaarhub.backend.shared.enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +38,6 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    @CachePut(cacheNames = CacheConfig.CART_CACHE_NAME, key = "#result.id")
     public CartResponseDto addToCart(Long userId, CartItemRequestDto cartItemRequestDto) {
         User user = userRepository.findByIdAndUserStatusNot(userId, UserStatus.DELETED).orElseThrow(() -> {
             log.error("User not found of id: {}", userId);
@@ -90,7 +85,6 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @CachePut(cacheNames = CacheConfig.CART_CACHE_NAME, key = "#userId")
     public CartResponseDto updateCartItem(Long userId, Long productId, Integer quantity) {
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
             log.error("Cart not found of id: {}", userId);
@@ -117,7 +111,6 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @Cacheable(cacheNames = CacheConfig.CART_CACHE_NAME, key = "#userId")
     @Transactional(readOnly = true)
     public CartResponseDto getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
@@ -128,7 +121,6 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @CacheEvict(cacheNames = CacheConfig.CART_CACHE_NAME, key = "#userId")
     public CartResponseDto removeItemFromCart(Long userId, Long productId) {
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
             log.error("Cart not found of id: {}", userId);
@@ -147,7 +139,6 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @CacheEvict(cacheNames = CacheConfig.CART_CACHE_NAME, key = "#userId")
     public void clearCart(Long userId) {
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
             log.error("Cart not found of id: {}", userId);

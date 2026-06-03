@@ -15,6 +15,7 @@ public class CartItemResponseDto implements Serializable {
     private Long id;
     private Long productId;
     private String productName;
+    private String productImage;
     private Integer quantity;
     private BigDecimal pricePerUnit;
     private BigDecimal totalPrice;

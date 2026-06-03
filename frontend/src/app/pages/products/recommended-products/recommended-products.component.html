@@ -8,11 +8,9 @@
 
   <div class="loading-box" *ngIf="loading">Loading recommended products...</div>
 
-  <div class="error-box" *ngIf="error && !loading">
-    {{ error }}
-  </div>
+  <p-toast position="top-right" [life]="3000"></p-toast>
 
-  <div class="empty-box" *ngIf="!loading && !error && products.length === 0">
+  <div class="empty-box" *ngIf="!loading && products.length === 0">
     No recommended products found.
   </div>
 
@@ -52,7 +50,13 @@
         </div>
 
         <div class="meta-row">
-          <span>{{ product.stockQuantity }} in stock</span>
+          <span [class.text-error]="product.stockQuantity === 0">
+            {{
+              product.stockQuantity === 0
+                ? "Out of stock"
+                : product.stockQuantity + " in stock"
+            }}
+          </span>
           <span>{{ product.vendorName }}</span>
         </div>
 
@@ -64,11 +68,11 @@
   </div>
 
   <div class="pagination" *ngIf="totalPages > 1">
-    <button (click)="previousPage()" [disabled]="page === 0">Previous</button>
-
+    <button (click)="previousPage()" [disabled]="page === 0 || loading">
+      Previous
+    </button>
     <span>Page {{ page + 1 }} of {{ totalPages }}</span>
-
-    <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">
+    <button (click)="nextPage()" [disabled]="page + 1 >= totalPages || loading">
       Next
     </button>
   </div>

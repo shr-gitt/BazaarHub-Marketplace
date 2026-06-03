@@ -119,7 +119,6 @@ public class PaymentServiceImpl implements PaymentService {
             throw new UnauthorizedPaymentAccessException("Unauthorized payment attempt");
         }
 
-        payment.setOrder(order);
         payment.setUser(order.getUser());
 
         PaymentType paymentType = paymentRequestDto.getPaymentType();
@@ -133,6 +132,7 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setExpiresAt(LocalDateTime.now().plusMinutes(5));
         }
         else{
+            order.setPaymentStatus(OrderPaymentStatus.CASH_PENDING);
             payment.setPaymentStatus(PaymentStatus.CASH_PENDING);
             payment.setExpiresAt(null);
         }
@@ -140,6 +140,9 @@ public class PaymentServiceImpl implements PaymentService {
                 + ",transaction_uuid=" + pid
                 + ",product_code=" + merchantCode;
 
+        Order updatedOrder = orderRepository.save(order);
+
+        payment.setOrder(updatedOrder);
         Payment savedPayment = paymentRepository.save(payment);
 
         PaymentResponseDto response = paymentMapper.mapToPaymentResponse(savedPayment);

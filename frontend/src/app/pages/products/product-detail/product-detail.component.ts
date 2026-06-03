@@ -7,6 +7,8 @@ import { ProductCardComponent } from '../product-card/product-card.component';
 import { ProductResponse } from '../../../core/models/product.model';
 import { ProductService } from '../../../services/product.service';
 import { CartService } from '../../../services/cart.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-product-detail',
@@ -17,9 +19,11 @@ import { CartService } from '../../../services/cart.service';
     RouterLink,
     LoadingSpinnerComponent,
     ProductCardComponent,
+    ToastModule,
   ],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.scss'],
+  providers: [MessageService],
 })
 export class ProductDetailComponent implements OnInit {
   product: ProductResponse | null = null;
@@ -33,6 +37,7 @@ export class ProductDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private productService: ProductService,
     private cartService: CartService,
+    private messageService: MessageService,
   ) {}
 
   ngOnInit() {
@@ -51,6 +56,7 @@ export class ProductDetailComponent implements OnInit {
         this.product = res.data;
         this.quantity = 1;
         this.isLoading = false;
+        this.recommendedProducts = [];
         this.loadRecommended();
       },
       error: () => {
@@ -69,6 +75,9 @@ export class ProductDetailComponent implements OnInit {
             .filter((p) => p.id !== this.product?.id)
             .slice(0, 4);
         }
+      },
+      error: () => {
+        this.recommendedProducts = [];
       },
     });
   }
@@ -94,19 +103,39 @@ export class ProductDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           this.isAdding = false;
-          alert('Successfully added to cart!');
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Successfully added to cart!',
+          });
         },
         error: (err) => {
           this.isAdding = false;
-          alert(err.error?.message || 'Failed to add to cart.');
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail:
+              err?.error?.message || 'Something went wrong, try again later.',
+          });
         },
       });
   }
 
   onRecommendedAddToCart(productId: number) {
     this.cartService.addItem({ productId, quantity: 1 }).subscribe({
-      next: () => alert('Product added to cart!'),
-      error: (err) => alert(err.error?.message || 'Failed to add product.'),
+      next: () =>
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Product added to cart.',
+        }),
+      error: (err) =>
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail:
+            err?.error?.message || 'Something went wrong, try again later.',
+        }),
     });
   }
 }

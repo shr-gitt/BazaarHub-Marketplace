@@ -24,7 +24,7 @@ import { MessageService } from 'primeng/api';
 type Tab = 'account' | 'profile';
 
 @Component({
-  selector: 'app-profile-page',
+  selector: 'app-update-profile-page',
   standalone: true,
   imports: [
     CommonModule,
@@ -41,11 +41,11 @@ type Tab = 'account' | 'profile';
     DividerModule,
     ToastModule,
   ],
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss'],
+  templateUrl: './update-profile.component.html',
+  styleUrls: ['./update-profile.component.scss'],
   providers: [MessageService],
 })
-export class ProfileComponent implements OnInit {
+export class UpdateProfileComponent implements OnInit {
   activeTab: Tab = 'account';
   userId: number | null = null;
   role: string | null = null;
@@ -127,7 +127,6 @@ export class ProfileComponent implements OnInit {
 
     const payload = { ...this.accountForm.value };
 
-    // If password is empty, don't send it
     if (!payload.password) {
       delete payload.password;
     }

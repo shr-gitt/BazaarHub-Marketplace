@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -9,19 +9,15 @@ import {
 
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { RadioButtonModule } from 'primeng/radiobutton';
 
 import { OrderSummaryComponent } from '../../orders/order-summary/order-summary.component';
-import {
-  PaymentRequest,
-  PaymentType,
-} from '../../../core/models/payment.model';
+import { PaymentRequest } from '../../../core/models/payment.model';
 import { PaymentService } from '../../../services/payment.service';
 import { Router } from '@angular/router';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-order-payment',
@@ -32,20 +28,18 @@ import { Router } from '@angular/router';
     OrderSummaryComponent,
     CardModule,
     ButtonModule,
-    TextareaModule,
-    InputTextModule,
-    FloatLabelModule,
     RadioButtonModule,
     ProgressSpinnerModule,
+    ToastModule,
   ],
   templateUrl: './create-order-payment.component.html',
   styleUrl: './create-order-payment.component.scss',
+  providers: [MessageService],
 })
 export class OrderPaymentComponent {
   orderId: number;
   isLoading = false;
   isSubmitting = false;
-  errorMessage = '';
 
   paymentForm!: FormGroup;
 
@@ -53,9 +47,11 @@ export class OrderPaymentComponent {
     private fb: FormBuilder,
     private router: Router,
     private paymentService: PaymentService,
+    private messageService: MessageService,
   ) {
     const navigation = this.router.getCurrentNavigation();
-    this.orderId = Number(navigation?.extras?.state?.['orderId']) ?? null;
+    const id = navigation?.extras?.state?.['orderId'];
+    this.orderId = id ? Number(id) : 0;
 
     if (!this.orderId) {
       this.router.navigate(['/cart']);
@@ -68,12 +64,12 @@ export class OrderPaymentComponent {
   }
 
   proceedToPayment(): void {
+    this.paymentForm.markAllAsTouched();
+
     if (this.paymentForm.invalid) {
-      this.paymentForm.markAllAsTouched();
       return;
     }
     this.isSubmitting = true;
-    this.errorMessage = '';
 
     const payload: PaymentRequest = {
       orderId: this.orderId,
@@ -82,15 +78,18 @@ export class OrderPaymentComponent {
 
     this.paymentService.createPayment(payload).subscribe({
       next: (res) => {
-        this.isSubmitting = false;
-        if (this.paymentForm.value.paymentType == 'WALLET')
+        if (this.paymentForm.value.paymentType === 'WALLET')
           this.submitEsewaForm(res.data);
         else this.router.navigate(['/orders']);
       },
       error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail:
+            err?.error?.message || 'Something went wrong, try again later.',
+        });
         this.isSubmitting = false;
-        this.errorMessage =
-          err.error?.message || 'Failed to perform payment. Please try again.';
       },
     });
   }

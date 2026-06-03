@@ -2,8 +2,10 @@ package com.bazaarhub.backend.feature.order.controller;
 
 import com.bazaarhub.backend.feature.order.resources.request.OrderRequestDto;
 import com.bazaarhub.backend.feature.order.resources.request.OrderStatusUpdateRequestDto;
+import com.bazaarhub.backend.feature.order.resources.response.OrderItemResponseDto;
 import com.bazaarhub.backend.feature.order.resources.response.OrderResponseDto;
 import com.bazaarhub.backend.feature.order.service.OrderService;
+import com.bazaarhub.backend.shared.aop.LogExecutionTime;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
 import com.bazaarhub.backend.shared.utils.AuthUtil;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
@@ -39,7 +41,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{orderId}/status")
-    public ApiResponseDto<OrderResponseDto> updateOrderStatus(@PathVariable Long orderId, @Valid @RequestBody OrderStatusUpdateRequestDto requestDto) {
+    public ApiResponseDto<OrderItemResponseDto> updateOrderStatus(@PathVariable Long orderId, @Valid @RequestBody OrderStatusUpdateRequestDto requestDto) {
         return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Order status updated successfully.", orderService.updateOrderStatus(orderId, requestDto));
     }
 
@@ -57,5 +59,11 @@ public class OrderController {
                 "All orders fetched successfully.",
                 orderService.getAllOrdersForAdmin(AuthUtil.getCurrentUserId(), pageable)
         );
+    }
+
+    @GetMapping("/vendor/{vendorId}")
+    @LogExecutionTime
+    public ApiResponseDto<Page<OrderItemResponseDto>> getOrdersByVendorId(@PathVariable("vendorId") Long vendorId, @PageableDefault(sort = "modifiedAt", direction = Sort.Direction.DESC) Pageable pageable){
+        return new ApiResponseDto<>(ResponseStatus.SUCCESS.value, "Vendor products fetched successfully", orderService.getOrdersByVendorId(vendorId, pageable));
     }
 }

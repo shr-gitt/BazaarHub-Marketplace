@@ -19,7 +19,7 @@ export const API_URLS = {
   // Products
   CREATE_PRODUCT: `${BASE_URL}/create-product`,
   GET_PRODUCT: (id: number) => `${BASE_URL}/product/${id}`,
-  GET_PRODUCTS_BY_VENDOR: (id:number) => `${BASE_URL}/product/vendor/${id}`,
+  GET_PRODUCTS_BY_VENDOR: (id: number) => `${BASE_URL}/vendor-product/${id}`,
   GET_PRODUCTS: `${BASE_URL}/products`,
   GET_RECOMMENDED_PRODUCTS: `${BASE_URL}/products/recommended`,
   UPDATE_PRODUCT: (id: number) => `${BASE_URL}/update-product/${id}`,
@@ -48,6 +48,7 @@ export const API_URLS = {
   // Orders
   CHECKOUT: `${BASE_URL}/orders/checkout`,
   GET_ORDER: (id: number) => `${BASE_URL}/orders/${id}`,
+  GET_VENDOR_ORDERS: (id: number) => `${BASE_URL}/orders/vendor/${id}`,
   GET_ORDERS: `${BASE_URL}/orders`,
   UPDATE_ORDER_STATUS: (id: number) => `${BASE_URL}/orders/${id}/status`,
   CANCEL_ORDER: (id: number) => `${BASE_URL}/orders/${id}/cancel`,

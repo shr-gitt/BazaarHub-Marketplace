@@ -1,39 +1,87 @@
-<div class="page-header">
-  <div>
-    <h2>🗂️ Categories</h2>
-    <p class="subtitle">{{ totalElements }} categories</p>
-  </div>
-  <a routerLink="/categories/add" class="btn btn-primary">+ Add Category</a>
-</div>
-
-<div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
 <div class="card">
-  <div *ngIf="loading" class="loading-overlay"><div class="spinner"></div></div>
-  <div class="table-wrapper" *ngIf="!loading">
-    <table *ngIf="categories.length > 0">
-      <thead>
-        <tr><th>#</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let c of categories; let i = index">
-          <td>{{ i + 1 }}</td>
-          <td><strong>{{ c.name }}</strong></td>
-          <td>{{ c.description || '—' }}</td>
-          <td><span class="badge badge-success">{{ c.status || 'ACTIVE' }}</span></td>
-          <td>
-            <div class="flex gap-2">
-              <a [routerLink]="['/categories/edit', c.id]" class="btn btn-outline btn-sm">✏️ Edit</a>
-              <button class="btn btn-danger btn-sm" (click)="delete(c.id)">🗑️</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="empty-state" *ngIf="categories.length === 0">
-      <div class="empty-icon">🗂️</div>
-      <h4>No categories yet</h4>
-      <a routerLink="/categories/add" class="btn btn-primary mt-4">+ Add Category</a>
+  <div class="card-header flex justify-between align-center">
+    <h2 class="card-title">Category Management</h2>
+    <p-button label="Add Category" routerLink="/admin/categories/create" />
+  </div>
+
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <app-empty-state
+    *ngIf="!isLoading && categories.length === 0"
+    icon="category"
+    title="No categories found"
+    description="There are currently no categories. Create one to get started."
+  ></app-empty-state>
+
+  <div class="card-body p-0" *ngIf="!isLoading && categories.length > 0">
+    <div class="table-container no-border-radius">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of categories">
+            <td>#{{ category.id }}</td>
+            <td class="font-medium">{{ category.name }}</td>
+            <td>{{ category.description || "No description" }}</td>
+            <td>
+              <span
+                class="status-badge"
+                [ngClass]="{
+                  success: category.status === 'ACTIVE',
+                  error: category.status === 'INACTIVE',
+                }"
+              >
+                {{ category.status }}
+              </span>
+            </td>
+            <td class="text-right">
+              <div class="action-buttons">
+                <button
+                  class="p-button-sm p-button-text"
+                  [routerLink]="['/admin/categories/edit', category.id]"
+                  title="Edit"
+                >
+                  <span class="material-icons">edit</span>
+                </button>
+                <button
+                  class="icon-btn text-error"
+                  (click)="deleteCategory(category.id)"
+                  title="Delete"
+                >
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 0"
+        (click)="loadCategories(currentPage - 1)"
+      >
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <span class="pagination-info"
+        >Page {{ currentPage + 1 }} of {{ totalPages }}</span
+      >
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="loadCategories(currentPage + 1)"
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
     </div>
   </div>
 </div>

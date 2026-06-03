@@ -13,11 +13,20 @@ import { VendorContextService } from '../../../services/vendor-context.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { CategoryResponse } from '../../../core/models/category.model';
+import { CategoryService } from '../../../services/category.service';
+import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-create-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastModule, ButtonModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ToastModule,
+    ButtonModule,
+    DropdownModule,
+  ],
   templateUrl: './create-product.component.html',
   styleUrl: './create-product.component.scss',
   providers: [MessageService],
@@ -26,7 +35,7 @@ export class CreateProductComponent implements OnInit {
   productForm: FormGroup;
   loading = false;
   imageError = false;
-
+  categories: CategoryResponse[] = [];
   vendorId: number | null = null;
 
   selectedImage?: File;
@@ -38,6 +47,7 @@ export class CreateProductComponent implements OnInit {
     private vendorContextService: VendorContextService,
     private router: Router,
     private messageService: MessageService,
+    private categoryService: CategoryService,
   ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
@@ -51,6 +61,18 @@ export class CreateProductComponent implements OnInit {
 
   ngOnInit(): void {
     this.vendorId = this.vendorContextService.getVendorId();
+    this.loadCategories();
+  }
+
+  loadCategories(): void {
+    this.categoryService.getAll(0, 100).subscribe({
+      next: (res) => {
+        this.categories = res.data?.content || [];
+      },
+      error: (err) => {
+        console.error('Failed to load categories:', err);
+      },
+    });
   }
 
   onImageSelected(event: Event): void {

@@ -63,6 +63,7 @@
             <input
               type="number"
               formControlName="price"
+              min="1"
               [class.is-invalid]="
                 productForm.get('price')?.invalid &&
                 productForm.get('price')?.touched
@@ -91,6 +92,7 @@
             <input
               type="number"
               formControlName="discountPrice"
+              min="0"
               placeholder="Optional"
             />
           </div>
@@ -102,6 +104,7 @@
             <input
               type="number"
               formControlName="stockQuantity"
+              min="1"
               [class.is-invalid]="
                 productForm.get('stockQuantity')?.invalid &&
                 productForm.get('stockQuantity')?.touched
@@ -127,16 +130,20 @@
           </div>
 
           <div class="form-group">
-            <label>Category ID <span style="color: red">*</span></label>
-            <input
-              type="number"
+            <label>Category <span style="color: red">*</span></label>
+            <p-dropdown
+              [options]="categories"
               formControlName="categoryId"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select a category"
+              [filter]="true"
+              filterBy="name"
               [class.is-invalid]="
                 productForm.get('categoryId')?.invalid &&
                 productForm.get('categoryId')?.touched
               "
-            />
-
+            ></p-dropdown>
             <small
               *ngIf="
                 productForm.get('categoryId')?.touched &&

@@ -150,7 +150,7 @@
       styleClass="w-full mt-4"
       type="submit"
       icon="pi pi-save"
-      label="saving ? 'Saving...'' : 'Save Profile'"
+      [label]="saving ? 'Saving...' : 'Save Profile'"
       [disabled]="saving || form.invalid"
     >
     </p-button>

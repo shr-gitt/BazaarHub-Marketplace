@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -7,19 +7,26 @@ import {
   Validators,
 } from '@angular/forms';
 import { VendorService } from '../../../services/vendor.service';
-import { AuthService } from '../../../services/auth.service';
 import { AddressComponent } from '../../../shared/components/address/address.component';
 import { Router } from '@angular/router';
-import { Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { VendorContextService } from '../../../services/vendor-context.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-vendor-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AddressComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AddressComponent,
+    ToastModule,
+    ButtonModule,
+  ],
   templateUrl: './vendor-profile.component.html',
   styleUrls: ['./vendor-profile.component.scss'],
+  providers: [MessageService],
 })
 export class VendorProfileComponent implements OnInit {
   @Input() isUpdate = false;
@@ -27,17 +34,15 @@ export class VendorProfileComponent implements OnInit {
   form: FormGroup;
   loading = false;
   saving = false;
-  error = '';
-  success = '';
 
   constructor(
     private fb: FormBuilder,
     private vendorService: VendorService,
-    private auth: AuthService,
     private router: Router,
+    private messageService: MessageService,
     private vendorContext: VendorContextService,
 
-    @Inject(PLATFORM_ID) private platformId: object,
+    //@Inject(PLATFORM_ID) private platformId: object,
   ) {
     this.form = this.fb.group({
       shopName: ['', Validators.required],
@@ -49,7 +54,7 @@ export class VendorProfileComponent implements OnInit {
         province: [''],
         district: [''],
         municipality: [''],
-        wardNo: [null, Validators.required],
+        wardNo: [null, [Validators.required, Validators.min(1)]],
         street: [''],
         postalCode: [''],
       }),
@@ -75,7 +80,11 @@ export class VendorProfileComponent implements OnInit {
     const vendorId = this.getVendorId();
 
     if (!vendorId) {
-      this.error = 'Vendor ID not found';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Vendor not found.',
+      });
       this.saving = false;
       return;
     }
@@ -101,34 +110,48 @@ export class VendorProfileComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail:
+            err?.error?.message || 'Something went wrong, try again later.',
+        });
       },
     });
   }
 
   onSubmit(): void {
+    this.form.markAllAsTouched();
+
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
       return;
     }
 
     this.saving = true;
-    this.error = '';
-    this.success = '';
 
     const vendorId = this.getVendorId();
 
     if (!this.isUpdate) {
       this.vendorService.create(this.form.value).subscribe({
         next: () => {
-          this.success = 'Vendor profile submitted for approval.';
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Vendor profile submitted for approval.',
+          });
           this.saving = false;
 
           this.router.navigate(['/vendor/selection']);
         },
         error: (err) => {
-          this.error = err?.error?.message || 'Create failed';
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail:
+              err?.error?.message || 'Something went wrong, try again later.',
+          });
           this.saving = false;
         },
       });
@@ -137,18 +160,31 @@ export class VendorProfileComponent implements OnInit {
     }
 
     if (!vendorId) {
-      this.error = 'Vendor ID not found';
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Vendor not found.',
+      });
       this.saving = false;
       return;
     }
 
     this.vendorService.update(vendorId, this.form.value).subscribe({
       next: () => {
-        this.success = 'Vendor profile updated.';
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Vendor profile updated.',
+        });
         this.saving = false;
       },
       error: (err) => {
-        this.error = err?.error?.message || 'Update failed';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail:
+            err?.error?.message || 'Something went wrong, try again later.',
+        });
         this.saving = false;
       },
     });
