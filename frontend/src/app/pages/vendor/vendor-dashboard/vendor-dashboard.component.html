@@ -1,1 +1,73 @@
-<p>vendor-dashboard works!</p>
+<div class="dashboard-page">
+  <div *ngIf="isLoading" class="loading">Loading...</div>
+
+  <ng-container *ngIf="!isLoading">
+    <h2>Summary</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-wallet"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Revenue</span>
+          <span class="stat-value">Rs. {{ totalRevenue | number }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-calendar"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">This Month</span>
+          <span class="stat-value">Rs. {{ thisMonthRevenue | number }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-shopping-bag"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Orders</span>
+          <span class="stat-value">{{ totalOrders }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-box"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Products in Inventory</span>
+          <span class="stat-value">{{ totalProducts }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="row">
+        <div class="chart-card">
+          <h4>Orders by Status</h4>
+          <p-chart
+            type="doughnut"
+            [data]="ordersByStatus"
+            [options]="chartOptions"
+            width="100%"
+            height="300px"
+          ></p-chart>
+        </div>
+        <div class="chart-card">
+          <h4>Top 5 Products Sold</h4>
+          <p-chart
+            type="bar"
+            [data]="topProducts"
+            [options]="chartOptions"
+            width="100%"
+            height="300px"
+          ></p-chart>
+        </div>
+      </div>
+      <div class="revenue-chart-card">
+        <h4>Revenue by Month</h4>
+        <p-chart
+          type="line"
+          [data]="revenueByMonth"
+          [options]="chartOptions"
+          width="100%"
+          height="240px"
+        ></p-chart>
+      </div>
+    </div>
+  </ng-container>
+</div>
