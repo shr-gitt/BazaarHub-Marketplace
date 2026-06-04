@@ -1,34 +1,52 @@
-<div class="page-header">
-  <div>
-    <h2>🔔 Notifications</h2>
-    <p class="subtitle">Stay updated with your account activity</p>
-  </div>
-  <button class="btn btn-outline" (click)="markAllAsRead()">Mark All as Read</button>
-</div>
-
-<div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
-<div class="card" style="max-width:800px;margin:0 auto">
-  <div *ngIf="loading" class="loading-overlay"><div class="spinner"></div></div>
-  
-  <div class="notif-list" *ngIf="!loading">
-    <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.isRead">
-      <div class="notif-icon">🔔</div>
-      <div class="notif-content">
-        <div class="notif-title">
-          <span>{{ n.title }}</span>
-          <span class="badge badge-primary ms-1" *ngIf="!n.isRead">New</span>
-        </div>
-        <div class="notif-message">{{ n.message }}</div>
-        <div class="notif-time">{{ n.createdAt | date:'medium' }}</div>
+<div class="notifications-container max-w-4xl mx-auto">
+      <div class="flex justify-between align-center mb-4">
+        <h1 class="page-title m-0">Notifications</h1>
+        <button
+          class="btn btn-secondary"
+          (click)="markAllRead()"
+          *ngIf="notifications.length > 0"
+        >
+          Mark all as read
+        </button>
       </div>
-      <button class="btn btn-ghost btn-icon" *ngIf="!n.isRead" (click)="markAsRead(n.id)" title="Mark as read">✓</button>
-    </div>
 
-    <div class="empty-state" *ngIf="notifications.length === 0">
-      <div class="empty-icon">🔕</div>
-      <h4>All caught up!</h4>
-      <p>No new notifications right now.</p>
+      <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+      <app-empty-state
+        *ngIf="!isLoading && notifications.length === 0"
+        icon="notifications_none"
+        title="All caught up!"
+        description="You have no new notifications."
+      ></app-empty-state>
+
+      <div
+        class="notification-list"
+        *ngIf="!isLoading && notifications.length > 0"
+      >
+        <div
+          class="notification-card card"
+          *ngFor="let notification of notifications"
+          [class.unread]="!notification.isRead"
+          (click)="markAsRead(notification)"
+        >
+          <div
+            class="notification-icon"
+            [ngClass]="getIconClass(notification.type)"
+          >
+            <span class="material-icons">{{ getIcon(notification.type) }}</span>
+          </div>
+
+          <div class="notification-content">
+            <h4 class="notification-title m-0">{{ notification.title }}</h4>
+            <p class="notification-message m-0 text-secondary">
+              {{ notification.message }}
+            </p>
+            <div class="notification-time text-sm text-tertiary mt-1">
+              {{ notification.createdAt | date: 'medium' }}
+            </div>
+          </div>
+
+          <div class="unread-dot" *ngIf="!notification.isRead"></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>

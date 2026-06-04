@@ -1,6 +1,7 @@
 package com.bazaarhub.backend.feature.payment.service.impl;
 
 import com.bazaarhub.backend.feature.cart.entity.Cart;
+import com.bazaarhub.backend.feature.cart.entity.CartItem;
 import com.bazaarhub.backend.feature.cart.exception.CartNotFoundException;
 import com.bazaarhub.backend.feature.cart.repository.CartRepository;
 import com.bazaarhub.backend.feature.notification.enums.NotificationType;
@@ -21,7 +22,9 @@ import com.bazaarhub.backend.feature.payment.resource.request.PaymentRequestDto;
 import com.bazaarhub.backend.feature.payment.resource.response.PaymentResponseDto;
 import com.bazaarhub.backend.feature.payment.service.PaymentService;
 import com.bazaarhub.backend.feature.points.service.PointsService;
+import com.bazaarhub.backend.feature.product.entity.Product;
 import com.bazaarhub.backend.feature.product.service.ProductService;
+import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import com.bazaarhub.backend.shared.enums.OrderPaymentStatus;
 import com.bazaarhub.backend.shared.enums.OrderStatus;
 import com.bazaarhub.backend.shared.enums.PaymentStatus;
@@ -165,6 +168,27 @@ public class PaymentServiceImpl implements PaymentService {
                 return new CartNotFoundException("Cart not found");
             });
 
+            notificationService.createNotification(
+                    order.getUser(),
+                    "Order placed",
+                    "Your order has been placed successfully.",
+                    NotificationType.ORDER_PLACED,
+                    savedPayment.getId()
+            );
+
+            for (CartItem cartItem : cart.getItems()) {
+                Product product = cartItem.getProduct();
+                Vendor vendor = product.getVendor();
+
+                notificationService.createNotification(
+                        vendor.getUser(),
+                        "Order received",
+                        "You received a new order for product: " + product.getName(),
+                        NotificationType.ORDER_RECEIVED,
+                        savedPayment.getId()
+                );
+            }
+
             cart.getItems().clear();
             cartRepository.save(cart);
         }
@@ -279,8 +303,8 @@ public class PaymentServiceImpl implements PaymentService {
 
             notificationService.createNotification(
                     order.getUser(),
-                    "Payment successful",
-                    "Your payment has been completed successfully.",
+                    "Order placed",
+                    "Your order has been placed.",
                     NotificationType.PAYMENT_SUCCESS,
                     order.getId()
             );
@@ -288,8 +312,8 @@ public class PaymentServiceImpl implements PaymentService {
             for (OrderItem orderItem : order.getOrderItems()) {
                 notificationService.createNotification(
                         orderItem.getProduct().getVendor().getUser(),
-                        "Payment received",
-                        "Payment received for product: " + orderItem.getProductName(),
+                        "Order received",
+                        "Order received for product: " + orderItem.getProductName(),
                         NotificationType.PAYMENT_SUCCESS,
                         order.getId()
                 );

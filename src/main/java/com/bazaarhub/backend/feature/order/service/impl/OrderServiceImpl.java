@@ -22,7 +22,6 @@ import com.bazaarhub.backend.feature.product.service.ProductService;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
 import com.bazaarhub.backend.feature.user.repository.UserRepository;
-import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import com.bazaarhub.backend.shared.enums.*;
 import com.bazaarhub.backend.shared.exception.*;
 import org.springframework.data.domain.Page;
@@ -82,26 +81,6 @@ public class OrderServiceImpl implements OrderService {
             productService.reserveStock(product.getId(), cartItem.getQuantity());
         }
 
-        notificationService.createNotification(
-                user,
-                "Order placed",
-                "Your order has been placed successfully.",
-                NotificationType.ORDER_PLACED,
-                saveOrder.getId()
-        );
-
-        for (CartItem cartItem : cart.getItems()) {
-            Product product = cartItem.getProduct();
-            Vendor vendor = product.getVendor();
-
-            notificationService.createNotification(
-                    vendor.getUser(),
-                    "New order received",
-                    "You received a new order for product: " + product.getName(),
-                    NotificationType.ORDER_RECEIVED,
-                    saveOrder.getId()
-            );
-        }
         return orderMapper.mapToOrderResponseDTO(saveOrder);
     }
 
