@@ -72,6 +72,7 @@ export class LoginComponent {
 
     this.auth.login(this.loginForm.value).subscribe({
       next: (res) => {
+        localStorage.setItem('email', this.loginForm.value.email);
         this.loading = false;
         this.redirectByRole();
       },

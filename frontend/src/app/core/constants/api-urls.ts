@@ -24,6 +24,8 @@ export const API_URLS = {
   GET_RECOMMENDED_PRODUCTS: `${BASE_URL}/products/recommended`,
   UPDATE_PRODUCT: (id: number) => `${BASE_URL}/update-product/${id}`,
   DELETE_PRODUCT: (id: number) => `${BASE_URL}/product/${id}`,
+  SEARCH_PRODUCTS: (keyword: string) =>
+    `${BASE_URL}/search-products/${encodeURIComponent(keyword)}`,
 
   // Categories
   CREATE_CATEGORY: `${BASE_URL}/category`,
@@ -68,4 +70,7 @@ export const API_URLS = {
   // Addresses
   GET_ADDRESS: (id: number) => `${BASE_URL}/address/${id}`,
   GET_ADDRESSES: `${BASE_URL}/addresses`,
+
+  //Points
+  MY_POINTS: `${BASE_URL}/points`,
 };

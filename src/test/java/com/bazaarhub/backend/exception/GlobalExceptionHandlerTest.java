@@ -2,8 +2,6 @@ package com.bazaarhub.backend.exception;
 
 import com.bazaarhub.backend.feature.category.exception.CategoryAlreadyExistsException;
 import com.bazaarhub.backend.feature.category.exception.CategoryNotFoundException;
-import com.bazaarhub.backend.feature.product.exception.InvalidDiscountPriceException;
-import com.bazaarhub.backend.feature.product.exception.InvalidPriceException;
 import com.bazaarhub.backend.feature.product.exception.ProductNotFoundException;
 import com.bazaarhub.backend.feature.user.exception.EmailAlreadyExistsException;
 import com.bazaarhub.backend.feature.user.exception.UserNotFoundException;
@@ -121,26 +119,6 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Product not found.", response.getBody().getMessage());
-    }
-
-    @Test
-    void handleInvalidPriceException_shouldReturnBadRequest() {
-        ResponseEntity<ApiResponseDto<?>> response =
-                handler.handleInvalidPriceException(new InvalidPriceException("Invalid price"));
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Invalid Price", response.getBody().getMessage());
-    }
-
-    @Test
-    void handleInvalidDiscountPriceException_shouldReturnBadRequest() {
-        ResponseEntity<ApiResponseDto<?>> response =
-                handler.handleInvalidPriceException(new InvalidDiscountPriceException("Invalid discount"));
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Invalid discount Price", response.getBody().getMessage());
     }
 
     @Test

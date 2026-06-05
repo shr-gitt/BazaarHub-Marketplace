@@ -1,1 +1,13 @@
-/* category-form uses global styles */
+.max-w-2xl { max-width: 42rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .alert-error {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+    }
+    .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+    .spin { animation: spin 1s linear infinite; margin-right: 0.5rem; font-size: 1.2rem; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }

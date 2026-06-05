@@ -10,6 +10,7 @@ import { ProductCardComponent } from '../../products/product-card/product-card.c
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
+import { PointsService } from '../../../services/points.service';
 
 @Component({
   selector: 'app-customer-dashboard',
@@ -21,7 +22,7 @@ import { ButtonModule } from 'primeng/button';
     LoadingSpinnerComponent,
     EmptyStateComponent,
     ToastModule,
-    ButtonModule
+    ButtonModule,
   ],
   templateUrl: './customer-dashboard.component.html',
   styleUrls: ['./customer-dashboard.component.scss'],
@@ -30,15 +31,29 @@ import { ButtonModule } from 'primeng/button';
 export class CustomerDashboardComponent implements OnInit {
   recommendedProducts: ProductResponse[] = [];
   isLoading = true;
+  points: number | null = null;
 
   constructor(
     private productService: ProductService,
     private cartService: CartService,
+    private pointsService: PointsService,
     private messageService: MessageService,
   ) {}
 
   ngOnInit() {
     this.fetchRecommendedProducts();
+    this.fetchPoints();
+  }
+
+  fetchPoints() {
+    this.pointsService.getMyPoints().subscribe({
+      next: (res: any) => {
+        this.points = res.data?.points ?? res.data ?? null;
+      },
+      error: () => {
+        this.points = null;
+      },
+    });
   }
 
   fetchRecommendedProducts() {

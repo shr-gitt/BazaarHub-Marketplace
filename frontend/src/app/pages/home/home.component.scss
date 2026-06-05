@@ -9,7 +9,7 @@
 }
 
 .container {
-  max-width: 1280px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -177,23 +177,23 @@
   .category-pill {
     white-space: nowrap;
     padding: 0.5rem 1.25rem;
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
+    background: #f0faeb; // primary.50
+    border: 1px solid #d9f2cc; // primary.100
     border-radius: var(--radius-full);
-    color: #475569;
+    color: #334155;
     font-weight: 500;
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s;
 
     &:hover {
-      background: #e2e8f0;
-      color: #1e293b;
+      background: #8cd966; // primary.300
+      color: white;
     }
 
     &.active {
-      background: var(--primary-color);
-      border-color: var(--primary-color);
+      background: #60BB46; // primary.500
+      border-color: #60BB46; // primary.500
       color: white;
     }
   }
@@ -283,41 +283,45 @@
 }
 
 .promo-clean {
-  padding: 0 0 5rem 0;
+  padding: 0 0 3rem 0;
 }
 
 .promo-banner {
-  background: var(--primary-color);
+  background: #60BB46; 
   border-radius: var(--radius-lg);
   color: white;
-  padding: 4rem 2rem;
+  padding: 4rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   background-image:
     radial-gradient(
       circle at 10% 20%,
-      rgba(255, 255, 255, 0.05) 0%,
-      transparent 20%
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 25%
     ),
     radial-gradient(
       circle at 90% 80%,
-      rgba(255, 255, 255, 0.05) 0%,
-      transparent 20%
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 25%
     );
 
   h2 {
     font-size: 2.25rem;
     font-weight: 800;
     margin-bottom: 1rem;
+    color: white;
   }
+
   p {
     font-size: 1.125rem;
     opacity: 0.9;
     margin-bottom: 2.5rem;
     max-width: 600px;
+    color: white;
   }
 
   .btn-outline-white {
@@ -327,12 +331,12 @@
     padding: 0.75rem 2rem;
     font-weight: 600;
     border-radius: var(--radius-full);
-    text-decoration: none;
     transition: all 0.2s;
 
     &:hover {
-      background: white;
-      color: var(--primary-color);
+      background: #f0faeb;
+      color: #3b8f24; 
+      border-color: #f0faeb;
     }
   }
 }

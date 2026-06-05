@@ -48,4 +48,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Long productId,
             Integer quantity
     );
+
+    Page<Product> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndStatusNot(
+            String name, String description, ProductStatus status, Pageable pageable);
 }

@@ -1,65 +1,99 @@
-<section class="admin-dashboard">
-  <p-card styleClass="dashboard-header">
-    <div>
-      <h1>Admin Dashboard</h1>
-      <p>System overview and management.</p>
+<div class="dashboard-page">
+  <div *ngIf="isLoading" class="loading">Loading...</div>
+
+  <ng-container *ngIf="!isLoading">
+    <h2>Platform Overview</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-wallet"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Revenue</span>
+          <span class="stat-value">Rs. {{ totalRevenue | number }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-calendar"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">This Month</span>
+          <span class="stat-value">Rs. {{ thisMonthRevenue | number }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-shopping-bag"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Orders</span>
+          <span class="stat-value">{{ totalOrders }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-users"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Users</span>
+          <span class="stat-value">{{ totalUsers }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="pi pi-storefront"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Vendors</span>
+          <span class="stat-value">{{ totalVendors }}</span>
+        </div>
+      </div>
+      <div class="stat-card accent" routerLink="/admin/vendors">
+        <div class="stat-icon"><i class="pi pi-clock"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Pending Approvals</span>
+          <span class="stat-value">{{ pendingVendors }}</span>
+        </div>
+      </div>
     </div>
-  </p-card>
 
-  <div class="stats-grid">
-    <p-card styleClass="stat-card">
-      <div class="stat-content">
-        <div class="stat-icon bg-blue">
-          <span class="material-icons">people</span>
+    <div class="charts-grid">
+      <div class="row">
+        <div class="chart-card">
+          <h4>Orders by Status</h4>
+          <p-chart
+            type="doughnut"
+            [data]="ordersByStatus"
+            [options]="chartOptions"
+            width="100%"
+            height="300px"
+          ></p-chart>
         </div>
-        <div>
-          <h3>Users</h3>
-          <p>Manage</p>
-        </div>
-      </div>
-    </p-card>
-
-    <p-card styleClass="stat-card">
-      <div class="stat-content">
-        <div class="stat-icon bg-green">
-          <span class="material-icons">storefront</span>
-        </div>
-        <div>
-          <h3>Vendors</h3>
-          <p>Approve</p>
-        </div>
-      </div>
-    </p-card>
-
-    <p-card styleClass="stat-card">
-      <div class="stat-content">
-        <div class="stat-icon bg-purple">
-          <span class="material-icons">category</span>
-        </div>
-        <div>
-          <h3>Categories</h3>
-          <p>Organize</p>
+        <div class="chart-card">
+          <h4>Top 5 Vendors by Revenue</h4>
+          <p-chart
+            type="bar"
+            [data]="topVendors"
+            [options]="horizontalBarOptions"
+            width="100%"
+            height="300px"
+          ></p-chart>
         </div>
       </div>
-    </p-card>
-  </div>
-
-  <p-card header="Quick Actions" styleClass="quick-actions-card">
-    <div class="actions-grid">
-      <a routerLink="/admin/users" pButton class="action-btn">
-        <span class="material-icons">group</span>
-        <span>User Management</span>
-      </a>
-
-      <a routerLink="/admin/vendors" pButton class="action-btn">
-        <span class="material-icons">fact_check</span>
-        <span>Vendor Approvals</span>
-      </a>
-
-      <a routerLink="/admin/categories" pButton class="action-btn">
-        <span class="material-icons">category</span>
-        <span>Category Management</span>
-      </a>
+      <div class="row">
+        <div class="chart-card">
+          <h4>Revenue by Month</h4>
+          <p-chart
+            type="line"
+            [data]="revenueByMonth"
+            [options]="chartOptions"
+            width="100%"
+            height="240px"
+          ></p-chart>
+        </div>
+        <div class="chart-card">
+          <h4>New User Signups</h4>
+          <p-chart
+            type="bar"
+            [data]="userGrowth"
+            [options]="chartOptions"
+            width="100%"
+            height="240px"
+          ></p-chart>
+        </div>
+      </div>
     </div>
-  </p-card>
-</section>
+  </ng-container>
+</div>

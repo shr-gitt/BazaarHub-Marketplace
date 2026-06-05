@@ -83,7 +83,9 @@ export class ProductListComponent implements OnInit {
     this.productService.getAll(page, 20).subscribe({
       next: (res) => {
         if (res.data) {
-          this.allLoadedProducts = res.data.content;
+          this.allLoadedProducts = res.data.content.filter(
+            (product) => product.stockQuantity > 0,
+          );
           this.currentPage = res.data.number;
           this.totalPages = res.data.totalPages;
           this.applyCategoryFilter();

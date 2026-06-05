@@ -78,4 +78,17 @@ export class ProductService {
       { params },
     );
   }
+
+  searchProducts(
+    keyword: string,
+    page = 0,
+    size = 10,
+  ): Observable<ApiResponse<PageResponse<ProductResponse>>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+
+    return this.http.get<ApiResponse<PageResponse<ProductResponse>>>(
+      API_URLS.SEARCH_PRODUCTS(keyword),
+      { params },
+    );
+  }
 }

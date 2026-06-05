@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -41,8 +41,6 @@ export class VendorProfileComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private vendorContext: VendorContextService,
-
-    //@Inject(PLATFORM_ID) private platformId: object,
   ) {
     this.form = this.fb.group({
       shopName: ['', Validators.required],
@@ -85,7 +83,6 @@ export class VendorProfileComponent implements OnInit {
         summary: 'Error',
         detail: 'Vendor not found.',
       });
-      this.saving = false;
       return;
     }
 
@@ -101,14 +98,26 @@ export class VendorProfileComponent implements OnInit {
             businessEmail: res.data.businessEmail,
             businessPhone: res.data.businessPhone,
           });
-
-          if (res.data.addressResponseDto) {
-            this.form
-              .get('addressRequestDto')
-              ?.patchValue(res.data.addressResponseDto);
-          }
         }
+
         this.loading = false;
+
+        setTimeout(() => {
+          if (res.data?.address) {
+            const addr = res.data.address;
+            const addrGroup = this.form.get('addressRequestDto');
+
+            addrGroup?.patchValue({
+              wardNo: addr.wardNo,
+              street: addr.street,
+              postalCode: addr.postalCode,
+            });
+
+            addrGroup?.get('province')?.setValue(addr.province);
+            addrGroup?.get('district')?.setValue(addr.district);
+            addrGroup?.get('municipality')?.setValue(addr.municipality);
+          }
+        }, 0);
       },
       error: (err) => {
         this.loading = false;
@@ -142,7 +151,6 @@ export class VendorProfileComponent implements OnInit {
             detail: 'Vendor profile submitted for approval.',
           });
           this.saving = false;
-
           this.router.navigate(['/vendor/selection']);
         },
         error: (err) => {
@@ -189,6 +197,7 @@ export class VendorProfileComponent implements OnInit {
       },
     });
   }
+
   get f() {
     return this.form.controls;
   }

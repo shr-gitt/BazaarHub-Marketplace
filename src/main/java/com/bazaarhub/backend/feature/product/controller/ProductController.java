@@ -2,6 +2,7 @@ package com.bazaarhub.backend.feature.product.controller;
 
 import com.bazaarhub.backend.feature.product.resource.request.ProductRequestDto;
 import com.bazaarhub.backend.feature.product.resource.response.ProductResponseDto;
+import com.bazaarhub.backend.feature.product.service.ProductSearchService;
 import com.bazaarhub.backend.feature.product.service.ProductService;
 import com.bazaarhub.backend.shared.aop.LogExecutionTime;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
@@ -17,11 +18,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+    private final ProductSearchService productSearchService;
 
     @PostMapping(value = "/create-product",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -60,6 +64,16 @@ public class ProductController {
                 ResponseStatus.SUCCESS.value,
                 "Recommended products fetched successfully",
                 productService.getRecommendedProducts(pageable)
+        );
+    }
+
+    @GetMapping("search-products/{keyword}")
+    @LogExecutionTime
+    public ApiResponseDto<Page<ProductResponseDto>> searchProducts(@PathVariable("keyword") String keyword, Pageable pageable){
+        return new ApiResponseDto<>(
+                ResponseStatus.SUCCESS.value,
+                "Search products fetched successfully",
+                productSearchService.search(keyword, pageable)
         );
     }
 

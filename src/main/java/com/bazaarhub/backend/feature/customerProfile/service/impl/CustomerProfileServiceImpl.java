@@ -17,13 +17,13 @@ import com.bazaarhub.backend.feature.user.repository.UserRepository;
 import com.bazaarhub.backend.shared.exception.UnauthorizedAccessException;
 import com.bazaarhub.backend.shared.service.MinioService;
 import jakarta.persistence.EntityExistsException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -75,6 +75,7 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#id")
     public CustomerProfileResponseDTO getCustomerProfileById(Long id) {
         CustomerProfile profile = customerProfileRepository.findById(id).orElseThrow(() -> {
@@ -85,6 +86,7 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(cacheNames = CacheConfig.CUSTOMER_CACHE_NAME, key = "#userId")
     public CustomerProfileResponseDTO getCustomerProfileByUser(Long userId) {
         CustomerProfile profile = customerProfileRepository.findByUser_Id(userId).orElseThrow(() -> {

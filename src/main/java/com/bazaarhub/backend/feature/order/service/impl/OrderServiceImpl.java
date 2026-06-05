@@ -115,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = CacheConfig.GET_ORDER_CACHE, key = "#orderId")
+    //@Cacheable(cacheNames = CacheConfig.GET_ORDER_CACHE, key = "#orderId")
     public OrderResponseDto getOrderById(Long userId, Long orderId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId).orElseThrow(() -> {
             log.error("Get Order By Id failed. Order not found. orderId: {}", orderId);
@@ -126,14 +126,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = CacheConfig.GET_ORDER_CACHE, key = "#userId")
+    //@Cacheable(cacheNames = CacheConfig.GET_ORDER_CACHE, key = "#userId")
     public List<OrderResponseDto> getOrdersByUserId(Long userId) {
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(orderMapper::mapToOrderResponseDTO).toList();
     }
 
     @Override
     @Transactional
-    @CachePut(cacheNames = CacheConfig.UPDATE_ORDER_CACHE, key = "#orderId")
+    //@CachePut(cacheNames = CacheConfig.UPDATE_ORDER_CACHE, key = "#orderId")
     public OrderItemResponseDto updateOrderStatus(Long orderId, OrderStatusUpdateRequestDto requestDTO) {
         log.info(
                 "Updating order status. orderId={}",
@@ -150,7 +150,7 @@ public class OrderServiceImpl implements OrderService {
         notificationService.createNotification(
                 saveOrderItem.getOrder().getUser(),
                 "Order status updated.",
-                "Your order status has been updated." + saveOrderItem.getOrderStatus(),
+                "Your order status has been updated:" + saveOrderItem.getOrderStatus(),
                 NotificationType.ORDER_STATUS_UPDATED,
                 saveOrderItem.getId()
         );
@@ -159,7 +159,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    @CachePut(cacheNames = CacheConfig.CANCEL_ORDER_CACHE, key = "#orderId")
+    //@CachePut(cacheNames = CacheConfig.CANCEL_ORDER_CACHE, key = "#orderId")
     public OrderResponseDto cancelOrder(Long userId, Long orderId) {
         log.info(
                 "Canceling order. orderId={}",
@@ -180,8 +180,10 @@ public class OrderServiceImpl implements OrderService {
             throw new InvalidOrderStateException("Order is already cancelled.");
         }
         for (OrderItem orderItem : order.getOrderItems()) {
+            orderItem.setOrderStatus(OrderStatus.CANCELLED);
             Product product = orderItem.getProduct();
             productService.restoreStock(product.getId(), orderItem.getQuantity());
+            orderItemRepository.save(orderItem);
         }
 
         order.setOrderStatus(OrderStatus.CANCELLED);

@@ -5,12 +5,15 @@ import { AuthModelService } from '../../../services/auth-model.service';
 import { AuthService } from '../../../services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, ButtonModule, ToastModule],
+  imports: [CommonModule, ButtonModule, ToastModule, ConfirmDialogModule],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss',
+  providers: [ConfirmationService],
 })
 export class ProductCardComponent {
   @Input() product!: ProductResponse;
@@ -24,6 +27,7 @@ export class ProductCardComponent {
   constructor(
     public authService: AuthService,
     public authModelService: AuthModelService,
+    private confirmationService: ConfirmationService,
   ) {}
 
   get imageSrc(): string {
@@ -38,9 +42,20 @@ export class ProductCardComponent {
     this.edit.emit(this.product.id);
   }
 
-  onDelete(): void {
-    if (!confirm('Are you sure you want to delete this product?')) return;
-    this.delete.emit(this.product.id);
+  onDelete(event: Event): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget, 
+      message: 'Are you sure you want to delete this product?',
+      header: 'Delete Product',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary',
+      accept: () => {
+        this.delete.emit(this.product.id);
+      },
+    });
   }
 
   onAddToCart(): void {

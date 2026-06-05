@@ -1,4 +1,5 @@
 <div class="orders-container">
+  <p-confirmDialog></p-confirmDialog>
   <div class="flex justify-between align-center mb-4">
     <h1 class="page-title m-0">My Orders</h1>
   </div>
@@ -41,15 +42,6 @@
             <div class="font-medium">{{ order.id }}</div>
           </div>
         </div>
-
-        <div class="order-status-badge">
-          <span
-            class="status-badge"
-            [ngClass]="getStatusClass(order.orderStatus)"
-          >
-            {{ order.orderStatus }}
-          </span>
-        </div>
       </div>
 
       <div class="card-body">
@@ -69,6 +61,12 @@
                 NPR {{ item.pricePerUnit }} × {{ item.quantity }} = NPR
                 {{ item.totalAmount }}
               </div>
+              <span
+                class="status-badge small"
+                [ngClass]="getStatusClass(item.orderStatus)"
+              >
+                {{ item.orderStatus }}
+              </span>
             </div>
           </div>
         </div>
@@ -87,7 +85,7 @@
           >
             <button
               class="btn btn-secondary text-error"
-              (click)="cancelOrder(order.id)"
+              (click)="confirmCancel($event, order.id)"
             >
               Cancel Order
             </button>

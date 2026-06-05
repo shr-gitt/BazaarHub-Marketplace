@@ -1,3 +1,5 @@
+<p-confirmDialog></p-confirmDialog>
+
 <div class="product-card">
   <img class="product-image" [src]="imageSrc" [alt]="product.name" />
 
@@ -26,7 +28,7 @@
 
     <div class="actions" *ngIf="isVendorView">
       <button class="edit-btn" (click)="onEdit()">Edit</button>
-      <button class="delete-btn" (click)="onDelete()">Delete</button>
+      <button class="delete-btn" (click)="onDelete($event)">Delete</button>
     </div>
 
     <div class="actions" *ngIf="!isVendorView">

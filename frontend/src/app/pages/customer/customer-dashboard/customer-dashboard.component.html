@@ -1,18 +1,28 @@
 <p-toast position="top-right" [life]="3000"></p-toast>
 
 <div class="dashboard-header mb-4">
-  <div>
+  <div class="header-text">
     <h1 class="card-title">Welcome to BazaarHub</h1>
     <p class="text-secondary mt-1">
       Discover the best products from our verified vendors.
     </p>
   </div>
-  <p-button
-    label="Browse All Products"
-    icon="pi pi-shopping-cart"
-    routerLink="/products"
-  >
-  </p-button>
+
+  <div class="header-actions">
+    <div class="points-badge" *ngIf="points !== null">
+      <span class="material-icons points-icon">stars</span>
+      <div class="points-text">
+        <span class="points-label">My Points</span>
+        <span class="points-value">{{ points | number }}</span>
+      </div>
+    </div>
+
+    <p-button
+      label="Browse All Products"
+      icon="pi pi-shopping-cart"
+      routerLink="/products"
+    ></p-button>
+  </div>
 </div>
 
 <!-- Recommended Products Section -->
@@ -43,7 +53,7 @@
   </div>
 </div>
 
-<!-- Quick Actions -->
+<!-- Quick Links -->
 <div class="section-container mt-4">
   <h2 class="section-title">Quick Links</h2>
   <div class="quick-links-grid">

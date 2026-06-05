@@ -17,7 +17,7 @@ export interface VendorResponse {
   businessPhone: string;
   panCardNo: string;
   registrationNo: string;
-  addressResponseDto?: AddressResponseDto;
+  address?: AddressResponseDto;
   approvalStatus: 'PENDING' | 'APPROVED' | 'REJECTED';
   approvedBy?: number;
   createdAt?: string;

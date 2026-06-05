@@ -51,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
-        String token = jwtService.generateToken(userDetails, Map.of("userId", user.getId(), "role", user.getRole() != null ? user.getRole() : "USER", "accessLevel", user.getAdminAccessLevel() != null ? user.getAdminAccessLevel() : "BASIC"));
+        String token = jwtService.generateToken(userDetails, Map.of("role", user.getRole() != null ? user.getRole() : "USER", "accessLevel", user.getAdminAccessLevel() != null ? user.getAdminAccessLevel() : "BASIC"));
         return new AuthResponse("Registration Successful", user.getId(), user.getRole(), token);
     }
 

@@ -7,7 +7,7 @@ import { OrderItemResponse } from '../../../core/models/order.model';
 import { OrderService } from '../../../services/order.service';
 import { VendorContextService } from '../../../services/vendor-context.service';
 import { DropdownModule } from 'primeng/dropdown';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import {
   FormBuilder,
   FormGroup,
@@ -15,6 +15,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
 
 @Component({
   selector: 'app-vendor-orders',
@@ -27,10 +28,11 @@ import { ToastModule } from 'primeng/toast';
     DropdownModule,
     FormsModule,
     ToastModule,
+    ConfirmPopupModule,
   ],
   templateUrl: './vendor-orders.component.html',
   styleUrl: './vendor-orders.component.scss',
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
 })
 export class VendorOrdersComponent implements OnInit {
   orders: OrderItemResponse[] = [];
@@ -54,6 +56,7 @@ export class VendorOrdersComponent implements OnInit {
     private fb: FormBuilder,
     private orderService: OrderService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private vendorContextService: VendorContextService,
   ) {
     this.checkoutForm = this.fb.group({
@@ -94,25 +97,42 @@ export class VendorOrdersComponent implements OnInit {
     const newStatus = event.value;
     const previousStatus = order.orderStatus;
 
-    this.orderService
-      .updateStatus(order.id, { orderStatus: newStatus })
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Status Updated',
-            detail: `Order #${order.id} marked as ${newStatus}`,
+    this.confirmationService.confirm({
+      target: event.originalEvent?.target || event.originalEvent,
+      message: `Change order #${order.id} status to ${newStatus}?`,
+      header: 'Confirm Status Update',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Yes, Update',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-warning',
+      rejectButtonStyleClass: 'p-button-secondary',
+
+      accept: () => {
+        this.orderService
+          .updateStatus(order.id, { orderStatus: newStatus })
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Status Updated',
+                detail: `Order #${order.id} marked as ${newStatus}`,
+              });
+            },
+            error: () => {
+              order.orderStatus = previousStatus;
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Update Failed',
+                detail: 'Could not update order status.',
+              });
+            },
           });
-        },
-        error: () => {
-          order.orderStatus = previousStatus;
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Update Failed',
-            detail: 'Could not update order status.',
-          });
-        },
-      });
+      },
+
+      reject: () => {
+        order.orderStatus = previousStatus;
+      },
+    });
   }
   onPageChange(event: any): void {
     const page = event.first / event.rows;

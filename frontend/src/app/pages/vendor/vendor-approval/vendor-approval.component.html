@@ -1,3 +1,4 @@
+<p-confirmDialog></p-confirmDialog>
 <div class="card">
   <div class="card-header flex justify-between align-center">
     <h2 class="card-title">Vendor Approvals</h2>
@@ -56,12 +57,12 @@
                 class="action-buttons"
                 *ngIf="vendor.approvalStatus === 'PENDING'"
               >
-                <p-button (click)="updateStatus(vendor.id, 'APPROVED')">
+                <p-button (click)="updateStatus($event, vendor.id, 'APPROVED')">
                   Approve
                 </p-button>
                 <p-button
                   severity="danger"
-                  (click)="updateStatus(vendor.id, 'REJECTED')"
+                  (click)="updateStatus($event, vendor.id, 'REJECTED')"
                 >
                   Reject
                 </p-button>

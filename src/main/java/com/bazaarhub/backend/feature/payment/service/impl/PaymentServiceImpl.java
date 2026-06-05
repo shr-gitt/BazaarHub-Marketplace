@@ -30,7 +30,7 @@ import com.bazaarhub.backend.shared.enums.OrderStatus;
 import com.bazaarhub.backend.shared.enums.PaymentStatus;
 import com.bazaarhub.backend.shared.exception.OrderNotFoundException;
 import com.bazaarhub.backend.shared.exception.OrderPaidException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -83,6 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
     private String frontendFailureUrl;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PaymentResponseDto> getAllPayments(Pageable pageable) {
         Pageable pages = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         return paymentRepository.findAll(pages)
@@ -90,6 +91,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaymentResponseDto getPaymentById(Long id) {
         Payment payment = paymentRepository.findById(id).orElseThrow(
                 () -> {

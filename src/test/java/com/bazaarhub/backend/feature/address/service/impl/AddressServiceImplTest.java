@@ -75,7 +75,7 @@ class AddressServiceImplTest {
         when(addressRepository.save(any(Address.class))).thenReturn(address);
         when(addressMapper.mapToAddressResponseDto(address)).thenReturn(addressResponseDto);
 
-        AddressResponseDto result = addressService.createAddress(addressRequestDto);
+        Address result = addressService.createAddress(addressRequestDto);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Province.BAGMATI, result.getProvince());

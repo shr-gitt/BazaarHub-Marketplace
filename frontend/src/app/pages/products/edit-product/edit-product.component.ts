@@ -15,19 +15,27 @@ import {
 } from '../../../core/models/product.model';
 import { VendorContextService } from '../../../services/vendor-context.service';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CategoryService } from '../../../services/category.service';
 import { CategoryResponse } from '../../../core/models/category.model';
 import { DropdownModule } from 'primeng/dropdown';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-edit-product',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastModule, ButtonModule, DropdownModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ToastModule,
+    ButtonModule,
+    DropdownModule,
+    ConfirmDialogModule,
+  ],
   templateUrl: './edit-product.component.html',
   styleUrl: './edit-product.component.scss',
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
 })
 export class EditProductComponent implements OnInit {
   productForm: FormGroup;
@@ -35,6 +43,7 @@ export class EditProductComponent implements OnInit {
   productId!: number;
   loading = false;
   saving = false;
+  vendorId: number | null = null;
 
   existingImageUrl: string | null = null;
 
@@ -45,6 +54,7 @@ export class EditProductComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private categoryService: CategoryService,
+    private confirmationService: ConfirmationService,
     private vendorContextService: VendorContextService,
   ) {
     this.productForm = this.fb.group({
@@ -68,6 +78,9 @@ export class EditProductComponent implements OnInit {
       });
       return;
     }
+
+    this.vendorId = this.vendorContextService.getVendorId();
+
     this.loadCategories();
     this.loadProduct();
   }
@@ -123,12 +136,10 @@ export class EditProductComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
+  onSubmit(event: Event): void {
     this.productForm.markAllAsTouched();
 
-    if (this.productForm.invalid) {
-      return;
-    }
+    if (this.productForm.invalid) return;
 
     const vendorId = this.vendorContextService.getVendorId();
 
@@ -141,6 +152,23 @@ export class EditProductComponent implements OnInit {
       return;
     }
 
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Are you sure you want to update this product?',
+      header: 'Update Product',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Yes, Update',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-warning',
+      rejectButtonStyleClass: 'p-button-secondary',
+
+      accept: () => {
+        this.updateProduct(vendorId);
+      },
+    });
+  }
+
+  private updateProduct(vendorId: number): void {
     this.saving = true;
 
     const dto: ProductRequest = {
@@ -158,6 +186,7 @@ export class EditProductComponent implements OnInit {
     this.productService.update(this.productId, dto).subscribe({
       next: () => {
         this.saving = false;
+
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
@@ -170,6 +199,7 @@ export class EditProductComponent implements OnInit {
       },
       error: (err) => {
         this.saving = false;
+
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -180,6 +210,6 @@ export class EditProductComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/vendor/products']);
+    this.router.navigate(['/vendor/products', this.vendorId]);
   }
 }

@@ -7,10 +7,11 @@ import { ProductService } from '../../../services/product.service';
 import { CategoryService } from '../../../services/category.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { VendorContextService } from '../../../services/vendor-context.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-vendor-product-list',
@@ -20,11 +21,12 @@ import { ButtonModule } from 'primeng/button';
     EmptyStateComponent,
     ToastModule,
     TableModule,
-    ButtonModule
+    ButtonModule,
+    ConfirmDialogModule,
   ],
   templateUrl: './vendor-product-list.component.html',
   styleUrl: './vendor-product-list.component.scss',
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
 })
 export class VendorProductListComponent implements OnInit {
   vendorId: number | null = null;
@@ -44,6 +46,7 @@ export class VendorProductListComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private vendorContextService: VendorContextService,
   ) {}
 
@@ -125,17 +128,29 @@ export class VendorProductListComponent implements OnInit {
     this.router.navigate(['/vendor/product/edit', productId]);
   }
 
-  onDelete(productId: number) {
-    this.productService.delete(productId).subscribe({
-      next: () => {
-        this.loadProducts(this.vendorId!, this.currentPage);
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail:
-            err?.error?.message || 'Something went wrong, try again later.',
+  onDelete(event: Event, productId: number) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget, // attach popup to the button
+      message: 'Are you sure you want to delete this product?',
+      header: 'Delete Product',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary',
+      accept: () => {
+        this.productService.delete(productId).subscribe({
+          next: () => {
+            this.loadProducts(this.vendorId!, this.currentPage);
+          },
+          error: (err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail:
+                err?.error?.message || 'Something went wrong, try again later.',
+            });
+          },
         });
       },
     });

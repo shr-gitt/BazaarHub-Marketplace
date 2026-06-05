@@ -13,6 +13,7 @@ import com.bazaarhub.backend.feature.product.mapper.ProductMapper;
 import com.bazaarhub.backend.feature.product.repository.ProductRepository;
 import com.bazaarhub.backend.feature.product.resource.request.ProductRequestDto;
 import com.bazaarhub.backend.feature.product.resource.response.ProductResponseDto;
+import com.bazaarhub.backend.feature.product.service.ProductSearchService;
 import com.bazaarhub.backend.feature.product.service.ProductService;
 import com.bazaarhub.backend.feature.vendorProfile.entity.Vendor;
 import com.bazaarhub.backend.feature.vendorProfile.exception.VendorNotFoundException;
@@ -22,7 +23,7 @@ import com.bazaarhub.backend.shared.exception.ClientValidationException;
 import com.bazaarhub.backend.shared.exception.InsufficientStockException;
 import com.bazaarhub.backend.shared.service.MinioService;
 import com.bazaarhub.backend.shared.utils.AuthUtil;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -33,7 +34,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -44,6 +44,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final VendorRepository vendorRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductSearchService productSearchService;
     private final CustomerProfileRepository customerProfileRepository;
     private final MinioService minioService;
 
@@ -79,11 +80,19 @@ public class ProductServiceImpl implements ProductService {
         product.setImageUrl(imageUrl);
         product.setStatus(ProductStatus.ACTIVE);
         Product newProduct = productRepository.save(product);
+
+        try {
+            productSearchService.indexProduct(newProduct);
+        } catch (Exception e) {
+            log.error("Elasticsearch indexing failed, product saved to DB only: {}", e.getMessage());
+            e.printStackTrace();
+        }
         log.info("Product created successfully. productId: {}", newProduct.getId());
         return productMapper.mapToProductResponse(newProduct);
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(cacheNames = CacheConfig.PRODUCT_CACHE_NAME, key = "#productId")
     public ProductResponseDto getProductById(Long productId) {
         log.info("Fetching product. productId: {}", productId);
@@ -102,6 +111,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductResponseDto> getProductsByVendorId(Long vendorId, Pageable pageable) {
         log.info("Fetching product. vendorId: {}", vendorId);
         return productRepository.findByVendor_IdAndStatusNot(vendorId, ProductStatus.DELETED, pageable).map(product -> {
@@ -117,6 +127,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductResponseDto> getAllProduct(Pageable pageable) {
         return productRepository.findByStatusNot(ProductStatus.DELETED, pageable).map(product -> {
             ProductResponseDto productResponseDto =
@@ -163,6 +174,7 @@ public class ProductServiceImpl implements ProductService {
         product.setVendor(vendor);
 
         Product updatedProduct = productRepository.save(product);
+        // productSearchService.indexProduct(updatedProduct);
         log.info("Product updated successfully. productId: {}", product.getId());
         return productMapper.mapToProductResponse(updatedProduct);
     }
@@ -204,11 +216,13 @@ public class ProductServiceImpl implements ProductService {
         });
         product.setStatus(ProductStatus.DELETED);
         productRepository.save(product);
+        productSearchService.removeProduct(product.getId());
         log.info("Deleted product of id: {}", productId);
 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductResponseDto> getRecommendedProducts(Pageable pageable) {
         Long userId = AuthUtil.getCurrentUserId();
         CustomerProfile customerProfile = customerProfileRepository.findByUser_Id(userId).orElseThrow(() -> {

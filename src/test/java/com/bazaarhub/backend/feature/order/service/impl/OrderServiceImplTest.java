@@ -10,6 +10,7 @@ import com.bazaarhub.backend.feature.order.mapper.OrderMapper;
 import com.bazaarhub.backend.feature.order.repository.OrderRepository;
 import com.bazaarhub.backend.feature.order.resources.request.OrderRequestDto;
 import com.bazaarhub.backend.feature.order.resources.request.OrderStatusUpdateRequestDto;
+import com.bazaarhub.backend.feature.order.resources.response.OrderItemResponseDto;
 import com.bazaarhub.backend.feature.order.resources.response.OrderResponseDto;
 import com.bazaarhub.backend.feature.product.entity.Product;
 import com.bazaarhub.backend.feature.user.entity.User;
@@ -281,7 +282,7 @@ class OrderServiceImplTest {
         when(orderMapper.mapToOrderResponseDTO(any(Order.class)))
                 .thenReturn(new OrderResponseDto());
 
-        OrderResponseDto response = orderService.updateOrderStatus(1L, dto);
+        OrderItemResponseDto response = orderService.updateOrderStatus(1L, dto);
 
         assertNotNull(response);
         assertEquals(OrderStatus.SHIPPED, order.getOrderStatus());

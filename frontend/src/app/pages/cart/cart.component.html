@@ -22,7 +22,7 @@
             <div class="item-image-placeholder">
               <img
                 class="product-image"
-                [src]="imageSrc"
+                [src]="item.productImage || 'assets/no-image.png'"
                 [alt]="item.productImage"
               />
             </div>

@@ -9,6 +9,7 @@ services:
       - mysql
       - redis
       - minio
+      - elasticsearch
     environment:
       SPRING_PROFILES_ACTIVE: docker
 
@@ -56,6 +57,15 @@ services:
       - "9001:9001"
     volumes:
       - minio_data:/data
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.16
+    container_name: es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
 
 volumes:
   mysql_data:

@@ -6,6 +6,8 @@ import { ApprovalStatus } from '../../../core/models/enums.model';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-vendor-approval',
@@ -15,9 +17,11 @@ import { ButtonModule } from 'primeng/button';
     LoadingSpinnerComponent,
     EmptyStateComponent,
     ButtonModule,
+    ConfirmDialogModule,
   ],
   templateUrl: './vendor-approval.component.html',
   styleUrls: ['./vendor-approval.component.scss'],
+  providers: [ConfirmationService],
 })
 export class VendorApprovalComponent implements OnInit {
   vendors: VendorResponse[] = [];
@@ -25,7 +29,10 @@ export class VendorApprovalComponent implements OnInit {
   currentPage = 0;
   totalPages = 0;
 
-  constructor(private vendorService: VendorService) {}
+  constructor(
+    private vendorService: VendorService,
+    private confirmationService: ConfirmationService,
+  ) {}
 
   ngOnInit() {
     this.loadVendors(0);
@@ -50,18 +57,28 @@ export class VendorApprovalComponent implements OnInit {
     });
   }
 
-  updateStatus(id: number, status: string) {
-    if (confirm(`Are you sure you want to mark this vendor as ${status}?`)) {
-      this.vendorService
-        .approve(id, { approvalStatus: status as ApprovalStatus })
-        .subscribe({
-          next: () => {
-            this.loadVendors(this.currentPage);
-          },
-          error: (err) => {
-            alert(err.error?.message || 'Failed to update vendor status.');
-          },
-        });
-    }
+  updateStatus(event: Event, id: number, status: string) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `Are you sure you want to mark this vendor as ${status}?`,
+      icon: 'pi pi-exclamation-triangle',
+      header: 'Confirm?',
+      acceptLabel: 'Yes',
+      rejectLabel: 'Cancel',
+      acceptButtonStyleClass: 'p-button-success', // green for approve
+      rejectButtonStyleClass: 'p-button-secondary', // grey for cancel
+      accept: () => {
+        this.vendorService
+          .approve(id, { approvalStatus: status as ApprovalStatus })
+          .subscribe({
+            next: () => {
+              this.loadVendors(this.currentPage);
+            },
+            error: (err) => {
+              alert(err.error?.message || 'Failed to update vendor status.');
+            },
+          });
+      },
+    });
   }
 }

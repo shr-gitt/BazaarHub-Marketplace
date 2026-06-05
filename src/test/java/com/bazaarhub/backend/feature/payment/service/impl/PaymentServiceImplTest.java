@@ -6,8 +6,6 @@ import com.bazaarhub.backend.feature.order.repository.OrderRepository;
 import com.bazaarhub.backend.feature.payment.entity.Payment;
 import com.bazaarhub.backend.feature.payment.enums.PaymentType;
 import com.bazaarhub.backend.feature.payment.exception.PaymentAmountMismatchException;
-import com.bazaarhub.backend.feature.payment.exception.PaymentNotFoundException;
-import com.bazaarhub.backend.feature.payment.util.EsewaSignatureUtil;
 import com.bazaarhub.backend.feature.payment.mapper.PaymentMapper;
 import com.bazaarhub.backend.feature.payment.repository.PaymentRepository;
 import com.bazaarhub.backend.feature.payment.resource.request.PaymentRequestDto;
@@ -16,15 +14,12 @@ import com.bazaarhub.backend.feature.points.service.PointsService;
 import com.bazaarhub.backend.feature.user.entity.User;
 import com.bazaarhub.backend.shared.enums.OrderPaymentStatus;
 import com.bazaarhub.backend.shared.enums.PaymentStatus;
-import com.bazaarhub.backend.shared.exception.OrderNotFoundException;
-import com.bazaarhub.backend.shared.exception.OrderPaidException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
@@ -48,9 +43,6 @@ class PaymentServiceImplTest {
 
     @Mock
     private OrderRepository orderRepository;
-
-    @Mock
-    private EsewaSignatureUtil esewaSignatureUtil;
 
     @Mock
     private RestTemplate restTemplate;
@@ -157,7 +149,7 @@ class PaymentServiceImplTest {
         String result = paymentService.verifyPayment("ORD-1-1714000000000", "REF123", "1000.0");
 
         assertEquals(frontendFailureUrl, result);
-        assertEquals(PaymentStatus.FAILED, order.getPaymentStatus());
+        assertEquals(OrderPaymentStatus.FAILED, order.getPaymentStatus());
         assertEquals(PaymentStatus.FAILED, payment.getPaymentStatus());
 
         verify(pointsService, never()).updateUserPoints(any(), any());
@@ -196,7 +188,7 @@ class PaymentServiceImplTest {
         paymentService.markPaymentFailed("ORD-1-1714000000000");
 
         assertEquals(PaymentStatus.FAILED, payment.getPaymentStatus());
-        assertEquals(PaymentStatus.FAILED, order.getPaymentStatus());
+        assertEquals(OrderPaymentStatus.FAILED, order.getPaymentStatus());
         verify(notificationService, times(1))
                 .createNotification(any(User.class), anyString(), anyString(), any(), anyLong());
 

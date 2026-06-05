@@ -24,7 +24,7 @@ import com.bazaarhub.backend.shared.enums.Role;
 import com.bazaarhub.backend.shared.exception.UnauthorizedAccessException;
 import com.bazaarhub.backend.shared.utils.InputUtil;
 import jakarta.persistence.EntityExistsException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -35,7 +35,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +51,7 @@ public class VendorServiceImpl implements VendorService {
     private final NotificationService notificationService;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<VendorResponseDto> getAllVendors(Pageable pageable) {
         log.info("Fetching all vendors.");
         return vendorRepository.findAll(pageable)
@@ -59,6 +59,7 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<VendorResponseDto> getVendorsByUser(Long userId){
         log.info("Fetching all vendors of user id = {}", userId);
         User user = userRepository.findById(userId).orElseThrow(
@@ -76,6 +77,7 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(cacheNames = CacheConfig.VENDOR_CACHE_NAME, key = "#vendorId")
     public VendorResponseDto getVendorById(Long vendorId) {
         log.info("Fetching vendor with id={}", vendorId);
@@ -144,6 +146,21 @@ public class VendorServiceImpl implements VendorService {
         vendor.setApprovalStatus(ApprovalStatus.PENDING);
 
         Vendor newVendor = vendorRepository.save(vendor);
+
+        List<User> admins = userRepository.findByRole(Role.ADMIN);
+
+        for(User admin: admins){
+            notificationService.createNotification(
+                    admin,
+                    "Vendor Approval Request",
+                    String.format(
+                            "Vendor %s has submitted an approval request.",
+                            newVendor.getShopName()
+                    ),
+                    NotificationType.VENDOR_APPROVED,
+                    newVendor.getId()
+            );
+        }
 
         return vendorMapper.mapToVendorResponse(newVendor);
     }

@@ -13,8 +13,13 @@
 
         <div class="search-box">
           <span class="material-icons search-icon">search</span>
-          <input type="text" placeholder="Search for products, categories..." />
-          <p-button>Search</p-button>
+          <input
+            type="text"
+            placeholder="Search for products, categories..."
+            [(ngModel)]="searchKeyword"
+            (keyup.enter)="onSearch(0)"
+          />
+          <p-button label="Search" (onClick)="onSearch(0)"></p-button>
         </div>
 
         <div class="hero-highlights">
@@ -51,7 +56,59 @@
 
   <section class="products-section">
     <div class="container">
-      <div class="section-header">
+      <ng-container *ngIf="hasSearched">
+        <div class="section-header">
+          <h2>Results for "{{ searchKeyword }}"</h2>
+          <a (click)="clearSearch()" style="cursor: pointer" class="view-all">
+            Clear <span class="material-icons">close</span>
+          </a>
+        </div>
+
+        <div class="loader-container" *ngIf="isSearching">
+          <app-loading-spinner></app-loading-spinner>
+        </div>
+
+        <div
+          class="product-grid"
+          *ngIf="!isSearching && searchResults.length > 0"
+        >
+          <app-product-card
+            *ngFor="let product of searchResults"
+            [product]="product"
+          ></app-product-card>
+        </div>
+
+        <div
+          class="empty-state-clean"
+          *ngIf="!isSearching && searchResults.length === 0"
+        >
+          <span class="material-icons">search_off</span>
+          <h3>No Results Found</h3>
+          <p>Try a different keyword.</p>
+        </div>
+
+        <div
+          class="pagination-controls"
+          *ngIf="!isSearching && searchTotalPages > 1"
+        >
+          <button
+            class="btn btn-outline"
+            [disabled]="searchPage === 0"
+            (click)="onSearchPageChange(searchPage - 1)"
+          >
+            <span class="material-icons">chevron_left</span>
+          </button>
+          <span>Page {{ searchPage + 1 }} of {{ searchTotalPages }}</span>
+          <button
+            class="btn btn-outline"
+            [disabled]="searchPage === searchTotalPages - 1"
+            (click)="onSearchPageChange(searchPage + 1)"
+          >
+            <span class="material-icons">chevron_right</span>
+          </button>
+        </div>
+      </ng-container>
+      <div class="section-header" style="margin-top: 32px">
         <h2>Featured Products</h2>
         <a routerLink="/products" class="view-all"
           >View All <span class="material-icons">arrow_forward</span></a

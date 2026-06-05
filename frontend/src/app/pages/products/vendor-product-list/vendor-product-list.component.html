@@ -1,5 +1,6 @@
 <div class="products-page">
   <p-toast position="top-right" [life]="3000"></p-toast>
+  <p-confirmDialog></p-confirmDialog>
 
   <!-- Sidebar -->
   <div class="filters-sidebar">
@@ -164,7 +165,7 @@
                 type="button"
                 icon="pi pi-trash"
                 class="p-button-sm p-button-text p-button-danger"
-                (click)="onDelete(product.id)"
+                (click)="onDelete($event, product.id)"
               ></button>
             </div>
           </td>

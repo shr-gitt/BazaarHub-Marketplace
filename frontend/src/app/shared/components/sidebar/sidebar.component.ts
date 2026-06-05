@@ -5,6 +5,9 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { AuthService } from '../../../services/auth.service';
 import { VendorContextService } from '../../../services/vendor-context.service';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 interface NavItem {
   label: string;
@@ -26,6 +29,9 @@ export class SidebarComponent implements OnInit {
   vendorId: number | null = null;
   collapsed = false;
   sidebarVisible = true;
+  email: string | null = null;
+  showCreateAdmin = false;
+  private isBrowser: boolean;
 
   navItems: NavItem[] = [
     {
@@ -131,14 +137,21 @@ export class SidebarComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private router: Router,
+    @Inject(PLATFORM_ID) private platformId: object,
     private vendorContextService: VendorContextService,
-  ) {}
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit(): void {
     this.role = this.auth.getRole();
     this.id = this.auth.getUserId();
     if (this.role == 'VENDOR') {
       this.vendorId = this.vendorContextService.getVendorId();
+    }
+    if (this.isBrowser) {
+      this.email = localStorage.getItem('email');
+      this.showCreateAdmin = this.email === 'super.admin@bazaarhub.com';
     }
   }
 

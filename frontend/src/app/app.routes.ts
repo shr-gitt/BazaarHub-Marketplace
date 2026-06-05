@@ -46,6 +46,7 @@ import { VendorProductListComponent } from './pages/products/vendor-product-list
 import { OrderListComponent } from './pages/orders/order-list/order-list.component';
 import { VendorOrdersComponent } from './pages/orders/vendor-orders/vendor-orders.component';
 import { UpdateProfileComponent } from './pages/update-profile/update-profile.component';
+import { VendorProfileComponent } from './pages/vendor/vendor-profile/vendor-profile.component';
 
 export const routes: Routes = [
   {
@@ -63,10 +64,6 @@ export const routes: Routes = [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       {
-        path: 'internal/admin/create',
-        component: CreateAdminComponent,
-      },
-      {
         path: 'customer/profile-setup',
         component: CustomerProfileSetupComponent,
         canActivate: [authGuard],
@@ -80,6 +77,12 @@ export const routes: Routes = [
       {
         path: 'vendor/selection',
         component: VendorSelectionComponent,
+        canActivate: [roleGuard],
+        data: { expectedRole: 'VENDOR' },
+      },
+      {
+        path: 'vendor/create',
+        component: VendorProfileComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'VENDOR' },
       },
@@ -254,6 +257,10 @@ export const routes: Routes = [
         component: AdminOrdersComponent,
         canActivate: [roleGuard],
         data: { expectedRole: 'ADMIN' },
+      },
+      {
+        path: 'internal/admin/create',
+        component: CreateAdminComponent,
       },
     ],
   },

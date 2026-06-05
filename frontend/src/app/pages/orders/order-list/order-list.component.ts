@@ -6,6 +6,8 @@ import { AuthService } from '../../../services/auth.service';
 import { OrderResponse } from '../../../core/models/order.model';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-order-list',
@@ -15,9 +17,11 @@ import { EmptyStateComponent } from '../../../shared/components/empty-state/empt
     RouterLink,
     LoadingSpinnerComponent,
     EmptyStateComponent,
+    ConfirmDialogModule,
   ],
   templateUrl: './order-list.component.html',
   styleUrls: ['./order-list.component.scss'],
+  providers: [ConfirmationService],
 })
 export class OrderListComponent implements OnInit {
   orders: OrderResponse[] = [];
@@ -28,6 +32,7 @@ export class OrderListComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private authService: AuthService,
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit() {
@@ -54,17 +59,25 @@ export class OrderListComponent implements OnInit {
     });
   }
 
-  cancelOrder(id: number) {
-    if (confirm('Are you sure you want to cancel this order?')) {
-      this.orderService.cancelOrder(id).subscribe({
-        next: () => {
-          this.loadOrders();
-        },
-        error: (err) => {
-          alert(err.error?.message || 'Failed to cancel order.');
-        },
-      });
-    }
+  confirmCancel(event: Event, orderId: number) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Are you sure you want to cancel this order?',
+      icon: 'pi pi-exclamation-triangle',
+      header: 'Cancel Order',
+      acceptLabel: 'Yes, Cancel',
+      rejectLabel: 'Keep Order',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-secondary',
+      accept: () => {
+        this.orderService.cancelOrder(orderId).subscribe({
+          next: () => this.loadOrders(),
+          error: (err) => {
+            alert(err.error?.message || 'Failed to cancel order.');
+          },
+        });
+      },
+    });
   }
 
   updateStatus(id: number, status: string) {

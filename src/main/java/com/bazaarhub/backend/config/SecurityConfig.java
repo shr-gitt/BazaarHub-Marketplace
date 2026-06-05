@@ -77,6 +77,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/vendor/**")
                         .hasAnyRole(Role.ADMIN.name(), Role.VENDOR.name())
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search-products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 )
                 .sessionManagement(sm -> sm

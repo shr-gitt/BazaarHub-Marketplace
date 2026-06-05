@@ -85,6 +85,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartResponseDto updateCartItem(Long userId, Long productId, Integer quantity) {
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
             log.error("Cart not found of id: {}", userId);
@@ -121,6 +122,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartResponseDto removeItemFromCart(Long userId, Long productId) {
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
             log.error("Cart not found of id: {}", userId);
@@ -139,6 +141,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void clearCart(Long userId) {
         Cart cart = cartRepository.findByUserId(userId).orElseThrow(() -> {
             log.error("Cart not found of id: {}", userId);
