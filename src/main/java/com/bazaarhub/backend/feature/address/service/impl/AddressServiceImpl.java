@@ -29,8 +29,7 @@ public class AddressServiceImpl implements AddressService {
     @CachePut(cacheNames = CacheConfig.ADDRESS_CACHE_NAME, key = "#result.id")
     public Address createAddress(AddressRequestDto addressRequestDto) {
         log.info("Creating address");
-        Address saved = addressRepository.save(addressMapper.mapToAddress(addressRequestDto));
-        return saved;
+        return addressRepository.save(addressMapper.mapToAddress(addressRequestDto));
     }
 
     @Override

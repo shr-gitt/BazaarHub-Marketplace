@@ -45,8 +45,9 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     @Override
     @Transactional(readOnly = true)
     public Page<ProductResponseDto> search(String keyword, Pageable pageable) {
+        ProductDocument productDocument = new ProductDocument();
         Page<ProductDocument> documentPage = productSearchRepository
-                .findByNameContainingOrDescriptionContaining(keyword, keyword, pageable);
+                .search(keyword, pageable);
 
         List<Long> ids = documentPage.getContent()
                 .stream()

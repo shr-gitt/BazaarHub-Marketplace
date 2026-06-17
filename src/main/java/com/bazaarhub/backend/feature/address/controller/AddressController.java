@@ -1,12 +1,10 @@
 package com.bazaarhub.backend.feature.address.controller;
 
-import com.bazaarhub.backend.feature.address.resource.request.AddressRequestDto;
 import com.bazaarhub.backend.feature.address.resource.response.AddressResponseDto;
 import com.bazaarhub.backend.feature.address.service.AddressService;
 import com.bazaarhub.backend.shared.aop.LogExecutionTime;
 import com.bazaarhub.backend.shared.enums.ResponseStatus;
 import com.bazaarhub.backend.shared.resource.ApiResponseDto;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -113,7 +113,7 @@
           <td>
             <div class="price-wrapper">
               <span class="discount-price" *ngIf="product.discountPrice">
-                Rs. {{ product.discountPrice }}
+                Rs. {{ product.price - product.discountPrice }}
               </span>
 
               <span class="amount" [class.strike]="product.discountPrice">
