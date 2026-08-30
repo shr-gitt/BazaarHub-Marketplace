@@ -6,6 +6,7 @@ import com.bazaarhub.backend.feature.customerProfile.entity.CustomerProfile;
 import com.bazaarhub.backend.feature.customerProfile.enums.Preferences;
 import com.bazaarhub.backend.feature.customerProfile.resource.request.CustomerProfileRequestDTO;
 import com.bazaarhub.backend.feature.customerProfile.resource.response.CustomerProfileResponseDTO;
+import com.bazaarhub.backend.shared.service.MinioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomerProfileMapper {
     private final AddressMapper addressMapper;
+    private final MinioService minioService;
 
     public CustomerProfile mapToCustomerProfile(CustomerProfileRequestDTO customerProfileRequestDTO, Address address) {
         CustomerProfile customerProfile = new CustomerProfile();
@@ -34,7 +36,7 @@ public class CustomerProfileMapper {
                 customerProfile.getUser().getEmail(),
                 customerProfile.getUser().getGender(),
                 customerProfile.getUser().getPhoneNumber(),
-                customerProfile.getProfileImageUrl(),
+                minioService.getImageUrl(customerProfile.getProfileImageUrl()),
                 customerProfile.getDateOfBirth(),
                 addressMapper.mapToAddressResponseDto(customerProfile.getAddress()),
                 customerProfile.getPreferences()
