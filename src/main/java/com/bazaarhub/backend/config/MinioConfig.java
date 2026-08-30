@@ -18,12 +18,24 @@ public class MinioConfig {
     private String minioSecretKey;
 
 
-    @Bean
+    @Bean("minioClient")
     public MinioClient minioClient(){
         return MinioClient
                 .builder()
                 .endpoint(minioEndpoint)
                 .credentials(minioAccessKey,minioSecretKey)
+                .build();
+    }
+
+    @Bean("minioPublicClient")
+    public MinioClient minioPublicClient(
+            @Value("${minio.public-url:http://127.0.0.1:9000}") String publicUrl,
+            @Value("${minio.access-key}") String accessKey,
+            @Value("${minio.secret-key}") String secretKey
+    ) {
+        return MinioClient.builder()
+                .endpoint(publicUrl)
+                .credentials(accessKey, secretKey)
                 .build();
     }
 }

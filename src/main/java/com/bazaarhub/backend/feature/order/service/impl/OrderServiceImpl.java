@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    @CachePut(cacheNames = CacheConfig.CREATE_ORDER_CACHE, key = "#userId")
+    @CachePut(cacheNames = CacheConfig.ORDER_CACHE_NAME, key = "#userId")
     public OrderResponseDto placeOrder(Long userId, OrderRequestDto orderRequestDTO) {
         log.info(
                 "Placing order. userId={}",

@@ -1,19 +1,17 @@
 package com.bazaarhub.backend.shared.service;
 
 import io.minio.*;
-import io.minio.http.Method;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
-@RequiredArgsConstructor
 public class MinioService {
     private final MinioClient minioClient;
+    private final MinioClient minioPublicClient;
 
     @Value("${minio.bucket-name}")
     private String bucketName;
@@ -21,21 +19,20 @@ public class MinioService {
     @Value("${minio.url}")
     private String minioUrl;
 
+    @Value("${minio.public-url:http://127.0.0.1:9000}")
+    private String minioPublicUrl;
+
+    public MinioService(
+            @Qualifier("minioClient") MinioClient minioClient,
+            @Qualifier("minioPublicClient") MinioClient minioPublicClient
+    ) {
+        this.minioClient = minioClient;
+        this.minioPublicClient = minioPublicClient;
+    }
+
     public String uploadFile(MultipartFile file) {
         try {
-            boolean bucketExists = minioClient.bucketExists(
-                    BucketExistsArgs
-                            .builder()
-                            .bucket(bucketName)
-                            .build()
-            );
-            if (!bucketExists) {
-                minioClient.makeBucket(
-                        MakeBucketArgs
-                                .builder()
-                                .bucket(bucketName)
-                                .build());
-            }
+            ensureBucketExistsAndPublic();
             String filename = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
             minioClient.putObject(
@@ -50,26 +47,49 @@ public class MinioService {
 
             return filename;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to upload file." + e.getMessage(), e);
+            throw new RuntimeException("Failed to upload file. " + e.getMessage(), e);
         }
     }
 
     public String getImageUrl(String fileName) {
-        try{
-            return minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder()
-                            .method(Method.GET)
-                            .bucket("bazaarhub")
-                            .object(fileName)
-                            .expiry(1, TimeUnit.HOURS)
-                            .build()
+        if (fileName == null || fileName.trim().isEmpty()) {
+            return null;
+        }
+        if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
+            return fileName;
+        }
+        String baseUrl = minioPublicUrl != null ? minioPublicUrl.trim().replaceAll("/+$", "") : "http://127.0.0.1:9000";
+        return baseUrl + "/" + bucketName + "/" + fileName;
+    }
+
+    private void ensureBucketExistsAndPublic() throws Exception {
+        boolean bucketExists = minioClient.bucketExists(
+                BucketExistsArgs.builder().bucket(bucketName).build()
+        );
+        if (!bucketExists) {
+            minioClient.makeBucket(
+                    MakeBucketArgs.builder().bucket(bucketName).build()
             );
         }
-        catch (Exception ex){
-            throw new RuntimeException(
-                    "Failed to generate presigned URL",
-                    ex
+        try {
+            String policy = """
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Principal": "*",
+                          "Action": ["s3:GetObject"],
+                          "Resource": ["arn:aws:s3:::%s/*"]
+                        }
+                      ]
+                    }
+                    """.formatted(bucketName);
+            minioClient.setBucketPolicy(
+                    SetBucketPolicyArgs.builder().bucket(bucketName).config(policy).build()
             );
+        } catch (Exception ignored) {
+            // Ignore if policy already set or restricted
         }
-}
+    }
 }
